@@ -28,7 +28,7 @@ SOFTWARE.
 pub static ELF_MAGIC_SIGNATURE: &[u8] = b"\x7fELF";
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-struct ElfHeader32 {
+pub struct ElfHeader32 {
     pub ident: ElfIdentification,
     pub e_type: u16,
     pub machine: u16,
