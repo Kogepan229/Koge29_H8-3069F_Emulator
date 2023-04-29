@@ -1,8 +1,11 @@
+use crate::memory::*;
 use std::io::Read;
 
 mod header;
 mod parse_header;
+mod parse_program_header;
 mod parse_section;
+mod program_header;
 mod section;
 mod string_table;
 
@@ -13,10 +16,11 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub fn load(elf_path: String, memory: Box<u8>) {
+pub fn load(elf_path: String, memory: Memory) {
     let program = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&program).unwrap();
     println!("{:?}", hd);
+
     let (_, sht) = parse_section::parse_section_header_table32(hd.shnum as usize)(
         &program[hd.shoff as usize..],
     )
@@ -35,6 +39,11 @@ pub fn load(elf_path: String, memory: Box<u8>) {
             header,
         })
         .collect::<Vec<section::Section32>>();
+    println!("{:#?}", sections);
 
-    println!("{:#?}", sections)
+    let (_, pht) = parse_program_header::parse_program_header_table32(hd.phnum as usize)(
+        &program[hd.phoff as usize..],
+    )
+    .unwrap();
+    println!("{:#?}", pht);
 }
