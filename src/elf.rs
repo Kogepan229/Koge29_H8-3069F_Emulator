@@ -1,3 +1,4 @@
+use crate::elf::program_header::SegmentType;
 use crate::memory::*;
 use std::io::Read;
 
@@ -16,7 +17,7 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub fn load(elf_path: String, memory: Memory) {
+pub fn load(elf_path: String, memory: &mut Memory) {
     let program = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&program).unwrap();
     println!("{:?}", hd);
@@ -46,4 +47,13 @@ pub fn load(elf_path: String, memory: Memory) {
     )
     .unwrap();
     println!("{:#?}", pht);
+
+    for ph in pht {
+        if ph.ty == SegmentType::Load {
+            memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
+                .copy_from_slice(
+                    &program[ph.offset as usize..(ph.offset + ph.size_in_file) as usize],
+                );
+        }
+    }
 }

@@ -7,3 +7,13 @@ pub type Memory = Box<[u8; MEMORY_SIZE]>;
 pub fn create_memory() -> Memory {
     Box::new([0; MEMORY_SIZE])
 }
+
+pub fn print_memory(memory: &Memory) {
+    for i in 0..MEMORY_SIZE {
+        if (i + 1) % 32 == 0 {
+            println!("{:02x}", memory[i]);
+        } else {
+            print!("{:02x} ", memory[i]);
+        }
+    }
+}
