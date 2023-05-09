@@ -43,3 +43,32 @@ impl Mcu {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::memory::{MEMORY_END_ADDR, MEMORY_SIZE, MEMORY_START_ADDR};
+
+    use super::Mcu;
+
+    #[test]
+    fn test_write_memory() {
+        let mut mcu = Mcu::new();
+        mcu.memory[0] = 0xff;
+        mcu.write(MEMORY_START_ADDR, 0xff).unwrap();
+        assert_eq!(mcu.memory[0], 0xff);
+
+        mcu.memory[MEMORY_SIZE - 1] = 0xff;
+        mcu.write(MEMORY_END_ADDR, 0xff).unwrap();
+        assert_eq!(mcu.memory[MEMORY_SIZE - 1], 0xff)
+    }
+
+    #[test]
+    fn test_read_memory() {
+        let mut mcu = Mcu::new();
+        mcu.memory[0] = 0xff;
+        assert_eq!(mcu.read(MEMORY_START_ADDR).unwrap(), 0xff);
+
+        mcu.memory[MEMORY_SIZE - 1] = 0xff;
+        assert_eq!(mcu.read(MEMORY_END_ADDR).unwrap(), 0xff)
+    }
+}
