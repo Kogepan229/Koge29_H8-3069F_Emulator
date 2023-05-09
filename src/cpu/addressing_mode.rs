@@ -84,6 +84,38 @@ impl<'a> Cpu<'a> {
             _ => return Err(AddressingError),
         }
     }
+
+    fn write_abs8(&mut self, addr: u8, value: u8) {
+        self.mcu.write(0xffff00 | addr as u32, value).unwrap();
+    }
+
+    fn read_abs8(&self, addr: u8) -> u8 {
+        self.mcu.read(0xffff00 | addr as u32).unwrap()
+    }
+
+    fn write_abs16(&mut self, addr: u16, value: u8) {
+        if addr & 0x8000 == 0x0000 {
+            self.mcu.write(addr as u32, value).unwrap();
+        } else {
+            self.mcu.write(0xff0000 | addr as u32, value).unwrap();
+        }
+    }
+
+    fn read_abs16(&self, addr: u16) -> u8 {
+        if addr & 0x8000 == 0x0000 {
+            return self.mcu.read(addr as u32).unwrap();
+        } else {
+            return self.mcu.read(0xff0000 | addr as u32).unwrap();
+        }
+    }
+
+    fn write_abs24(&mut self, addr: u32, value: u8) {
+        self.mcu.write(addr, value).unwrap();
+    }
+
+    fn read_abs24(&self, addr: u32) -> u8 {
+        self.mcu.read(addr).unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -95,8 +127,8 @@ mod tests {
 
     #[test]
     fn test_write_rn8() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.write_rn8(0b0000, 0xff).unwrap(); // R0H
         cpu.write_rn8(0b0111, 0xff).unwrap(); // R7H
         assert_eq!(cpu.er[0], 0x0000ff00);
@@ -113,8 +145,8 @@ mod tests {
 
     #[test]
     fn test_read_rn8() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.er[0] = 0x0000ff00;
         cpu.er[7] = 0x0000ff00;
         assert_eq!(cpu.read_rn8(0b0000).unwrap(), 0xff); // R0H
@@ -130,8 +162,8 @@ mod tests {
 
     #[test]
     fn test_write_rn16() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.write_rn16(0b0000, 0xffff).unwrap(); // R0
         cpu.write_rn16(0b0111, 0xffff).unwrap(); // R7
         assert_eq!(cpu.er[0], 0x0000ffff);
@@ -148,8 +180,8 @@ mod tests {
 
     #[test]
     fn test_read_rn16() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.er[0] = 0x0000ffff;
         cpu.er[7] = 0x0000ffff;
         assert_eq!(cpu.read_rn16(0b0000).unwrap(), 0xffff); // R0
@@ -165,8 +197,8 @@ mod tests {
 
     #[test]
     fn test_write_rn32() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.write_rn32(0b0000, 0xffffffff).unwrap(); // ER0
         cpu.write_rn32(0b0001, 0xf0f0f0f0).unwrap(); // ER1
         cpu.write_rn32(0b0111, 0x00000000).unwrap(); // ER7
@@ -182,8 +214,8 @@ mod tests {
 
     #[test]
     fn test_read_rn32() {
-        let mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mcu);
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
         cpu.er[0] = 0xffffffff;
         cpu.er[7] = 0xf0f0f0f0;
         assert_eq!(cpu.read_rn32(0b0000).unwrap(), 0xffffffff); // E0
@@ -191,4 +223,17 @@ mod tests {
         assert_eq!(cpu.read_rn32(0b0111).unwrap(), 0xf0f0f0f0); // E7
         assert_eq!(cpu.read_rn32(0b1000).unwrap_err(), AddressingError); // E7
     }
+
+    #[test]
+    fn test_write_abs8() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs8(0x10, 0xff);
+        cpu.write_abs8(0x1f, 0xff);
+        assert_eq!(mcu.read(0xffff10).unwrap(), 0xff);
+        assert_eq!(mcu.read(0xffff1f).unwrap(), 0xff);
+    }
+
+    #[test]
+    fn test_read_abs8() {}
 }
