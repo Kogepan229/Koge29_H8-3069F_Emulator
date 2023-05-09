@@ -9,7 +9,7 @@ use memory::*;
 
 fn main() {
     let mut mcu = Mcu::new();
-    let cpu = Cpu::new(&mcu);
+    let cpu = Cpu::new(&mut mcu);
 
     //let mut memory: Memory = create_memory();
     elf::load(

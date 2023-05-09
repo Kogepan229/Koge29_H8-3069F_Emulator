@@ -3,14 +3,14 @@ use crate::mcu::Mcu;
 mod addressing_mode;
 
 pub struct Cpu<'a> {
-    mcu: &'a Mcu,
+    mcu: &'a mut Mcu,
     cp: u32,
     cr: u8,
     er: [u32; 8],
 }
 
 impl<'a> Cpu<'a> {
-    pub fn new(mcu: &'a Mcu) -> Self {
+    pub fn new(mcu: &'a mut Mcu) -> Self {
         Cpu {
             mcu: mcu,
             cp: 0,
