@@ -31,7 +31,7 @@ impl<'a> Cpu<'a> {
         Ok(())
     }
 
-    fn read_Rn8(&self, register: Resister8) -> Result<u8, AddressingError> {
+    fn read_rn8(&self, register: Resister8) -> Result<u8, AddressingError> {
         match register as usize {
             // R0H..=R7H
             0..=7 => return Ok((self.er[register as usize] >> 8) as u8),
@@ -41,19 +41,19 @@ impl<'a> Cpu<'a> {
         };
     }
 
-    fn write_Rn16(&self, register: Resister16, value: u16) -> Result<(), AddressingError> {
+    fn write_rn16(&self, register: Resister16, value: u16) -> Result<(), AddressingError> {
         Ok(())
     }
 
-    fn read_Rn16(&self, register: Resister16) -> Result<u16, AddressingError> {
+    fn read_rn16(&self, register: Resister16) -> Result<u16, AddressingError> {
         Ok(0)
     }
 
-    fn write_Rn32(&self, register: Resister32, value: u32) -> Result<(), AddressingError> {
+    fn write_rn32(&self, register: Resister32, value: u32) -> Result<(), AddressingError> {
         Ok(())
     }
 
-    fn read_Rn32(&self, register: Resister32) -> Result<u32, AddressingError> {
+    fn read_rn32(&self, register: Resister32) -> Result<u32, AddressingError> {
         Ok(0)
     }
 }
@@ -86,14 +86,14 @@ mod tests {
         let mut cpu = Cpu::new(&mcu);
         cpu.er[0] = 0x0000ff00;
         cpu.er[7] = 0x0000ff00;
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R0H).unwrap(), 0xff);
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R1H).unwrap(), 0x00);
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R7H).unwrap(), 0xff);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R0H).unwrap(), 0xff);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R1H).unwrap(), 0x00);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R7H).unwrap(), 0xff);
 
         cpu.er[0] = 0x000000ff;
         cpu.er[7] = 0x000000ff;
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R0L).unwrap(), 0xff);
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R1L).unwrap(), 0x00);
-        assert_eq!(cpu.read_Rn8(crate::cpu::Resister8::R7L).unwrap(), 0xff);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R0L).unwrap(), 0xff);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R1L).unwrap(), 0x00);
+        assert_eq!(cpu.read_rn8(crate::cpu::Resister8::R7L).unwrap(), 0xff);
     }
 }
