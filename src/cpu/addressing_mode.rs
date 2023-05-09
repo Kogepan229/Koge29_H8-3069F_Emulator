@@ -421,4 +421,36 @@ mod tests {
 
         assert_eq!(cpu.read_abs16_w(0xff11).unwrap_err(), AddressingError)
     }
+
+    #[test]
+    fn test_write_abs24_w() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs24_w(0xffff10, 0xf0f0).unwrap();
+        assert_eq!(
+            cpu.mcu.read(0xffff10).unwrap() as u16
+                | ((cpu.mcu.read(0xffff11).unwrap() as u16) << 8),
+            0xf0f0
+        );
+
+        assert_eq!(
+            cpu.write_abs24_w(0xffff11, 0xff).unwrap_err(),
+            AddressingError
+        )
+    }
+
+    #[test]
+    fn test_read_abs24_w() {
+        let mut mcu = Mcu::new();
+        let cpu = Cpu::new(&mut mcu);
+        cpu.mcu.write(0xffff00, 0x0f).unwrap();
+        cpu.mcu.write(0xffff01, 0x0f).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xffff00).unwrap(), 0x0f0f);
+
+        cpu.mcu.write(0xffff10, 0x0f).unwrap();
+        cpu.mcu.write(0xffff11, 0xff).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
+
+        assert_eq!(cpu.read_abs24_w(0xffff11).unwrap_err(), AddressingError)
+    }
 }
