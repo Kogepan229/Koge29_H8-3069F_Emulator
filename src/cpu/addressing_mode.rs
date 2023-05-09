@@ -3,18 +3,23 @@ use std::error::Error;
 use super::*;
 
 #[derive(Debug, PartialEq)]
-struct AddressingError;
+pub struct AddressingError;
 
 impl Error for AddressingError {}
 
 impl std::fmt::Display for AddressingError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Occurred addressing error.")
+        let var_name = write!(f, "Occurred addressing error.");
+        var_name
     }
 }
 
 impl<'a> Cpu<'a> {
-    fn write_rn_b(&mut self, register_field: u8, value: u8) -> Result<(), AddressingError> {
+    pub(super) fn write_rn_b(
+        &mut self,
+        register_field: u8,
+        value: u8,
+    ) -> Result<(), AddressingError> {
         match register_field {
             // R0H..=R7H
             0..=7 => {
@@ -31,7 +36,7 @@ impl<'a> Cpu<'a> {
         Ok(())
     }
 
-    fn read_rn_b(&self, register_field: u8) -> Result<u8, AddressingError> {
+    pub(super) fn read_rn_b(&self, register_field: u8) -> Result<u8, AddressingError> {
         match register_field {
             // R0H..=R7H
             0..=7 => return Ok((self.er[register_field as usize] >> 8) as u8),
@@ -41,7 +46,11 @@ impl<'a> Cpu<'a> {
         };
     }
 
-    fn write_rn_w(&mut self, register_field: u8, value: u16) -> Result<(), AddressingError> {
+    pub(super) fn write_rn_w(
+        &mut self,
+        register_field: u8,
+        value: u16,
+    ) -> Result<(), AddressingError> {
         match register_field {
             // R0..=R7
             0..=7 => {
@@ -58,7 +67,7 @@ impl<'a> Cpu<'a> {
         Ok(())
     }
 
-    fn read_rn_w(&self, register_field: u8) -> Result<u16, AddressingError> {
+    pub(super) fn read_rn_w(&self, register_field: u8) -> Result<u16, AddressingError> {
         match register_field {
             // R0..=R7
             0..=7 => return Ok((self.er[register_field as usize]) as u16),
@@ -68,7 +77,11 @@ impl<'a> Cpu<'a> {
         };
     }
 
-    fn write_rn_l(&mut self, register_field: u8, value: u32) -> Result<(), AddressingError> {
+    pub(super) fn write_rn_l(
+        &mut self,
+        register_field: u8,
+        value: u32,
+    ) -> Result<(), AddressingError> {
         match register_field {
             // ER0..=ER7
             0..=7 => self.er[register_field as usize] = value,
@@ -77,7 +90,7 @@ impl<'a> Cpu<'a> {
         Ok(())
     }
 
-    fn read_rn_l(&self, register_field: u8) -> Result<u32, AddressingError> {
+    pub(super) fn read_rn_l(&self, register_field: u8) -> Result<u32, AddressingError> {
         match register_field {
             // ER0..=ER7
             0..=7 => return Ok(self.er[register_field as usize]),
@@ -85,15 +98,15 @@ impl<'a> Cpu<'a> {
         }
     }
 
-    fn write_abs8_b(&mut self, addr: u8, value: u8) {
+    pub(super) fn write_abs8_b(&mut self, addr: u8, value: u8) {
         self.mcu.write(0xffff00 | addr as u32, value).unwrap();
     }
 
-    fn read_abs8_b(&self, addr: u8) -> u8 {
+    pub(super) fn read_abs8_b(&self, addr: u8) -> u8 {
         self.mcu.read(0xffff00 | addr as u32).unwrap()
     }
 
-    fn write_abs16_b(&mut self, addr: u16, value: u8) {
+    pub(super) fn write_abs16_b(&mut self, addr: u16, value: u8) {
         if addr & 0x8000 == 0x0000 {
             self.mcu.write(addr as u32, value).unwrap();
         } else {
@@ -101,7 +114,7 @@ impl<'a> Cpu<'a> {
         }
     }
 
-    fn read_abs16_b(&self, addr: u16) -> u8 {
+    pub(super) fn read_abs16_b(&self, addr: u16) -> u8 {
         if addr & 0x8000 == 0x0000 {
             return self.mcu.read(addr as u32).unwrap();
         } else {
@@ -109,11 +122,11 @@ impl<'a> Cpu<'a> {
         }
     }
 
-    fn write_abs24_b(&mut self, addr: u32, value: u8) {
+    pub(super) fn write_abs24_b(&mut self, addr: u32, value: u8) {
         self.mcu.write(addr, value).unwrap();
     }
 
-    fn read_abs24_b(&self, addr: u32) -> u8 {
+    pub(super) fn read_abs24_b(&self, addr: u32) -> u8 {
         self.mcu.read(addr).unwrap()
     }
 }
@@ -237,7 +250,7 @@ mod tests {
     #[test]
     fn test_read_abs8_b() {
         let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let cpu = Cpu::new(&mut mcu);
         cpu.mcu.write(0xffff10, 0xff).unwrap();
         cpu.mcu.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_b(0x10), 0xff);
