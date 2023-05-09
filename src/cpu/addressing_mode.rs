@@ -129,6 +129,51 @@ impl<'a> Cpu<'a> {
     pub(super) fn read_abs24_b(&self, addr: u32) -> u8 {
         self.mcu.read(addr).unwrap()
     }
+
+    pub(super) fn write_abs8_w(&mut self, addr: u8, value: u16) {
+        self.mcu.write(0xffff00 | addr as u32, value as u8).unwrap();
+        self.mcu
+            .write((0xffff00 | addr as u32) + 1, (value >> 8) as u8)
+            .unwrap();
+    }
+
+    pub(super) fn read_abs8_w(&self, addr: u8) -> u16 {
+        self.mcu.read(0xffff00 | addr as u32).unwrap() as u16
+            | (self.mcu.read((0xffff00 | addr as u32) + 1).unwrap() as u16) << 8
+    }
+
+    pub(super) fn write_abs16_w(&mut self, addr: u16, value: u16) {
+        if addr & 0x8000 == 0x0000 {
+            self.mcu.write(addr as u32, value as u8).unwrap();
+            self.mcu
+                .write((addr + 1) as u32, (value >> 8) as u8)
+                .unwrap();
+        } else {
+            self.mcu.write(0xff0000 | addr as u32, value as u8).unwrap();
+            self.mcu
+                .write((0xff0000 | addr as u32) + 1, (value >> 8) as u8)
+                .unwrap();
+        }
+    }
+
+    pub(super) fn read_abs16_w(&self, addr: u16) -> u16 {
+        if addr & 0x8000 == 0x0000 {
+            return self.mcu.read(addr as u32).unwrap() as u16
+                | self.mcu.read((addr + 1) as u32).unwrap() as u16;
+        } else {
+            return self.mcu.read(0xff0000 | addr as u32).unwrap() as u16
+                | self.mcu.read((0xff0000 | addr as u32) + 1).unwrap() as u16;
+        }
+    }
+
+    pub(super) fn write_abs24_w(&mut self, addr: u32, value: u16) {
+        self.mcu.write(addr, value as u8).unwrap();
+        self.mcu.write(addr + 1, (value >> 8) as u8).unwrap();
+    }
+
+    pub(super) fn read_abs24_w(&self, addr: u32) -> u16 {
+        self.mcu.read(addr).unwrap() as u16 | self.mcu.read(addr + 1).unwrap() as u16
+    }
 }
 
 #[cfg(test)]
