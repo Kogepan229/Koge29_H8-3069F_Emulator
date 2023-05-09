@@ -230,10 +230,17 @@ mod tests {
         let mut cpu = Cpu::new(&mut mcu);
         cpu.write_abs8_b(0x10, 0xff);
         cpu.write_abs8_b(0x1f, 0xff);
-        assert_eq!(mcu.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(mcu.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.mcu.read(0xffff10).unwrap(), 0xff);
+        assert_eq!(cpu.mcu.read(0xffff1f).unwrap(), 0xff);
     }
 
     #[test]
-    fn test_read_abs8_b() {}
+    fn test_read_abs8_b() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.mcu.write(0xffff10, 0xff).unwrap();
+        cpu.mcu.write(0xffff1f, 0xff).unwrap();
+        assert_eq!(cpu.read_abs8_b(0x10), 0xff);
+        assert_eq!(cpu.read_abs8_b(0x1f), 0xff);
+    }
 }
