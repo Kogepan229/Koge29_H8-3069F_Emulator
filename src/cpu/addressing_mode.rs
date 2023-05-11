@@ -195,6 +195,36 @@ impl<'a> Cpu<'a> {
         }
         Ok((self.mcu.read(addr).unwrap() as u16) << 8 | self.mcu.read(addr + 1).unwrap() as u16)
     }
+
+    pub(super) fn write_ern_b(
+        &mut self,
+        register_field: u8,
+        value: u8,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        self.write_abs24_b(addr & 0x00ffffff, value);
+        Ok(())
+    }
+
+    pub(super) fn read_ern_b(&self, register_field: u8) -> Result<u8, AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        Ok(self.read_abs24_b(addr & 0x00ffffff))
+    }
+
+    pub(super) fn write_ern_w(
+        &mut self,
+        register_field: u8,
+        value: u16,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        self.write_abs24_w(addr & 0x00ffffff, value);
+        Ok(())
+    }
+
+    pub(super) fn read_ern_w(&self, register_field: u8) -> Result<u16, AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        self.read_abs24_w(addr & 0x00ffffff)
+    }
 }
 
 #[cfg(test)]
