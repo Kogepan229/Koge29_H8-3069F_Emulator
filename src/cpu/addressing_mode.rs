@@ -312,6 +312,175 @@ impl<'a> Cpu<'a> {
         let addr = self.read_rn_l(register_field)?;
         self.read_abs24_l(addr & 0x00ffffff)
     }
+
+    pub(super) fn write_disp16_ern_b(
+        &mut self,
+        register_field: u8,
+        disp: u16,
+        value: u8,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            self.write_abs24_b((addr + disp as u32) & 0xffffff, value);
+        } else {
+            self.write_abs24_b((addr + (0xffff0000 + disp as u32)) & 0xffffff, value);
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp16_ern_b(
+        &self,
+        register_field: u8,
+        disp: u16,
+    ) -> Result<u8, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            Ok(self.read_abs24_b((addr + disp as u32) & 0xffffff))
+        } else {
+            Ok(self.read_abs24_b((addr + (0xffff0000 + disp as u32)) & 0xffffff))
+        }
+    }
+
+    pub(super) fn write_disp16_ern_w(
+        &mut self,
+        register_field: u8,
+        disp: u16,
+        value: u16,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            self.write_abs24_w((addr + disp as u32) & 0xffffff, value)?;
+        } else {
+            self.write_abs24_w((addr + (0xffff0000 + disp as u32)) & 0xffffff, value)?;
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp16_ern_w(
+        &self,
+        register_field: u8,
+        disp: u16,
+    ) -> Result<u16, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            Ok(self.read_abs24_w((addr + disp as u32) & 0xffffff)?)
+        } else {
+            Ok(self.read_abs24_w((addr + (0xffff0000 + disp as u32)) & 0xffffff)?)
+        }
+    }
+
+    pub(super) fn write_disp16_ern_l(
+        &mut self,
+        register_field: u8,
+        disp: u16,
+        value: u32,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            self.write_abs24_l((addr + disp as u32) & 0xffffff, value)?;
+        } else {
+            self.write_abs24_l((addr + (0xffff0000 + disp as u32)) & 0xffffff, value)?;
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp16_ern_l(
+        &self,
+        register_field: u8,
+        disp: u16,
+    ) -> Result<u32, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x8000 == 0x0000 {
+            Ok(self.read_abs24_l((addr + disp as u32) & 0xffffff)?)
+        } else {
+            Ok(self.read_abs24_l((addr + (0xffff0000 + disp as u32)) & 0xffffff)?)
+        }
+    }
+
+    ////
+    pub(super) fn write_disp24_ern_b(
+        &mut self,
+        register_field: u8,
+        disp: u32,
+        value: u8,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            self.write_abs24_b((addr + disp) & 0xffffff, value);
+        } else {
+            self.write_abs24_b((addr + (0xff000000 + disp)) & 0xffffff, value);
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp24_ern_b(
+        &self,
+        register_field: u8,
+        disp: u32,
+    ) -> Result<u8, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            Ok(self.read_abs24_b((addr + disp) & 0xffffff))
+        } else {
+            Ok(self.read_abs24_b((addr + (0xff000000 + disp)) & 0xffffff))
+        }
+    }
+
+    pub(super) fn write_disp24_ern_w(
+        &mut self,
+        register_field: u8,
+        disp: u32,
+        value: u16,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            self.write_abs24_w((addr + disp) & 0xffffff, value)?;
+        } else {
+            self.write_abs24_w((addr + (0xff000000 + disp)) & 0xffffff, value)?;
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp24_ern_w(
+        &self,
+        register_field: u8,
+        disp: u32,
+    ) -> Result<u16, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            Ok(self.read_abs24_w((addr + disp) & 0xffffff)?)
+        } else {
+            Ok(self.read_abs24_w((addr + (0xff000000 + disp)) & 0xffffff)?)
+        }
+    }
+
+    pub(super) fn write_disp24_ern_l(
+        &mut self,
+        register_field: u8,
+        disp: u32,
+        value: u32,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            self.write_abs24_l((addr + disp) & 0xffffff, value)?;
+        } else {
+            self.write_abs24_l((addr + (0xff000000 + disp)) & 0xffffff, value)?;
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_disp24_ern_l(
+        &self,
+        register_field: u8,
+        disp: u32,
+    ) -> Result<u32, AddressingError> {
+        let addr = self.read_ern_l(register_field)?;
+        if disp & 0x800000 == 0x000000 {
+            Ok(self.read_abs24_l((addr + disp) & 0xffffff)?)
+        } else {
+            Ok(self.read_abs24_l((addr + (0xff000000 + disp)) & 0xffffff)?)
+        }
+    }
 }
 
 #[cfg(test)]
