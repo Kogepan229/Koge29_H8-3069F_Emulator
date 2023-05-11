@@ -198,6 +198,76 @@ impl<'a> Cpu<'a> {
         Ok((self.mcu.read(addr).unwrap() as u16) << 8 | self.mcu.read(addr + 1).unwrap() as u16)
     }
 
+    pub(super) fn write_abs8_l(&mut self, addr: u8, value: u32) -> Result<(), AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        self.write_abs24_w(0xffff00 | addr as u32, (value >> 16) as u16)
+            .unwrap();
+        self.write_abs24_w((0xffff00 | addr as u32) + 2, value as u16)
+            .unwrap();
+        Ok(())
+    }
+
+    pub(super) fn read_abs8_l(&self, addr: u8) -> Result<u32, AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        Ok(
+            (self.read_abs24_w(0xffff00 | addr as u32).unwrap() as u32) << 16
+                | self.read_abs24_w((0xffff00 | addr as u32) + 2).unwrap() as u32,
+        )
+    }
+
+    pub(super) fn write_abs16_l(&mut self, addr: u16, value: u32) -> Result<(), AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        if addr & 0x8000 == 0x0000 {
+            self.write_abs24_w(addr as u32, (value >> 16) as u16)
+                .unwrap();
+            self.write_abs24_w((addr + 2) as u32, value as u16).unwrap();
+        } else {
+            self.write_abs24_w(0xff0000 | addr as u32, (value >> 16) as u16)
+                .unwrap();
+            self.write_abs24_w((0xff0000 | addr as u32) + 2, value as u16)
+                .unwrap();
+        }
+        Ok(())
+    }
+
+    pub(super) fn read_abs16_l(&self, addr: u16) -> Result<u32, AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        if addr & 0x8000 == 0x0000 {
+            return Ok((self.read_abs24_w(addr as u32).unwrap() as u32) << 16
+                | self.read_abs24_w((addr + 2) as u32).unwrap() as u32);
+        } else {
+            return Ok(
+                (self.read_abs24_w(0xff0000 | addr as u32).unwrap() as u32) << 16
+                    | self.read_abs24_w((0xff0000 | addr as u32) + 2).unwrap() as u32,
+            );
+        }
+    }
+
+    pub(super) fn write_abs24_l(&mut self, addr: u32, value: u32) -> Result<(), AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        self.write_abs24_w(addr, (value >> 16) as u16).unwrap();
+        self.write_abs24_w(addr + 2, value as u16).unwrap();
+        Ok(())
+    }
+
+    pub(super) fn read_abs24_l(&self, addr: u32) -> Result<u32, AddressingError> {
+        if addr % 2 != 0 {
+            return Err(AddressingError);
+        }
+        Ok((self.read_abs24_w(addr).unwrap() as u32) << 16
+            | self.read_abs24_w(addr + 2).unwrap() as u32)
+    }
+
     pub(super) fn write_ern_b(
         &mut self,
         register_field: u8,
@@ -481,5 +551,88 @@ mod tests {
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
 
         assert_eq!(cpu.read_abs24_w(0xffff11).unwrap_err(), AddressingError)
+    }
+
+    #[test]
+    fn test_write_abs8_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs8_l(0x10, 0x0f0fff0f).unwrap();
+        assert_eq!(
+            (cpu.read_abs24_w(0xffff10).unwrap() as u32) << 16
+                | cpu.read_abs24_w(0xffff12).unwrap() as u32,
+            0x0f0fff0f
+        );
+
+        assert_eq!(cpu.write_abs8_l(0x11, 0xff).unwrap_err(), AddressingError)
+    }
+
+    #[test]
+    fn test_read_abs8_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs24_w(0xffff10, 0x0f0f).unwrap();
+        cpu.write_abs24_w(0xffff12, 0xff0f).unwrap();
+        assert_eq!(cpu.read_abs8_l(0x10).unwrap(), 0x0f0fff0f);
+
+        assert_eq!(cpu.read_abs8_l(0x11).unwrap_err(), AddressingError)
+    }
+
+    // アドレスの最上位ビットが1のときのみ
+    #[test]
+    fn test_write_abs16_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs16_l(0xff10, 0x0f0fff0f).unwrap();
+        assert_eq!(
+            (cpu.read_abs24_w(0xffff10).unwrap() as u32) << 16
+                | cpu.read_abs24_w(0xffff12).unwrap() as u32,
+            0x0f0fff0f
+        );
+
+        assert_eq!(
+            cpu.write_abs16_l(0xff11, 0xf0f0).unwrap_err(),
+            AddressingError
+        )
+    }
+
+    // アドレスの最上位ビットが1のときのみ
+    #[test]
+    fn test_read_abs16_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs24_w(0xffff00, 0x0f0f).unwrap();
+        cpu.write_abs24_w(0xffff02, 0xff0f).unwrap();
+        assert_eq!(cpu.read_abs16_l(0xff00).unwrap(), 0x0f0fff0f);
+
+        assert_eq!(cpu.read_abs16_l(0xff11).unwrap_err(), AddressingError)
+    }
+
+    #[test]
+    fn test_write_abs24_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
+        assert_eq!(
+            (cpu.read_abs24_w(0xffff10).unwrap() as u32) << 16
+                | cpu.read_abs24_w(0xffff12).unwrap() as u32,
+            0x0f0fff0f
+        );
+
+        assert_eq!(
+            cpu.write_abs24_l(0xffff11, 0xff).unwrap_err(),
+            AddressingError
+        )
+    }
+
+    #[test]
+    fn test_read_abs24_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.write_abs24_w(0xffff00, 0x0f0f).unwrap();
+        cpu.write_abs24_w(0xffff02, 0xff0f).unwrap();
+        assert_eq!(cpu.read_abs24_l(0xffff00).unwrap(), 0x0f0fff0f);
+
+        assert_eq!(cpu.read_abs24_l(0xffff11).unwrap_err(), AddressingError)
     }
 }
