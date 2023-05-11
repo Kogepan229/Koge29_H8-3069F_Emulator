@@ -954,4 +954,82 @@ mod tests {
         cpu.write_abs24_l(0xfff112, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_disp16_ern_l(1, 0xf002).unwrap(), 0x0f0fff0f);
     }
+
+    #[test]
+    fn test_write_disp24_ern_b() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_disp24_ern_b(0, 0x000f10, 0xff).unwrap();
+        assert_eq!(cpu.read_abs24_b(0xffff10), 0xff);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_disp24_ern_b(1, 0xfff002, 0xff).unwrap();
+        assert_eq!(cpu.read_abs24_b(0xfff112), 0xff);
+    }
+
+    #[test]
+    fn test_read_disp24_ern_b() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_abs24_b(0xffff10, 0xff);
+        assert_eq!(cpu.read_disp24_ern_b(0, 0x000f10).unwrap(), 0xff);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_abs24_b(0xfff112, 0xff);
+        assert_eq!(cpu.read_disp24_ern_b(1, 0xfff002).unwrap(), 0xff);
+    }
+
+    #[test]
+    fn test_write_disp24_ern_w() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_disp24_ern_w(0, 0x000f10, 0x0fff).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_disp24_ern_w(1, 0xfff002, 0x0fff).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xfff112).unwrap(), 0x0fff);
+    }
+
+    #[test]
+    fn test_read_disp24_ern_w() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
+        assert_eq!(cpu.read_disp24_ern_w(0, 0x000f10).unwrap(), 0x0fff);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_abs24_w(0xfff112, 0x0fff).unwrap();
+        assert_eq!(cpu.read_disp24_ern_w(1, 0xfff002).unwrap(), 0x0fff);
+    }
+
+    #[test]
+    fn test_write_disp24_ern_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_disp24_ern_l(0, 0x000f10, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_disp24_ern_l(1, 0xfff002, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_abs24_l(0xfff112).unwrap(), 0x0f0fff0f);
+    }
+
+    #[test]
+    fn test_read_disp24_ern_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xfff000;
+        cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_disp24_ern_l(0, 0x000f10).unwrap(), 0x0f0fff0f);
+
+        cpu.er[1] = 0x000110;
+        cpu.write_abs24_l(0xfff112, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_disp24_ern_l(1, 0xfff002).unwrap(), 0x0f0fff0f);
+    }
 }
