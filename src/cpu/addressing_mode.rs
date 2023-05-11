@@ -319,7 +319,7 @@ impl<'a> Cpu<'a> {
         disp: u16,
         value: u8,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             self.write_abs24_b((addr + disp as u32) & 0xffffff, value);
         } else {
@@ -333,7 +333,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u16,
     ) -> Result<u8, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             Ok(self.read_abs24_b((addr + disp as u32) & 0xffffff))
         } else {
@@ -347,7 +347,7 @@ impl<'a> Cpu<'a> {
         disp: u16,
         value: u16,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             self.write_abs24_w((addr + disp as u32) & 0xffffff, value)?;
         } else {
@@ -361,7 +361,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u16,
     ) -> Result<u16, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             Ok(self.read_abs24_w((addr + disp as u32) & 0xffffff)?)
         } else {
@@ -375,7 +375,7 @@ impl<'a> Cpu<'a> {
         disp: u16,
         value: u32,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             self.write_abs24_l((addr + disp as u32) & 0xffffff, value)?;
         } else {
@@ -389,7 +389,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u16,
     ) -> Result<u32, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x8000 == 0x0000 {
             Ok(self.read_abs24_l((addr + disp as u32) & 0xffffff)?)
         } else {
@@ -404,7 +404,7 @@ impl<'a> Cpu<'a> {
         disp: u32,
         value: u8,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             self.write_abs24_b((addr + disp) & 0xffffff, value);
         } else {
@@ -418,7 +418,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u32,
     ) -> Result<u8, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             Ok(self.read_abs24_b((addr + disp) & 0xffffff))
         } else {
@@ -432,7 +432,7 @@ impl<'a> Cpu<'a> {
         disp: u32,
         value: u16,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             self.write_abs24_w((addr + disp) & 0xffffff, value)?;
         } else {
@@ -446,7 +446,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u32,
     ) -> Result<u16, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             Ok(self.read_abs24_w((addr + disp) & 0xffffff)?)
         } else {
@@ -460,7 +460,7 @@ impl<'a> Cpu<'a> {
         disp: u32,
         value: u32,
     ) -> Result<(), AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             self.write_abs24_l((addr + disp) & 0xffffff, value)?;
         } else {
@@ -474,7 +474,7 @@ impl<'a> Cpu<'a> {
         register_field: u8,
         disp: u32,
     ) -> Result<u32, AddressingError> {
-        let addr = self.read_ern_l(register_field)?;
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             Ok(self.read_abs24_l((addr + disp) & 0xffffff)?)
         } else {
