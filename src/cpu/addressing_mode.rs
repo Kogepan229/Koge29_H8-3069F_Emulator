@@ -289,13 +289,28 @@ impl<'a> Cpu<'a> {
         value: u16,
     ) -> Result<(), AddressingError> {
         let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_w(addr & 0x00ffffff, value);
+        self.write_abs24_w(addr & 0x00ffffff, value)?;
         Ok(())
     }
 
     pub(super) fn read_ern_w(&self, register_field: u8) -> Result<u16, AddressingError> {
         let addr = self.read_rn_l(register_field)?;
         self.read_abs24_w(addr & 0x00ffffff)
+    }
+
+    pub(super) fn write_ern_l(
+        &mut self,
+        register_field: u8,
+        value: u32,
+    ) -> Result<(), AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        self.write_abs24_l(addr & 0x00ffffff, value)?;
+        Ok(())
+    }
+
+    pub(super) fn read_ern_l(&self, register_field: u8) -> Result<u32, AddressingError> {
+        let addr = self.read_rn_l(register_field)?;
+        self.read_abs24_l(addr & 0x00ffffff)
     }
 }
 
