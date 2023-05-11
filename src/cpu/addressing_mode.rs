@@ -650,4 +650,61 @@ mod tests {
 
         assert_eq!(cpu.read_abs24_l(0xffff11).unwrap_err(), AddressingError)
     }
+
+    #[test]
+    fn test_write_ern_b() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_ern_b(0, 0xff).unwrap();
+
+        assert_eq!(cpu.read_abs24_b(0xffff10), 0xff)
+    }
+
+    #[test]
+    fn test_read_ern_b() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_abs24_b(0xffff10, 0xff);
+        assert_eq!(cpu.read_ern_b(0).unwrap(), 0xff)
+    }
+
+    #[test]
+    fn test_write_ern_w() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_ern_w(0, 0x0fff).unwrap();
+
+        assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff)
+    }
+
+    #[test]
+    fn test_read_ern_w() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
+        assert_eq!(cpu.read_ern_w(0).unwrap(), 0x0fff)
+    }
+
+    #[test]
+    fn test_write_ern_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_ern_l(0, 0x0f0fff0f).unwrap();
+
+        assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f)
+    }
+
+    #[test]
+    fn test_read_ern_l() {
+        let mut mcu = Mcu::new();
+        let mut cpu = Cpu::new(&mut mcu);
+        cpu.er[0] = 0xffff10;
+        cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_ern_l(0).unwrap(), 0x0f0fff0f)
+    }
 }
