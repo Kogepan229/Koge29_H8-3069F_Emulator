@@ -5,6 +5,7 @@ use super::*;
 mod abs;
 mod disp;
 mod ern;
+mod inc_ern;
 mod rn;
 
 #[derive(Debug, PartialEq)]
