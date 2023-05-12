@@ -198,10 +198,7 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        cpu::{addressing_mode::AddressingError, Cpu},
-        mcu::Mcu,
-    };
+    use crate::{cpu::Cpu, mcu::Mcu};
 
     #[test]
     fn test_write_abs8_b() {
