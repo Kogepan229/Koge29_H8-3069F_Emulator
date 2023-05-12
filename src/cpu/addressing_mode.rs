@@ -7,6 +7,7 @@ mod dec_ern;
 mod disp;
 mod ern;
 mod inc_ern;
+mod mem_indirect;
 mod rn;
 
 #[derive(Debug, PartialEq)]
