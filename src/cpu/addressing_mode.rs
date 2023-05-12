@@ -3,6 +3,7 @@ use std::error::Error;
 use super::*;
 
 mod abs;
+mod dec_ern;
 mod disp;
 mod ern;
 mod inc_ern;
