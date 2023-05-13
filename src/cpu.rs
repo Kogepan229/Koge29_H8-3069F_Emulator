@@ -6,6 +6,7 @@ use crate::{
 };
 
 mod addressing_mode;
+mod instruction;
 
 const CPUCLOCK: usize = 20000000;
 
@@ -14,6 +15,16 @@ pub struct Cpu<'a> {
     pc: u32,
     ccr: u8,
     er: [u32; 8],
+}
+
+pub enum CCR {
+    C,
+    V,
+    Z,
+    N,
+    U,
+    H,
+    I,
 }
 
 impl<'a> Cpu<'a> {
@@ -36,7 +47,7 @@ impl<'a> Cpu<'a> {
         }
     }
 
-    fn fetch(&mut self) -> u16 {
+    pub fn fetch(&mut self) -> u16 {
         let _pc = self.pc & !1;
         if _pc < MEMORY_START_ADDR || _pc > MEMORY_END_ADDR {
             panic!("fetch error [pc: {:4x}]", self.pc)
@@ -55,5 +66,17 @@ impl<'a> Cpu<'a> {
                 opcode as u8
             ),
         }
+    }
+
+    pub fn write_ccr(&mut self, target: CCR, val: u8) {
+        match val {
+            0 => self.ccr &= !(1 << target as u8),
+            1 => self.ccr |= 1 << target as u8,
+            _ => panic!("[write_ccr] invalid value"),
+        }
+    }
+
+    pub fn read_ccr(&self, target: CCR) -> u8 {
+        (self.ccr >> target as u8) & 1
     }
 }
