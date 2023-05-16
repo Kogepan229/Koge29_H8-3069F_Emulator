@@ -58,8 +58,9 @@ impl<'a> Cpu<'a> {
         op
     }
 
-    fn exec(&self, opcode: u16) -> u8 {
+    fn exec(&mut self, opcode: u16) -> usize {
         match opcode {
+            0x0f80..=0x0ff7 | 0x7a00..=0x7a07 | 0x0100 => return self.mov_l(opcode),
             _ => panic!(
                 "exec error. [opcode: {:>02x} {:>02x}]",
                 opcode >> 8 as u8,
