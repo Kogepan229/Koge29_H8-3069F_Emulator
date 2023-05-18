@@ -16,7 +16,7 @@ fn main() {
         "D:/Desktop/VSCode/Koge29_H8-300H_Emulator/example/example1.elf".to_string(),
         &mut cpu.mcu.memory,
     );
-    print_memory(&cpu.mcu.memory);
+    // print_memory(&cpu.mcu.memory);
 
     cpu.run().unwrap();
 }

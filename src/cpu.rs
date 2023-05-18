@@ -1,9 +1,9 @@
 use crate::{
     mcu::Mcu,
-    memory::{self, MEMORY_END_ADDR, MEMORY_START_ADDR},
+    memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
 };
 use anyhow::{Context as _, Result};
-use std::{arch::x86_64::_mm_loaddup_pd, thread, time::Duration};
+use std::{thread, time::Duration};
 
 mod addressing_mode;
 mod instruction;

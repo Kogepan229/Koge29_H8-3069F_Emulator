@@ -20,7 +20,7 @@ fn read_elf(path: String) -> Vec<u8> {
 pub fn load(elf_path: String, memory: &mut Memory) {
     let program = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&program).unwrap();
-    println!("{:?}", hd);
+    // println!("{:?}", hd);
 
     let (_, sht) = parse_section::parse_section_header_table32(hd.shnum as usize)(
         &program[hd.shoff as usize..],
@@ -40,13 +40,13 @@ pub fn load(elf_path: String, memory: &mut Memory) {
             header,
         })
         .collect::<Vec<section::Section32>>();
-    println!("{:#?}", sections);
+    // println!("{:#?}", sections);
 
     let (_, pht) = parse_program_header::parse_program_header_table32(hd.phnum as usize)(
         &program[hd.phoff as usize..],
     )
     .unwrap();
-    println!("{:#?}", pht);
+    // println!("{:#?}", pht);
 
     for ph in pht {
         if ph.ty == SegmentType::Load {
