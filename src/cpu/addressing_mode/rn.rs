@@ -1,11 +1,9 @@
+use anyhow::{bail, Result};
+
 use super::*;
 
 impl<'a> Cpu<'a> {
-    pub(in super::super) fn write_rn_b(
-        &mut self,
-        register_field: u8,
-        value: u8,
-    ) -> Result<(), AddressingError> {
+    pub(in super::super) fn write_rn_b(&mut self, register_field: u8, value: u8) -> Result<()> {
         match register_field {
             // R0H..=R7H
             0..=7 => {
@@ -17,26 +15,22 @@ impl<'a> Cpu<'a> {
                 self.er[register_field as usize - 8] =
                     (self.er[register_field as usize - 8] & 0xffffff00) | (value as u32)
             }
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         };
         Ok(())
     }
 
-    pub(in super::super) fn read_rn_b(&self, register_field: u8) -> Result<u8, AddressingError> {
+    pub(in super::super) fn read_rn_b(&self, register_field: u8) -> Result<u8> {
         match register_field {
             // R0H..=R7H
             0..=7 => return Ok((self.er[register_field as usize] >> 8) as u8),
             // R0L..=R7L
             8..=15 => return Ok((self.er[register_field as usize - 8]) as u8),
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         };
     }
 
-    pub(in super::super) fn write_rn_w(
-        &mut self,
-        register_field: u8,
-        value: u16,
-    ) -> Result<(), AddressingError> {
+    pub(in super::super) fn write_rn_w(&mut self, register_field: u8, value: u16) -> Result<()> {
         match register_field {
             // R0..=R7
             0..=7 => {
@@ -48,49 +42,42 @@ impl<'a> Cpu<'a> {
                 self.er[register_field as usize - 8] =
                     (self.er[register_field as usize - 8] & 0x0000ffff) | ((value as u32) << 16)
             }
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         }
         Ok(())
     }
 
-    pub(in super::super) fn read_rn_w(&self, register_field: u8) -> Result<u16, AddressingError> {
+    pub(in super::super) fn read_rn_w(&self, register_field: u8) -> Result<u16> {
         match register_field {
             // R0..=R7
             0..=7 => return Ok((self.er[register_field as usize]) as u16),
             // E0..=E7
             8..=15 => return Ok((self.er[register_field as usize - 8] >> 16) as u16),
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         };
     }
 
-    pub(in super::super) fn write_rn_l(
-        &mut self,
-        register_field: u8,
-        value: u32,
-    ) -> Result<(), AddressingError> {
+    pub(in super::super) fn write_rn_l(&mut self, register_field: u8, value: u32) -> Result<()> {
         match register_field {
             // ER0..=ER7
             0..=7 => self.er[register_field as usize] = value,
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         }
         Ok(())
     }
 
-    pub(in super::super) fn read_rn_l(&self, register_field: u8) -> Result<u32, AddressingError> {
+    pub(in super::super) fn read_rn_l(&self, register_field: u8) -> Result<u32> {
         match register_field {
             // ER0..=ER7
             0..=7 => return Ok(self.er[register_field as usize]),
-            _ => return Err(AddressingError),
+            _ => bail!("Invalid register [{:x}]", register_field),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        cpu::{addressing_mode::AddressingError, Cpu},
-        mcu::Mcu,
-    };
+    use crate::{cpu::Cpu, mcu::Mcu};
 
     #[test]
     fn test_write_rn_b() {
@@ -173,10 +160,7 @@ mod tests {
         assert_eq!(cpu.er[1], 0xf0f0f0f0);
         assert_eq!(cpu.er[7], 0x00000000);
 
-        assert_eq!(
-            cpu.write_rn_l(0b1000, 0xffffffff).unwrap_err(),
-            AddressingError
-        )
+        assert!(cpu.write_rn_l(0b1000, 0xffffffff).is_err())
     }
 
     #[test]
@@ -188,6 +172,6 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0b0000).unwrap(), 0xffffffff); // E0
         assert_eq!(cpu.read_rn_l(0b0001).unwrap(), 0x00000000); // E1
         assert_eq!(cpu.read_rn_l(0b0111).unwrap(), 0xf0f0f0f0); // E7
-        assert_eq!(cpu.read_rn_l(0b1000).unwrap_err(), AddressingError); // E7
+        assert!(cpu.read_rn_l(0b1000).is_err()); // E7
     }
 }
