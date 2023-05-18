@@ -13,7 +13,7 @@ fn main() {
 
     //let mut memory: Memory = create_memory();
     elf::load(
-        "D:/Desktop/VSCode/Koge29_H8-300H_Emulator/example/example1.elf".to_string(),
+        "D:/Desktop/VSCode/Koge29_H8-300H_Emulator/example/example2.elf".to_string(),
         &mut cpu.mcu.memory,
     );
     // print_memory(&cpu.mcu.memory);
