@@ -1,5 +1,5 @@
 use super::super::*;
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Context as _, Result};
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn mov_l(&mut self, opcode: u16) -> Result<usize> {
@@ -16,7 +16,7 @@ impl<'a> Cpu<'a> {
             0x78 => return self.mov_l_disp24(opcode2),
             0x6d => return self.mov_l_inc(opcode2),
             0x6b => return self.mov_l_abs(opcode2),
-            _ => panic!("invalid opcode [{::>04x} {::>04x}]", opcode, opcode2),
+            _ => bail!("invalid opcode [{:>04x} {:>04x}]", opcode, opcode2),
         }
     }
 
@@ -36,15 +36,12 @@ impl<'a> Cpu<'a> {
 
     fn mov_l_rn(&mut self, opcode: u16) -> Result<usize> {
         let mut f = || -> Result<usize> {
-            let value = self
-                .read_rn_l(Cpu::get_nibble_opcode(opcode, 3)? & 0x07)
-                .unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode, 4)?, value)
-                .unwrap();
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 3)? & 0x07)?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
             self.mov_l_proc_pcc(value);
             return Ok(2);
         };
-        f().with_context(|| format!("opcode [{}]", opcode))
+        f().with_context(|| format!("opcode [{:x}]", opcode))
     }
 
     fn mov_l_imm(&mut self, opcode: u16) -> Result<usize> {
@@ -54,7 +51,7 @@ impl<'a> Cpu<'a> {
             self.mov_l_proc_pcc(imm);
             return Ok(6);
         };
-        f().with_context(|| format!("opcode [{}]", opcode))
+        f().with_context(|| format!("opcode [{:x}]", opcode))
     }
 
     fn mov_l_ern(&mut self, opcode2: u16) -> Result<usize> {
@@ -70,7 +67,7 @@ impl<'a> Cpu<'a> {
             }
             return Ok(8);
         };
-        f().with_context(|| format!("opcode2 [{}]", opcode2))
+        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
     }
 
     fn mov_l_disp16(&mut self, opcode2: u16) -> Result<usize> {
@@ -87,7 +84,7 @@ impl<'a> Cpu<'a> {
             }
             return Ok(10);
         };
-        f().with_context(|| format!("opcode2 [{}] disp [{}]", opcode2, disp))
+        f().with_context(|| format!("opcode2 [{:x}] disp [{:x}]", opcode2, disp))
     }
 
     fn mov_l_disp24(&mut self, opcode2: u16) -> Result<usize> {
@@ -107,7 +104,7 @@ impl<'a> Cpu<'a> {
         };
         f().with_context(|| {
             format!(
-                "opcode2 [{}] opcode3 [{}] disp [{}]",
+                "opcode2 [{:x}] opcode3 [{:x}] disp [{:x}]",
                 opcode2, opcode3, disp
             )
         })
@@ -126,14 +123,14 @@ impl<'a> Cpu<'a> {
             }
             return Ok(10);
         };
-        f().with_context(|| format!("opcode2 [{}]", opcode2))
+        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
     }
 
     fn mov_l_abs(&mut self, opcode2: u16) -> Result<usize> {
         match opcode2 & 0xfff0 {
             0x6b00 | 0x6b80 => return self.mov_l_abs16(opcode2),
             0x6b20 | 0x6ba0 => return self.mov_l_abs24(opcode2),
-            _ => bail!("invalid opcode2 [{}]", opcode2),
+            _ => bail!("invalid opcode2 [{:x}]", opcode2),
         }
     }
 
@@ -151,7 +148,7 @@ impl<'a> Cpu<'a> {
             }
             return Ok(10);
         };
-        f().with_context(|| format!("opcode2 [{}] abs_addr [{}]", opcode2, abs_addr))
+        f().with_context(|| format!("opcode2 [{:x}] abs_addr [{:x}]", opcode2, abs_addr))
     }
 
     fn mov_l_abs24(&mut self, opcode2: u16) -> Result<usize> {
@@ -163,11 +160,11 @@ impl<'a> Cpu<'a> {
                 self.mov_l_proc_pcc(value);
             } else {
                 let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_abs24_l(abs_addr, value).unwrap();
+                self.write_abs24_l(abs_addr, value)?;
                 self.mov_l_proc_pcc(value);
             }
             return Ok(12);
         };
-        f().with_context(|| format!("opcode2 [{}] abs_addr [{}]", opcode2, abs_addr))
+        f().with_context(|| format!("opcode2 [{:x}] abs_addr [{:x}]", opcode2, abs_addr))
     }
 }
