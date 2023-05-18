@@ -1,16 +1,5 @@
 use crate::memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR};
-use std::error::Error;
-
-#[derive(Debug, PartialEq)]
-pub struct AddressAccessError;
-
-impl Error for AddressAccessError {}
-
-impl std::fmt::Display for AddressAccessError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Occurred address access error.")
-    }
-}
+use anyhow::{bail, Result};
 
 // cpuは別 本来のmcuとは意味が異なるのであとで変えるかも
 pub struct Mcu {
@@ -24,22 +13,22 @@ impl Mcu {
         }
     }
 
-    pub fn write(&mut self, addr: u32, value: u8) -> Result<(), AddressAccessError> {
+    pub fn write(&mut self, addr: u32, value: u8) -> Result<()> {
         match addr {
             MEMORY_START_ADDR..=MEMORY_END_ADDR => {
                 self.memory[(addr - MEMORY_START_ADDR) as usize] = value
             }
-            _ => return Err(AddressAccessError),
+            _ => bail!("Invalid address [{:x}]", addr),
         }
         Ok(())
     }
 
-    pub fn read(&self, addr: u32) -> Result<u8, AddressAccessError> {
+    pub fn read(&self, addr: u32) -> Result<u8> {
         match addr {
             MEMORY_START_ADDR..=MEMORY_END_ADDR => {
                 return Ok(self.memory[(addr - MEMORY_START_ADDR) as usize])
             }
-            _ => return Err(AddressAccessError),
+            _ => bail!("Invalid address [{:x}]", addr),
         }
     }
 }

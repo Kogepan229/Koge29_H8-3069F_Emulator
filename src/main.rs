@@ -18,5 +18,5 @@ fn main() {
     );
     print_memory(&cpu.mcu.memory);
 
-    cpu.run();
+    cpu.run().unwrap();
 }
