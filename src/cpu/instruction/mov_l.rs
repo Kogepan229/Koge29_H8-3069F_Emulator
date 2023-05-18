@@ -1,7 +1,8 @@
 use super::super::*;
+use anyhow::{bail, Context, Result};
 
 impl<'a> Cpu<'a> {
-    pub(in super::super) fn mov_l(&mut self, opcode: u16) -> usize {
+    pub(in super::super) fn mov_l(&mut self, opcode: u16) -> Result<usize> {
         if opcode & 0xff00 == 0x0f00 {
             return self.mov_l_rn(opcode);
         }
@@ -33,127 +34,140 @@ impl<'a> Cpu<'a> {
         self.write_ccr(CCR::V, 0);
     }
 
-    fn mov_l_rn(&mut self, opcode: u16) -> usize {
-        let value = self
-            .read_rn_l(Cpu::get_nibble_opcode(opcode, 3) & 0x07)
-            .unwrap();
-        self.write_rn_l(Cpu::get_nibble_opcode(opcode, 4), value)
-            .unwrap();
-        self.mov_l_proc_pcc(value);
-        return 2;
-    }
-
-    fn mov_l_imm(&mut self, opcode: u16) -> usize {
-        let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
-        self.write_rn_l((opcode & 0x000f) as u8, imm).unwrap();
-        self.mov_l_proc_pcc(imm);
-        return 6;
-    }
-
-    fn mov_l_ern(&mut self, opcode2: u16) -> usize {
-        if opcode2 & 0x0080 == 0 {
-            let value = self.read_ern_l(Cpu::get_nibble_opcode(opcode2, 3)).unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)).unwrap();
-            self.write_ern_l(Cpu::get_nibble_opcode(opcode2, 3) & 0x07, value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        }
-        return 8;
-    }
-
-    fn mov_l_disp16(&mut self, opcode2: u16) -> usize {
-        let disp = self.fetch();
-        if opcode2 & 0x0080 == 0 {
+    fn mov_l_rn(&mut self, opcode: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
             let value = self
-                .read_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3), disp)
+                .read_rn_l(Cpu::get_nibble_opcode(opcode, 3)? & 0x07)
                 .unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)).unwrap();
-            self.write_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3) & 0x07, disp, value)
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode, 4)?, value)
                 .unwrap();
             self.mov_l_proc_pcc(value);
-        }
-        return 10;
+            return Ok(2);
+        };
+        f().with_context(|| format!("opcode [{}]", opcode))
     }
 
-    fn mov_l_disp24(&mut self, opcode2: u16) -> usize {
+    fn mov_l_imm(&mut self, opcode: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
+            let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
+            self.write_rn_l((opcode & 0x000f) as u8, imm)?;
+            self.mov_l_proc_pcc(imm);
+            return Ok(6);
+        };
+        f().with_context(|| format!("opcode [{}]", opcode))
+    }
+
+    fn mov_l_ern(&mut self, opcode2: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0x0080 == 0 {
+                let value = self.read_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+                self.write_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(8);
+        };
+        f().with_context(|| format!("opcode2 [{}]", opcode2))
+    }
+
+    fn mov_l_disp16(&mut self, opcode2: u16) -> Result<usize> {
+        let disp = self.fetch();
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0x0080 == 0 {
+                let value = self.read_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+                self.write_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)?;
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(10);
+        };
+        f().with_context(|| format!("opcode2 [{}] disp [{}]", opcode2, disp))
+    }
+
+    fn mov_l_disp24(&mut self, opcode2: u16) -> Result<usize> {
         let opcode3 = self.fetch();
         let disp = ((self.fetch() as u32) << 16) | self.fetch() as u32;
-        if opcode2 & 0x0080 == 0 {
-            let value = self
-                .read_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3), disp)
-                .unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode3, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode3, 4)).unwrap();
-            self.write_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3) & 0x07, disp, value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        }
-        return 14;
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0x0080 == 0 {
+                let value = self.read_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?)?;
+                self.write_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)?;
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(14);
+        };
+        f().with_context(|| {
+            format!(
+                "opcode2 [{}] opcode3 [{}] disp [{}]",
+                opcode2, opcode3, disp
+            )
+        })
     }
 
-    fn mov_l_inc(&mut self, opcode2: u16) -> usize {
-        if opcode2 & 0x0080 == 0 {
-            let value = self
-                .read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3))
-                .unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)).unwrap();
-            self.write_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3) & 0x07, value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        }
-        return 10;
+    fn mov_l_inc(&mut self, opcode2: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0x0080 == 0 {
+                let value = self.read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+                self.write_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(10);
+        };
+        f().with_context(|| format!("opcode2 [{}]", opcode2))
     }
 
-    fn mov_l_abs(&mut self, opcode2: u16) -> usize {
+    fn mov_l_abs(&mut self, opcode2: u16) -> Result<usize> {
         match opcode2 & 0xfff0 {
             0x6b00 | 0x6b80 => return self.mov_l_abs16(opcode2),
             0x6b20 | 0x6ba0 => return self.mov_l_abs24(opcode2),
-            _ => panic!("invalid opcode2 [{}]", opcode2),
+            _ => bail!("invalid opcode2 [{}]", opcode2),
         }
     }
 
-    fn mov_l_abs16(&mut self, opcode2: u16) -> usize {
+    fn mov_l_abs16(&mut self, opcode2: u16) -> Result<usize> {
         let abs_addr = self.fetch();
-        if opcode2 & 0xfff0 == 0x6b00 {
-            let value = self.read_abs16_l(abs_addr).unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)).unwrap();
-            self.write_abs16_l(abs_addr, value).unwrap();
-            self.mov_l_proc_pcc(value);
-        }
-        return 10;
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0xfff0 == 0x6b00 {
+                let value = self.read_abs16_l(abs_addr)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+                self.write_abs16_l(abs_addr, value)?;
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(10);
+        };
+        f().with_context(|| format!("opcode2 [{}] abs_addr [{}]", opcode2, abs_addr))
     }
 
-    fn mov_l_abs24(&mut self, opcode2: u16) -> usize {
+    fn mov_l_abs24(&mut self, opcode2: u16) -> Result<usize> {
         let abs_addr = ((self.fetch() as u32) << 16) | self.fetch() as u32;
-        if opcode2 & 0xfff0 == 0x6b20 {
-            let value = self.read_abs24_l(abs_addr).unwrap();
-            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4), value)
-                .unwrap();
-            self.mov_l_proc_pcc(value);
-        } else {
-            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)).unwrap();
-            self.write_abs24_l(abs_addr, value).unwrap();
-            self.mov_l_proc_pcc(value);
-        }
-        return 12;
+        let mut f = || -> Result<usize> {
+            if opcode2 & 0xfff0 == 0x6b20 {
+                let value = self.read_abs24_l(abs_addr)?;
+                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+                self.mov_l_proc_pcc(value);
+            } else {
+                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+                self.write_abs24_l(abs_addr, value).unwrap();
+                self.mov_l_proc_pcc(value);
+            }
+            return Ok(12);
+        };
+        f().with_context(|| format!("opcode2 [{}] abs_addr [{}]", opcode2, abs_addr))
     }
 }
