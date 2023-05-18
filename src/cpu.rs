@@ -2,7 +2,7 @@ use crate::{
     mcu::Mcu,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
 };
-use anyhow::{Context as _, Result};
+use anyhow::{bail, Context as _, Result};
 use std::{thread, time::Duration};
 
 mod addressing_mode;
@@ -63,11 +63,7 @@ impl<'a> Cpu<'a> {
     fn exec(&mut self, opcode: u16) -> Result<usize> {
         match opcode {
             0x0f80..=0x0ff7 | 0x7a00..=0x7a07 | 0x0100 => return self.mov_l(opcode),
-            _ => panic!(
-                "exec error. [opcode: {:>02x} {:>02x}]",
-                opcode >> 8 as u8,
-                opcode as u8
-            ),
+            _ => bail!("unimplemented instruction [{:>04x}]", opcode),
         }
     }
 
