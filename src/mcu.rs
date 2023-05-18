@@ -1,20 +1,25 @@
 use crate::memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR};
 use anyhow::{bail, Result};
 
+const EXCEPTION_HANDLING_VENCTOR_SIZE: usize = 0xff;
+
 // cpuは別 本来のmcuとは意味が異なるのであとで変えるかも
 pub struct Mcu {
     pub memory: Memory,
+    pub exception_handling_vector: [u8; EXCEPTION_HANDLING_VENCTOR_SIZE],
 }
 
 impl Mcu {
     pub fn new() -> Self {
         Mcu {
             memory: create_memory(),
+            exception_handling_vector: [0; EXCEPTION_HANDLING_VENCTOR_SIZE],
         }
     }
 
     pub fn write(&mut self, addr: u32, value: u8) -> Result<()> {
         match addr {
+            0x00..=0xff => self.exception_handling_vector[addr as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => {
                 self.memory[(addr - MEMORY_START_ADDR) as usize] = value
             }
@@ -25,6 +30,7 @@ impl Mcu {
 
     pub fn read(&self, addr: u32) -> Result<u8> {
         match addr {
+            0x00..=0xff => return Ok(self.exception_handling_vector[addr as usize]),
             MEMORY_START_ADDR..=MEMORY_END_ADDR => {
                 return Ok(self.memory[(addr - MEMORY_START_ADDR) as usize])
             }
