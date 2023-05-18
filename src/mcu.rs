@@ -1,16 +1,5 @@
 use crate::memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR};
 use anyhow::{bail, Result};
-use std::error::Error;
-#[derive(Debug, PartialEq)]
-pub struct AddressAccessError;
-
-impl Error for AddressAccessError {}
-
-impl std::fmt::Display for AddressAccessError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Occurred address access error.")
-    }
-}
 
 // cpuは別 本来のmcuとは意味が異なるのであとで変えるかも
 pub struct Mcu {
