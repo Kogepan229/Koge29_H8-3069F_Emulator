@@ -2,7 +2,7 @@ use crate::{
     mcu::Mcu,
     memory::{self, MEMORY_END_ADDR, MEMORY_START_ADDR},
 };
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use std::{arch::x86_64::_mm_loaddup_pd, thread, time::Duration};
 
 mod addressing_mode;
@@ -40,7 +40,9 @@ impl<'a> Cpu<'a> {
     pub fn run(&mut self) -> Result<()> {
         loop {
             let opcode = self.fetch();
-            let state = self.exec(opcode)?;
+            let state = self
+                .exec(opcode)
+                .with_context(|| format!("opcode1 [{:0>4x}]", opcode))?;
             thread::sleep(Duration::from_secs_f64(
                 state as f64 * 1.0 / CPUCLOCK as f64,
             ))
