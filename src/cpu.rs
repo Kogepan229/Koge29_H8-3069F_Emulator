@@ -14,7 +14,7 @@ pub struct Cpu<'a> {
     pub mcu: &'a mut Mcu,
     pc: u32,
     ccr: u8,
-    er: [u32; 8],
+    pub er: [u32; 8],
 }
 
 pub enum CCR {
@@ -38,6 +38,7 @@ impl<'a> Cpu<'a> {
     }
 
     pub fn run(&mut self) -> Result<()> {
+        self.er[7] = MEMORY_END_ADDR - 0xf;
         loop {
             print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
 
