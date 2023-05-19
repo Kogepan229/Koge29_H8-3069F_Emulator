@@ -39,10 +39,18 @@ impl<'a> Cpu<'a> {
 
     pub fn run(&mut self) -> Result<()> {
         loop {
+            print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
+
             let opcode = self.fetch();
-            let state = self
-                .exec(opcode)
-                .with_context(|| format!("opcode1 [{:0>4x}]", opcode))?;
+            let state = self.exec(opcode).with_context(|| {
+                format!(
+                    "[pc: {:0>8x}({:0>8x})] opcode1 [{:0>4x}]",
+                    self.pc - 2,
+                    self.pc - 2 - MEMORY_START_ADDR,
+                    opcode
+                )
+            })?;
+            println!("");
             thread::sleep(Duration::from_secs_f64(
                 state as f64 * 1.0 / CPUCLOCK as f64,
             ))
@@ -52,10 +60,11 @@ impl<'a> Cpu<'a> {
     pub fn fetch(&mut self) -> u16 {
         let _pc = self.pc & !1;
         if _pc < MEMORY_START_ADDR || _pc > MEMORY_END_ADDR {
-            panic!("fetch error [pc: {:4x}]", self.pc)
+            panic!("fetch error [pc: {:0>8x}]", self.pc)
         }
         let op = (self.mcu.memory[(_pc - MEMORY_START_ADDR) as usize] as u16) << 8
             | (self.mcu.memory[(_pc - MEMORY_START_ADDR + 1) as usize] as u16);
+        print!("{:0>2x} {:0>2x} ", (op >> 8) as u8, op as u8);
         self.pc += 2;
         op
     }
