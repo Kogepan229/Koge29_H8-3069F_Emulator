@@ -1,5 +1,6 @@
 mod jsr;
 mod mov_l;
+mod subs;
 
 use super::*;
 use anyhow::{bail, Context, Result};

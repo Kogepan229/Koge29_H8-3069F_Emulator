@@ -73,6 +73,7 @@ impl<'a> Cpu<'a> {
     fn exec(&mut self, opcode: u16) -> Result<usize> {
         match ((opcode & 0xff00) >> 8) as u8 {
             0x01 | 0x0f | 0x7a => return self.mov_l(opcode),
+            0x1b => return self.subs(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
             _ => bail!(
                 "unimplemented instruction [{:>04x}] pc [{:x}]",
