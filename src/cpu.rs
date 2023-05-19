@@ -61,14 +61,24 @@ impl<'a> Cpu<'a> {
     }
 
     fn exec(&mut self, opcode: u16) -> Result<usize> {
-        match opcode {
-            0x0f80..=0x0ff7 | 0x7a00..=0x7a07 | 0x0100 => return self.mov_l(opcode),
+        match ((opcode & 0xff00) >> 8) as u8 {
+            0x01 | 0x0f | 0x7a => return self.mov_l(opcode),
+            0x5d | 0x5e | 0x5f => return self.jsr(opcode),
             _ => bail!(
                 "unimplemented instruction [{:>04x}] pc [{:x}]",
                 opcode,
                 self.pc - 2
             ),
         }
+
+        // match opcode {
+        //     0x0f80..=0x0ff7 | 0x7a00..=0x7a07 | 0x0100 => return self.mov_l(opcode),
+        //     _ => bail!(
+        //         "unimplemented instruction [{:>04x}] pc [{:x}]",
+        //         opcode,
+        //         self.pc - 2
+        //     ),
+        // }
     }
 
     pub fn write_ccr(&mut self, target: CCR, val: u8) {
