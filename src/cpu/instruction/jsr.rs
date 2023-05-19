@@ -13,7 +13,7 @@ impl<'a> Cpu<'a> {
     fn jsr_ern(&mut self, opcode: u16) -> Result<usize> {
         let mut f = || -> Result<usize> {
             self.write_dec_ern_l(7, self.pc)?;
-            let addr = self.read_ern_l(Cpu::get_nibble_opcode(opcode, 3)?)?;
+            let addr = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 3)?)?;
             self.pc = addr;
             Ok(8)
         };
