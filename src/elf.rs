@@ -1,5 +1,6 @@
+use crate::cpu::Cpu;
 use crate::elf::program_header::SegmentType;
-use crate::memory::*;
+use crate::memory::MEMORY_START_ADDR;
 use std::io::Read;
 
 mod header;
@@ -17,7 +18,7 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub fn load(elf_path: String, memory: &mut Memory) {
+pub fn load(elf_path: String, cpu: &mut Cpu) {
     let program = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&program).unwrap();
     // println!("{:?}", hd);
@@ -48,12 +49,34 @@ pub fn load(elf_path: String, memory: &mut Memory) {
     .unwrap();
     // println!("{:#?}", pht);
 
+    // load to memory
     for ph in pht {
         if ph.ty == SegmentType::Load {
-            memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
+            cpu.mcu.memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
                 .copy_from_slice(
                     &program[ph.offset as usize..(ph.offset + ph.size_in_file) as usize],
                 );
+        }
+    }
+
+    for s in sections {
+        if s.name == ".got" {
+            // set .got section address to er5
+            cpu.er[5] = s.header.addr + MEMORY_START_ADDR;
+            println!("Set er5 [{:x}({:x})]", cpu.er[5], s.header.addr);
+
+            // Add start address of program to Global Offset
+            for i in 0..(s.header.size / 4) {
+                let mut global_off = ((cpu.mcu.memory[(s.header.addr + 4 * i) as usize] as u32)
+                    << 24)
+                    | ((cpu.mcu.memory[(s.header.addr + 4 * i + 1) as usize] as u32) << 16)
+                    | ((cpu.mcu.memory[(s.header.addr + 4 * i + 2) as usize] as u32) << 8)
+                    | (cpu.mcu.memory[(s.header.addr + 4 * i + 3) as usize] as u32);
+                global_off += MEMORY_START_ADDR;
+                cpu.mcu.memory
+                    [((s.header.addr + 4 * i) as usize)..((s.header.addr + 4 * i + 4) as usize)]
+                    .copy_from_slice(&global_off.to_be_bytes());
+            }
         }
     }
 }

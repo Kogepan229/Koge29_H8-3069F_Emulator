@@ -5,7 +5,6 @@ mod memory;
 
 use crate::cpu::Cpu;
 use mcu::Mcu;
-use memory::*;
 
 fn main() {
     let mut mcu = Mcu::new();
@@ -14,7 +13,7 @@ fn main() {
     //let mut memory: Memory = create_memory();
     elf::load(
         "D:/Desktop/VSCode/Koge29_H8-300H_Emulator/example/example2.elf".to_string(),
-        &mut cpu.mcu.memory,
+        &mut cpu,
     );
     // print_memory(&cpu.mcu.memory);
 
