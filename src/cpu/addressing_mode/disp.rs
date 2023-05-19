@@ -1,7 +1,27 @@
 use super::*;
-use anyhow::{Context as _, Result};
+use anyhow::{anyhow, Context as _, Result};
 
 impl<'a> Cpu<'a> {
+    fn add_disp16(addr: u32, disp: u16) -> Result<u32> {
+        (addr.checked_add_signed((0xffff0000 + disp as u32) as i32)).ok_or_else(|| {
+            anyhow!(
+                "attempt to add with overflow [{:x} + {:x}]",
+                addr,
+                (0xffff0000 + disp as u32)
+            )
+        })
+    }
+
+    fn add_disp24(addr: u32, disp: u32) -> Result<u32> {
+        (addr.checked_add_signed((0xff000000 + disp) as i32)).ok_or_else(|| {
+            anyhow!(
+                "attempt to add with overflow [{:x} + {:x}]",
+                addr,
+                (0xffff0000 + disp)
+            )
+        })
+    }
+
     pub(in super::super) fn write_disp16_ern_b(
         &mut self,
         register_field: u8,
@@ -13,7 +33,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x8000 == 0x0000 {
                 self.write_abs24_b((addr + disp as u32) & 0xffffff, value)?;
             } else {
-                self.write_abs24_b((addr + (0xffff0000 + disp as u32)) & 0xffffff, value)?;
+                self.write_abs24_b(Cpu::add_disp16(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
@@ -31,7 +51,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x8000 == 0x0000 {
                 Ok(self.read_abs24_b((addr + disp as u32) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_b((addr + (0xffff0000 + disp as u32)) & 0xffffff)?)
+                Ok(self.read_abs24_b(Cpu::add_disp16(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -48,7 +68,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x8000 == 0x0000 {
                 self.write_abs24_w((addr + disp as u32) & 0xffffff, value)?;
             } else {
-                self.write_abs24_w((addr + (0xffff0000 + disp as u32)) & 0xffffff, value)?;
+                self.write_abs24_w(Cpu::add_disp16(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
@@ -66,7 +86,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x8000 == 0x0000 {
                 Ok(self.read_abs24_w((addr + disp as u32) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_w((addr + (0xffff0000 + disp as u32)) & 0xffffff)?)
+                Ok(self.read_abs24_w(Cpu::add_disp16(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -78,19 +98,20 @@ impl<'a> Cpu<'a> {
         disp: u16,
         value: u32,
     ) -> Result<()> {
+        let mut addr: u32 = 0;
         let mut f = || -> Result<()> {
-            let addr = self.read_rn_l(register_field)?;
+            addr = self.read_rn_l(register_field)?;
             if disp & 0x8000 == 0x0000 {
                 self.write_abs24_l((addr + disp as u32) & 0xffffff, value)?;
             } else {
-                self.write_abs24_l((addr + (0xffff0000 + disp as u32)) & 0xffffff, value)?;
+                self.write_abs24_l(Cpu::add_disp16(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
         f().with_context(|| {
             format!(
-                "register [{:x}] disp [{:x}] value [{:x}]",
-                register_field, disp, value
+                "register [{:x}] addr [{:x}] disp [{:x}] value [{:x}]",
+                register_field, addr, disp, value
             )
         })
     }
@@ -101,7 +122,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x8000 == 0x0000 {
                 Ok(self.read_abs24_l((addr + disp as u32) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_l((addr + (0xffff0000 + disp as u32)) & 0xffffff)?)
+                Ok(self.read_abs24_l(Cpu::add_disp16(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -119,7 +140,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 self.write_abs24_b((addr + disp) & 0xffffff, value)?;
             } else {
-                self.write_abs24_b((addr + (0xff000000 + disp)) & 0xffffff, value)?;
+                self.write_abs24_b(Cpu::add_disp24(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
@@ -137,7 +158,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 Ok(self.read_abs24_b((addr + disp) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_b((addr + (0xff000000 + disp)) & 0xffffff)?)
+                Ok(self.read_abs24_b(Cpu::add_disp24(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -154,7 +175,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 self.write_abs24_w((addr + disp) & 0xffffff, value)?;
             } else {
-                self.write_abs24_w((addr + (0xff000000 + disp)) & 0xffffff, value)?;
+                self.write_abs24_w(Cpu::add_disp24(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
@@ -172,7 +193,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 Ok(self.read_abs24_w((addr + disp) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_w((addr + (0xff000000 + disp)) & 0xffffff)?)
+                Ok(self.read_abs24_w(Cpu::add_disp24(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -189,7 +210,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 self.write_abs24_l((addr + disp) & 0xffffff, value)?;
             } else {
-                self.write_abs24_l((addr + (0xff000000 + disp)) & 0xffffff, value)?;
+                self.write_abs24_l(Cpu::add_disp24(addr, disp)? & 0xffffff, value)?;
             }
             Ok(())
         };
@@ -207,7 +228,7 @@ impl<'a> Cpu<'a> {
             if disp & 0x800000 == 0x000000 {
                 Ok(self.read_abs24_l((addr + disp) & 0xffffff)?)
             } else {
-                Ok(self.read_abs24_l((addr + (0xff000000 + disp)) & 0xffffff)?)
+                Ok(self.read_abs24_l(Cpu::add_disp24(addr, disp)? & 0xffffff)?)
             }
         };
         f().with_context(|| format!("register [{:x}] disp [{:x}]", register_field, disp))
@@ -226,9 +247,9 @@ mod tests {
         cpu.write_disp16_ern_b(0, 0x0f10, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp16_ern_b(1, 0xf002, 0xff).unwrap();
-        assert_eq!(cpu.read_abs24_b(0xfff112).unwrap(), 0xff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp16_ern_b(1, 0xfff6, 0xff).unwrap();
+        assert_eq!(cpu.read_abs24_b(0xfffe00).unwrap(), 0xff);
     }
 
     #[test]
@@ -239,9 +260,9 @@ mod tests {
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         assert_eq!(cpu.read_disp16_ern_b(0, 0x0f10).unwrap(), 0xff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_b(0xfff112, 0xff).unwrap();
-        assert_eq!(cpu.read_disp16_ern_b(1, 0xf002).unwrap(), 0xff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_b(0xfffe00, 0xff).unwrap();
+        assert_eq!(cpu.read_disp16_ern_b(1, 0xfff6).unwrap(), 0xff);
     }
 
     #[test]
@@ -252,9 +273,9 @@ mod tests {
         cpu.write_disp16_ern_w(0, 0x0f10, 0x0fff).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp16_ern_w(1, 0xf002, 0x0fff).unwrap();
-        assert_eq!(cpu.read_abs24_w(0xfff112).unwrap(), 0x0fff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp16_ern_w(1, 0xfff6, 0x0fff).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xfffe00).unwrap(), 0x0fff);
     }
 
     #[test]
@@ -265,9 +286,9 @@ mod tests {
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(cpu.read_disp16_ern_w(0, 0x0f10).unwrap(), 0x0fff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_w(0xfff112, 0x0fff).unwrap();
-        assert_eq!(cpu.read_disp16_ern_w(1, 0xf002).unwrap(), 0x0fff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_w(0xfffe00, 0x0fff).unwrap();
+        assert_eq!(cpu.read_disp16_ern_w(1, 0xfff6).unwrap(), 0x0fff);
     }
 
     #[test]
@@ -278,9 +299,9 @@ mod tests {
         cpu.write_disp16_ern_l(0, 0x0f10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp16_ern_l(1, 0xf002, 0x0f0fff0f).unwrap();
-        assert_eq!(cpu.read_abs24_l(0xfff112).unwrap(), 0x0f0fff0f);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp16_ern_l(1, 0xfff6, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_abs24_l(0xfffe00).unwrap(), 0x0f0fff0f);
     }
 
     #[test]
@@ -291,9 +312,9 @@ mod tests {
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_disp16_ern_l(0, 0x0f10).unwrap(), 0x0f0fff0f);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_l(0xfff112, 0x0f0fff0f).unwrap();
-        assert_eq!(cpu.read_disp16_ern_l(1, 0xf002).unwrap(), 0x0f0fff0f);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_l(0xfffe00, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_disp16_ern_l(1, 0xfff6).unwrap(), 0x0f0fff0f);
     }
 
     #[test]
@@ -304,9 +325,9 @@ mod tests {
         cpu.write_disp24_ern_b(0, 0x000f10, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp24_ern_b(1, 0xfff002, 0xff).unwrap();
-        assert_eq!(cpu.read_abs24_b(0xfff112).unwrap(), 0xff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp24_ern_b(1, 0xfffff6, 0xff).unwrap();
+        assert_eq!(cpu.read_abs24_b(0xfffe00).unwrap(), 0xff);
     }
 
     #[test]
@@ -317,9 +338,9 @@ mod tests {
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         assert_eq!(cpu.read_disp24_ern_b(0, 0x000f10).unwrap(), 0xff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_b(0xfff112, 0xff).unwrap();
-        assert_eq!(cpu.read_disp24_ern_b(1, 0xfff002).unwrap(), 0xff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_b(0xfffe00, 0xff).unwrap();
+        assert_eq!(cpu.read_disp24_ern_b(1, 0xfffff6).unwrap(), 0xff);
     }
 
     #[test]
@@ -330,9 +351,9 @@ mod tests {
         cpu.write_disp24_ern_w(0, 0x000f10, 0x0fff).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp24_ern_w(1, 0xfff002, 0x0fff).unwrap();
-        assert_eq!(cpu.read_abs24_w(0xfff112).unwrap(), 0x0fff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp24_ern_w(1, 0xfffff6, 0x0fff).unwrap();
+        assert_eq!(cpu.read_abs24_w(0xfffe00).unwrap(), 0x0fff);
     }
 
     #[test]
@@ -343,9 +364,9 @@ mod tests {
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(cpu.read_disp24_ern_w(0, 0x000f10).unwrap(), 0x0fff);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_w(0xfff112, 0x0fff).unwrap();
-        assert_eq!(cpu.read_disp24_ern_w(1, 0xfff002).unwrap(), 0x0fff);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_w(0xfffe00, 0x0fff).unwrap();
+        assert_eq!(cpu.read_disp24_ern_w(1, 0xfffff6).unwrap(), 0x0fff);
     }
 
     #[test]
@@ -356,9 +377,9 @@ mod tests {
         cpu.write_disp24_ern_l(0, 0x000f10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_disp24_ern_l(1, 0xfff002, 0x0f0fff0f).unwrap();
-        assert_eq!(cpu.read_abs24_l(0xfff112).unwrap(), 0x0f0fff0f);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_disp24_ern_l(1, 0xfffff6, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_abs24_l(0xfffe00).unwrap(), 0x0f0fff0f);
     }
 
     #[test]
@@ -369,8 +390,8 @@ mod tests {
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_disp24_ern_l(0, 0x000f10).unwrap(), 0x0f0fff0f);
 
-        cpu.er[1] = 0x000110;
-        cpu.write_abs24_l(0xfff112, 0x0f0fff0f).unwrap();
-        assert_eq!(cpu.read_disp24_ern_l(1, 0xfff002).unwrap(), 0x0f0fff0f);
+        cpu.er[1] = 0xfffe0a;
+        cpu.write_abs24_l(0xfffe00, 0x0f0fff0f).unwrap();
+        assert_eq!(cpu.read_disp24_ern_l(1, 0xfffff6).unwrap(), 0x0f0fff0f);
     }
 }
