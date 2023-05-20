@@ -1,0 +1,70 @@
+use super::super::*;
+
+impl<'a> Cpu<'a> {
+    pub(in super::super) fn add_b(&mut self, opcode: u16) -> Result<usize> {
+        match (opcode >> 8) as u8 {
+            0x80..=0x8f => return self.add_b_imm(opcode),
+            0x08 => return self.add_b_rn(opcode),
+            _ => bail!("invalid opcode [{:>04x}]", opcode),
+        }
+    }
+
+    fn add_b_proc(&mut self, dest: u8, src: u8) -> u8 {
+        let (value, overflowed) = (dest as i8).overflowing_add(src as i8);
+        if (dest >> 3) & 1 == 0 && (value >> 3) & 1 == 1 {
+            self.write_ccr(CCR::H, 1);
+        } else {
+            self.write_ccr(CCR::H, 0);
+        }
+
+        if value < 0 {
+            self.write_ccr(CCR::N, 1);
+        } else {
+            self.write_ccr(CCR::N, 0);
+        }
+
+        if value == 0 {
+            self.write_ccr(CCR::Z, 1);
+        } else {
+            self.write_ccr(CCR::Z, 0);
+        }
+
+        if overflowed {
+            self.write_ccr(CCR::V, 1);
+        } else {
+            self.write_ccr(CCR::V, 0);
+        }
+
+        if (dest >> 7) & 1 == 0 && (value >> 7) & 1 == 1 {
+            self.write_ccr(CCR::C, 1);
+        } else {
+            self.write_ccr(CCR::C, 0);
+        }
+
+        value as u8
+    }
+
+    fn add_b_imm(&mut self, opcode: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
+            let register = Cpu::get_nibble_opcode(opcode, 2)?;
+            let dest = self.read_rn_b(register)?;
+            let result = self.add_b_proc(dest, opcode as u8);
+            self.write_rn_b(register, result)?;
+            Ok(2)
+        };
+        f()
+    }
+
+    fn add_b_rn(&mut self, opcode: u16) -> Result<usize> {
+        let mut f = || -> Result<usize> {
+            let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
+            let dest = self.read_rn_b(register_dest)?;
+            let register_src = Cpu::get_nibble_opcode(opcode, 3)? & 0x7;
+            let src = self.read_rn_b(register_src)?;
+            let result = self.add_b_proc(dest, src);
+            self.write_rn_b(register_dest, result)?;
+            Ok(2)
+        };
+        f()
+    }
+}
