@@ -1,3 +1,4 @@
+mod adds;
 mod bcc;
 mod cmp_l;
 mod jsr;

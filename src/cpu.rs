@@ -89,6 +89,7 @@ impl<'a> Cpu<'a> {
                     )
                 }
             }
+            0x0b => return self.adds(opcode),
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
             0x1f => return self.cmp_l(opcode),
