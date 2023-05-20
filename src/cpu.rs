@@ -3,6 +3,7 @@ use crate::{
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
 };
 use anyhow::{bail, Context as _, Result};
+use std::time;
 use std::{thread, time::Duration};
 
 mod addressing_mode;
@@ -40,7 +41,11 @@ impl<'a> Cpu<'a> {
     }
 
     pub fn run(&mut self) -> Result<()> {
+        let mut state_sum: usize = 0;
+        let mut loop_count: usize = 0;
         self.er[7] = MEMORY_END_ADDR - 0xf;
+        let exec_time = time::Instant::now();
+        let mut loop_time = time::Instant::now();
         loop {
             print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
 
@@ -53,16 +58,28 @@ impl<'a> Cpu<'a> {
                     opcode
                 )
             })?;
+            state_sum += state;
+            loop_count += state;
             println!("");
 
             if self.pc == self.exit_addr {
                 self.print_er();
+                println!(
+                    "state: {}, time: {}sec",
+                    state_sum,
+                    exec_time.elapsed().as_secs_f64()
+                );
                 return Ok(());
             }
 
-            thread::sleep(Duration::from_secs_f64(
-                state as f64 * 1.0 / CPUCLOCK as f64,
-            ))
+            if loop_count >= 14000 {
+                thread::sleep(
+                    Duration::from_secs_f64(loop_count as f64 * 1.0 / CPUCLOCK as f64)
+                        .saturating_sub(loop_time.elapsed()),
+                );
+                loop_count = 0;
+                loop_time = time::Instant::now();
+            }
         }
     }
 
