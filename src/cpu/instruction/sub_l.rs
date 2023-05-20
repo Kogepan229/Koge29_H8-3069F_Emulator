@@ -54,7 +54,7 @@ impl<'a> Cpu<'a> {
             self.write_rn_l(register, result)?;
             Ok(6)
         };
-        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))?;
+        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))
     }
 
     fn sub_l_rn(&mut self, opcode: u16) -> Result<usize> {
