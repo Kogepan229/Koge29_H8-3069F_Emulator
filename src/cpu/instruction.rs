@@ -3,6 +3,7 @@ mod bcc;
 mod cmp_l;
 mod jsr;
 mod mov_l;
+mod rts;
 mod sub_l;
 mod subs;
 
