@@ -36,9 +36,9 @@ impl<'a> Cpu<'a> {
         }
 
         if (dest >> 31) & 1 == 1 && (value >> 31) & 1 == 0 {
-            self.write_ccr(CCR::H, 1);
+            self.write_ccr(CCR::C, 1);
         } else {
-            self.write_ccr(CCR::H, 0);
+            self.write_ccr(CCR::C, 0);
         }
 
         value as u32
