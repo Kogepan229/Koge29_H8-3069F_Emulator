@@ -77,6 +77,8 @@ impl<'a> Cpu<'a> {
                 if opcode & 0x00f0 == 0x0 {
                     return self.mov_l(opcode);
                 } else if opcode & 0x00f0 == 0x0020 {
+                    return self.cmp_l(opcode);
+                } else if opcode & 0x00f0 == 0x0030 {
                     return self.sub_l(opcode);
                 } else {
                     bail!(
@@ -89,6 +91,7 @@ impl<'a> Cpu<'a> {
             }
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
+            0x1f => return self.cmp_l(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
             0x40..=0x4f | 0x58 => return self.bcc(opcode),
             _ => bail!(

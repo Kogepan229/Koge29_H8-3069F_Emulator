@@ -1,4 +1,5 @@
 mod bcc;
+mod cmp_l;
 mod jsr;
 mod mov_l;
 mod sub_l;
