@@ -14,7 +14,7 @@ impl<'a> Cpu<'a> {
             0x69 => return self.mov_l_ern(opcode2),
             0x6f => return self.mov_l_disp16(opcode2),
             0x78 => return self.mov_l_disp24(opcode2),
-            0x6d => return self.mov_l_inc(opcode2),
+            0x6d => return self.mov_l_inc_or_dec(opcode2),
             0x6b => return self.mov_l_abs(opcode2),
             _ => bail!("invalid opcode [{:>04x} {:>04x}]", opcode, opcode2),
         }
@@ -110,7 +110,7 @@ impl<'a> Cpu<'a> {
         })
     }
 
-    fn mov_l_inc(&mut self, opcode2: u16) -> Result<usize> {
+    fn mov_l_inc_or_dec(&mut self, opcode2: u16) -> Result<usize> {
         let mut f = || -> Result<usize> {
             if opcode2 & 0x0080 == 0 {
                 let value = self.read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)?;
@@ -118,7 +118,7 @@ impl<'a> Cpu<'a> {
                 self.mov_l_proc_pcc(value);
             } else {
                 let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
+                self.write_dec_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
                 self.mov_l_proc_pcc(value);
             }
             return Ok(10);
