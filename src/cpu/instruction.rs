@@ -1,6 +1,7 @@
 mod adds;
 mod bcc;
 mod cmp_l;
+mod jmp;
 mod jsr;
 mod mov_l;
 mod rts;
