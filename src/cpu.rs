@@ -76,7 +76,7 @@ impl<'a> Cpu<'a> {
             0x7a => {
                 if opcode & 0x00f0 == 0x0 {
                     return self.mov_l(opcode);
-                } else if opcode & 0x00f0 == 0x3 {
+                } else if opcode & 0x00f0 == 0x0020 {
                     return self.sub_l(opcode);
                 } else {
                     bail!(
