@@ -80,19 +80,22 @@ impl<'a> Cpu<'a> {
                     return self.sub_l(opcode);
                 } else {
                     bail!(
-                        "unimplemented instruction [{:>04x}] pc [{:x}]",
+                        "unimplemented instruction [{:>04x}] pc [{:x}({:x})]",
                         opcode,
-                        self.pc - 2
+                        self.pc - 2,
+                        self.pc - 2 - MEMORY_START_ADDR
                     )
                 }
             }
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
+            0x40..=0x4f | 0x58 => return self.bcc(opcode),
             _ => bail!(
-                "unimplemented instruction [{:>04x}] pc [{:x}]",
+                "unimplemented instruction [{:>04x}] pc [{:x}({:x})]",
                 opcode,
-                self.pc - 2
+                self.pc - 2,
+                self.pc - 2 - MEMORY_START_ADDR
             ),
         }
 
