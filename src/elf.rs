@@ -1,4 +1,5 @@
 use crate::cpu::Cpu;
+use crate::elf::parse_symtab::parse_symbol_table32;
 use crate::elf::program_header::SegmentType;
 use crate::memory::MEMORY_START_ADDR;
 use std::io::Read;
@@ -7,9 +8,11 @@ mod header;
 mod parse_header;
 mod parse_program_header;
 mod parse_section;
+mod parse_symtab;
 mod program_header;
 mod section;
 mod string_table;
+mod symtab;
 
 fn read_elf(path: String) -> Vec<u8> {
     let mut file = std::fs::File::open(path).expect("failed open elf");
@@ -31,7 +34,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
     let raw_section_names_offset = sht[hd.shstrndx as usize].offset;
     let raw_section_names = &program[raw_section_names_offset as usize..];
     let sections = sht
-        .into_iter()
+        .iter()
         .map(|header| section::Section32 {
             name: string_table::parse_string_table_entry(
                 &raw_section_names[header.name_idx as usize..],
@@ -76,6 +79,38 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
                 cpu.mcu.memory
                     [((s.header.addr + 4 * i) as usize)..((s.header.addr + 4 * i + 4) as usize)]
                     .copy_from_slice(&global_off.to_be_bytes());
+            }
+        } else if s.name == ".symtab" {
+            let (_, symtabs) =
+                parse_symbol_table32((s.header.size / s.header.entry_size) as usize)(
+                    &program[s.header.offset as usize..],
+                )
+                .unwrap();
+            // println!("{:#?}", symtabs);
+
+            let raw_symbol_names_offset = sht[s.header.link as usize].offset;
+            let raw_symbol_names = &program[raw_symbol_names_offset as usize..];
+            let symtabs_with_name = symtabs
+                .into_iter()
+                .map(|symtab| -> symtab::SymbolTableWithName32 {
+                    // nameの中にスペースがあるとエラー？
+                    symtab::SymbolTableWithName32 {
+                        name: string_table::parse_string_table_entry(
+                            &raw_symbol_names[symtab.name_idx as usize..],
+                        )
+                        .unwrap_or_else(|_| (&raw_symbol_names, "Error".to_string()))
+                        .1,
+                        symtab,
+                    }
+                })
+                .collect::<Vec<symtab::SymbolTableWithName32>>();
+            // println!("{:#?}", symtabs_with_name);
+
+            for symtab in symtabs_with_name {
+                if symtab.name == "___exit" {
+                    cpu.exit_addr = symtab.symtab.value + MEMORY_START_ADDR;
+                    println!("Set ___exit address");
+                }
             }
         }
     }

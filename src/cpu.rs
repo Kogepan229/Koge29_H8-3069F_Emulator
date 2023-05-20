@@ -15,6 +15,7 @@ pub struct Cpu<'a> {
     pc: u32,
     ccr: u8,
     pub er: [u32; 8],
+    pub exit_addr: u32, // address of ___exit
 }
 
 pub enum CCR {
@@ -34,6 +35,7 @@ impl<'a> Cpu<'a> {
             pc: MEMORY_START_ADDR,
             ccr: 0,
             er: [0; 8],
+            exit_addr: 0,
         }
     }
 
@@ -52,6 +54,12 @@ impl<'a> Cpu<'a> {
                 )
             })?;
             println!("");
+
+            if self.pc == self.exit_addr {
+                self.print_er();
+                return Ok(());
+            }
+
             thread::sleep(Duration::from_secs_f64(
                 state as f64 * 1.0 / CPUCLOCK as f64,
             ))
@@ -130,5 +138,12 @@ impl<'a> Cpu<'a> {
 
     pub fn read_ccr(&self, target: CCR) -> u8 {
         (self.ccr >> target as u8) & 1
+    }
+
+    fn print_er(&self) {
+        for i in 0..8 {
+            print!("ER{}:[{:x}] ", i, self.er[i]);
+        }
+        println!("");
     }
 }

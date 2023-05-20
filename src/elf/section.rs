@@ -26,9 +26,9 @@ SOFTWARE.
 */
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub struct Section32 {
+pub struct Section32<'a> {
     pub name: String,
-    pub header: SectionHeader32,
+    pub header: &'a SectionHeader32,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
