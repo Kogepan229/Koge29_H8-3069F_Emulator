@@ -44,16 +44,17 @@ impl<'a> Cpu<'a> {
         value as u32
     }
 
+    // 仕様書の図ではimmが16bitになっているが実際は32bit
     fn sub_l_imm(&mut self, opcode: u16) -> Result<usize> {
-        let opcode2 = self.fetch();
+        let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let dest = self.read_rn_l(register)?;
-            let result = self.sub_l_proc(dest, opcode2 as u32);
+            let result = self.sub_l_proc(dest, imm);
             self.write_rn_l(register, result)?;
             Ok(6)
         };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))?;
     }
 
     fn sub_l_rn(&mut self, opcode: u16) -> Result<usize> {
