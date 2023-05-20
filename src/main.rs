@@ -2,6 +2,7 @@ mod cpu;
 mod elf;
 mod mcu;
 mod memory;
+mod setting;
 
 use crate::cpu::Cpu;
 use mcu::Mcu;

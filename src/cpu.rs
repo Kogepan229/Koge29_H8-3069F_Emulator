@@ -1,6 +1,7 @@
 use crate::{
     mcu::Mcu,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
+    setting,
 };
 use anyhow::{bail, Context as _, Result};
 use std::time;
@@ -47,7 +48,9 @@ impl<'a> Cpu<'a> {
         let exec_time = time::Instant::now();
         let mut loop_time = time::Instant::now();
         loop {
-            print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
+            if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
+                print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
+            }
 
             let opcode = self.fetch();
             let state = self.exec(opcode).with_context(|| {
@@ -60,7 +63,10 @@ impl<'a> Cpu<'a> {
             })?;
             state_sum += state;
             loop_count += state;
-            println!("");
+
+            if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
+                println!("");
+            }
 
             if self.pc == self.exit_addr {
                 self.print_er();
@@ -90,7 +96,11 @@ impl<'a> Cpu<'a> {
         }
         let op = (self.mcu.memory[(_pc - MEMORY_START_ADDR) as usize] as u16) << 8
             | (self.mcu.memory[(_pc - MEMORY_START_ADDR + 1) as usize] as u16);
-        print!("{:0>2x} {:0>2x} ", (op >> 8) as u8, op as u8);
+
+        if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
+            print!("{:0>2x} {:0>2x} ", (op >> 8) as u8, op as u8);
+        }
+
         self.pc += 2;
         op
     }
