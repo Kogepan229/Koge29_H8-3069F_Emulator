@@ -9,6 +9,7 @@ mod cmp_w;
 mod jmp;
 mod jsr;
 mod mov_l;
+mod mov_w;
 mod rts;
 mod sub_b;
 mod sub_l;
