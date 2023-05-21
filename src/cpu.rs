@@ -124,6 +124,7 @@ impl<'a> Cpu<'a> {
             0x0a => return self.add_l(opcode),
             0x79 => match opcode & 0x00f0 {
                 0x0010 => return self.add_w(opcode),
+                0x0020 => return self.cmp_w(opcode),
                 0x0030 => return self.sub_w(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
@@ -139,6 +140,8 @@ impl<'a> Cpu<'a> {
             0x19 => return self.sub_w(opcode),
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
+            0x1c | 0xa0..=0xa7 => return self.cmp_b(opcode),
+            0x1d => return self.cmp_w(opcode),
             0x1f => return self.cmp_l(opcode),
             0x59 | 0x5a | 0x5b => return self.jmp(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
