@@ -1,1 +1,1 @@
-# Koge29_H8-300H_Emulator
+# Koge29_H8-3069F_Emulator
