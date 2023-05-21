@@ -10,6 +10,7 @@ mod mov_l;
 mod rts;
 mod sub_b;
 mod sub_l;
+mod sub_w;
 mod subs;
 
 use super::*;
