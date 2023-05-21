@@ -30,6 +30,17 @@ pub enum CCR {
     I,
 }
 
+macro_rules! unimpl {
+    ($op:expr, $pc:expr ) => {
+        bail!(
+            "unimplemented instruction:[{:>04x}] pc:[{:x}({:x})]",
+            $op,
+            $pc - 2,
+            $pc - 2 - MEMORY_START_ADDR
+        )
+    };
+}
+
 impl<'a> Cpu<'a> {
     pub fn new(mcu: &'a mut Mcu) -> Self {
         Cpu {
@@ -111,25 +122,13 @@ impl<'a> Cpu<'a> {
             0x80..=0x8f | 0x08 => return self.add_b(opcode),
             0x79 | 0x09 => return self.add_w(opcode),
             0x0a => return self.add_l(opcode),
-            0x7a => {
-                if opcode & 0x00f0 == 0x0 {
-                    return self.mov_l(opcode);
-                } else if opcode & 0x00f0 == 0x0010 {
-                    return self.add_l(opcode);
-                } else if opcode & 0x00f0 == 0x0020 {
-                    return self.cmp_l(opcode);
-                } else if opcode & 0x00f0 == 0x0030 {
-                    return self.sub_l(opcode);
-                } else {
-                    bail!(
-                        "unimplemented instruction [{:>04x}] pc [{:x}({:x})]",
-                        opcode,
-                        self.pc - 2,
-                        self.pc - 2 - MEMORY_START_ADDR
-                    )
-                }
-            }
-            0x80..=0x8f | 0x08 => return self.add_b(opcode),
+            0x7a => match opcode & 0x00f0 {
+                0x0 => return self.mov_l(opcode),
+                0x0010 => return self.add_l(opcode),
+                0x0020 => return self.cmp_l(opcode),
+                0x0030 => return self.sub_l(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
             0x0b => return self.adds(opcode),
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
@@ -139,22 +138,8 @@ impl<'a> Cpu<'a> {
             0x40..=0x4f | 0x58 => return self.bcc(opcode),
             0x54 => return self.rts(),
             0x57 => Ok(14), // TRAPA命令は無視
-            _ => bail!(
-                "unimplemented instruction [{:>04x}] pc [{:x}({:x})]",
-                opcode,
-                self.pc - 2,
-                self.pc - 2 - MEMORY_START_ADDR
-            ),
+            _ => unimpl!(opcode, self.pc),
         }
-
-        // match opcode {
-        //     0x0f80..=0x0ff7 | 0x7a00..=0x7a07 | 0x0100 => return self.mov_l(opcode),
-        //     _ => bail!(
-        //         "unimplemented instruction [{:>04x}] pc [{:x}]",
-        //         opcode,
-        //         self.pc - 2
-        //     ),
-        // }
     }
 
     pub fn write_ccr(&mut self, target: CCR, val: u8) {
