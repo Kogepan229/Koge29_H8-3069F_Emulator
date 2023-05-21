@@ -159,7 +159,7 @@ impl<'a> Cpu<'a> {
         match val {
             0 => self.ccr &= !(1 << target as u8),
             1 => self.ccr |= 1 << target as u8,
-            _ => panic!("[write_ccr] invalid value"),
+            _ => panic!("[write_ccr] invalid value [{:x}]", val),
         }
     }
 
