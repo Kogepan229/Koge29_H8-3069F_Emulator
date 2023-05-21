@@ -8,6 +8,7 @@ mod jmp;
 mod jsr;
 mod mov_l;
 mod rts;
+mod sub_b;
 mod sub_l;
 mod subs;
 

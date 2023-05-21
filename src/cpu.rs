@@ -130,6 +130,7 @@ impl<'a> Cpu<'a> {
                 _ => unimpl!(opcode, self.pc),
             },
             0x0b => return self.adds(opcode),
+            0x18 => return self.sub_b(opcode),
             0x1a => return self.sub_l(opcode),
             0x1b => return self.subs(opcode),
             0x1f => return self.cmp_l(opcode),
