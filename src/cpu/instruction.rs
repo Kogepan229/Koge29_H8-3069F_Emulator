@@ -1,5 +1,6 @@
 mod add_b;
 mod add_l;
+mod add_w;
 mod adds;
 mod bcc;
 mod cmp_l;
