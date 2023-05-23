@@ -89,8 +89,8 @@ impl<'a> Cpu<'a> {
                 return Ok(());
             }
 
-            if loop_count >= 14000 {
-                thread::sleep(
+            if loop_count >= 20000 {
+                spin_sleep::sleep(
                     Duration::from_secs_f64(loop_count as f64 * 1.0 / CPUCLOCK as f64)
                         .saturating_sub(loop_time.elapsed()),
                 );
