@@ -13,7 +13,7 @@ use mcu::Mcu;
 struct Args {
     /// path of the elf file to execute
     #[arg(short, long)]
-    elf: String,
+    elf: String
 
     /// Print executed opcode
     #[arg(long)]
