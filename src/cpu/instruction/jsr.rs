@@ -25,7 +25,6 @@ impl<'a> Cpu<'a> {
         let opcode2 = self.fetch();
         let abs_addr = (((opcode & 0x00ff) as u32) << 16) | opcode2 as u32;
         let mut f = || -> Result<usize> {
-            // let addr = self.read_ern_l(Cpu::get_nibble_opcode(opcode, 3)?)?;
             self.write_dec_ern_l(7, self.pc)?;
             self.pc = abs_addr;
             Ok(10)
@@ -36,11 +35,10 @@ impl<'a> Cpu<'a> {
     fn jsr_indirect(&mut self, opcode: u16) -> Result<usize> {
         let abs_addr = (opcode & 0x00ff) as u8;
         let mut f = || -> Result<usize> {
-            // let addr = self.read_ern_l(Cpu::get_nibble_opcode(opcode, 3)?)?;
             self.write_dec_ern_l(7, self.pc)?;
-            let addr = self.read_mem_indirect_l(abs_addr)?;
+            let addr = self.read_abs8_l(abs_addr)?;
             self.pc = addr;
-            Ok(10)
+            Ok(12)
         };
         f().with_context(|| format!("abs_addr:[{:x}]", abs_addr))
     }
