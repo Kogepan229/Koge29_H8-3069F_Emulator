@@ -117,7 +117,7 @@ impl<'a> Cpu<'a> {
     }
 
     pub(in super::super) fn read_disp16_ern_l(&self, register_field: u8, disp: u16) -> Result<u32> {
-        let mut f = || -> Result<u32> {
+        let f = || -> Result<u32> {
             let addr = self.read_rn_l(register_field)?;
             if disp & 0x8000 == 0x0000 {
                 Ok(self.read_abs24_l((addr + disp as u32) & 0xffffff)?)

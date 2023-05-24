@@ -5,7 +5,7 @@ use crate::{
 };
 use anyhow::{bail, Context as _, Result};
 use std::time;
-use std::{thread, time::Duration};
+use std::time::Duration;
 
 mod addressing_mode;
 mod instruction;

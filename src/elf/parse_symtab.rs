@@ -1,7 +1,7 @@
 use crate::elf::symtab::SymbolTable32;
 use nom::{
-    combinator::map, multi::count, number::complete::be_u16, number::complete::be_u32,
-    number::complete::be_u8, IResult,
+    multi::count, number::complete::be_u16, number::complete::be_u32, number::complete::be_u8,
+    IResult,
 };
 
 pub fn parse_symbol_table32<'a>(

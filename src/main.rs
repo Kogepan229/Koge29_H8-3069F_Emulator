@@ -29,7 +29,6 @@ fn main() {
     let mut mcu = Mcu::new();
     let mut cpu = Cpu::new(&mut mcu);
 
-    //let mut memory: Memory = create_memory();
     elf::load(args.elf, &mut cpu);
     // print_memory(&cpu.mcu.memory);
 

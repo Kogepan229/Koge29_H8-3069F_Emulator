@@ -4,7 +4,7 @@ impl<'a> Cpu<'a> {
     pub(in super::super) fn bcc(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x40 => return self.bra8(opcode),
-            0x41 => return self.brn8(opcode),
+            0x41 => return self.brn8(),
             0x42 => return self.bhi8(opcode),
             0x43 => return self.bls8(opcode),
             0x44 => return self.bcc8(opcode),
@@ -54,7 +54,7 @@ impl<'a> Cpu<'a> {
         Ok(6)
     }
 
-    fn brn8(&mut self, opcode: u16) -> Result<usize> {
+    fn brn8(&mut self) -> Result<usize> {
         Ok(4)
     }
 
