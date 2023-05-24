@@ -27,6 +27,7 @@ pub enum CCR {
     N,
     U,
     H,
+    UI,
     I,
 }
 
