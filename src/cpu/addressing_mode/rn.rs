@@ -1,6 +1,5 @@
+use crate::cpu::Cpu;
 use anyhow::{bail, Result};
-
-use super::*;
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn write_rn_b(&mut self, register_field: u8, value: u8) -> Result<()> {

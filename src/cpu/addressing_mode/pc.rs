@@ -1,5 +1,5 @@
-use super::*;
-use anyhow::{anyhow, Context as _, Result};
+use crate::cpu::Cpu;
+use anyhow::{anyhow, bail, Result};
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn pc_disp8(&mut self, disp: u8) -> Result<()> {

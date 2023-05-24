@@ -1,4 +1,5 @@
-use super::super::*;
+use crate::cpu::Cpu;
+use anyhow::{bail, Result};
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn jmp(&mut self, opcode: u16) -> Result<usize> {

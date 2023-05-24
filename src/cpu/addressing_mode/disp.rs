@@ -1,4 +1,4 @@
-use super::*;
+use crate::cpu::Cpu;
 use anyhow::{anyhow, Context as _, Result};
 
 impl<'a> Cpu<'a> {

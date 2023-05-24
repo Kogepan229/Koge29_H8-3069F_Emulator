@@ -1,4 +1,5 @@
-use super::super::*;
+use crate::cpu::Cpu;
+use anyhow::{bail, Context as _, Result};
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn jsr(&mut self, opcode: u16) -> Result<usize> {

@@ -1,6 +1,5 @@
+use crate::cpu::Cpu;
 use anyhow::{Context as _, Result};
-
-use super::*;
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn write_inc_ern_b(

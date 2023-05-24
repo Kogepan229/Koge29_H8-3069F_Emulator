@@ -1,4 +1,5 @@
-use super::super::*;
+use crate::cpu::{Cpu, CCR};
+use anyhow::Result;
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn sub_b(&mut self, opcode: u16) -> Result<usize> {

@@ -16,8 +16,8 @@ mod sub_l;
 mod sub_w;
 mod subs;
 
-use super::*;
-use anyhow::{bail, Context, Result};
+use crate::cpu::Cpu;
+use anyhow::{bail, Result};
 
 impl<'a> Cpu<'a> {
     // order: 1 ~ 4 [0x1234]
