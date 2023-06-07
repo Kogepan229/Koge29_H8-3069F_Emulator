@@ -8,7 +8,6 @@ impl<'a> Cpu<'a> {
             0x79 => return self.mov_w_imm(opcode),
             0x69 => return self.mov_w_ern(opcode),
             0x6f => return self.mov_w_disp16(opcode),
-            0x78 => return self.mov_w_disp24(opcode),
             0x6d => return self.mov_w_inc_or_dec(opcode),
             0x6b => return self.mov_w_abs(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
@@ -82,8 +81,7 @@ impl<'a> Cpu<'a> {
         f().with_context(|| format!("disp [{:x}]", disp))
     }
 
-    fn mov_w_disp24(&mut self, opcode: u16) -> Result<usize> {
-        let opcode2 = self.fetch();
+    pub(in super::super) fn mov_w_disp24(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
         let disp = ((self.fetch() as u32) << 16) | self.fetch() as u32;
         let mut f = || -> Result<usize> {
             if opcode2 & 0xfff0 == 0x6b20 {

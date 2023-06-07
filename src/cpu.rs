@@ -119,9 +119,21 @@ impl<'a> Cpu<'a> {
 
     fn exec(&mut self, opcode: u16) -> Result<usize> {
         match ((opcode & 0xff00) >> 8) as u8 {
+            0x0c | 0xf0..=0xf7 | 0x68 | 0x6e | 0x6c | 0x20..=0x27 | 0x6a => {
+                return self.mov_b(opcode)
+            }
             0x0d => return self.mov_w(opcode),
-            0x69 | 0x6f | 0x78 | 0x6d | 0x6b => return self.mov_w(opcode),
+            0x69 | 0x6f | 0x6d | 0x6b => return self.mov_w(opcode),
             0x01 | 0x0f => return self.mov_l(opcode),
+
+            0x78 => {
+                let opcode2 = self.fetch();
+                match (opcode2 >> 8) as u8 {
+                    0x6a => return self.mov_b_disp24(opcode, opcode2),
+                    0x6b => return self.mov_w_disp24(opcode, opcode2),
+                    _ => unimpl!(opcode, self.pc),
+                }
+            }
 
             0x79 => match opcode & 0x00f0 {
                 0x0 => return self.mov_w(opcode),
