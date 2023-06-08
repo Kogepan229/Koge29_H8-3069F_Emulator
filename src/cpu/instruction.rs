@@ -14,6 +14,7 @@ mod jsr;
 mod mov_b;
 mod mov_l;
 mod mov_w;
+mod or;
 mod rts;
 mod sub_b;
 mod sub_l;
