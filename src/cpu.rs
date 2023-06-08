@@ -119,7 +119,7 @@ impl<'a> Cpu<'a> {
 
     fn exec(&mut self, opcode: u16) -> Result<usize> {
         match ((opcode & 0xff00) >> 8) as u8 {
-            0x0c | 0xf0..=0xf7 | 0x68 | 0x6e | 0x6c | 0x20..=0x27 | 0x6a => {
+            0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x27 | 0x6a => {
                 return self.mov_b(opcode)
             }
             0x0d => return self.mov_w(opcode),

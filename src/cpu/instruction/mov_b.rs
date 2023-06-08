@@ -3,13 +3,13 @@ use anyhow::{bail, Context as _, Result};
 
 impl<'a> Cpu<'a> {
     pub(in super::super) fn mov_b(&mut self, opcode: u16) -> Result<usize> {
-        match opcode as u8 {
+        match (opcode >> 8) as u8 {
             0x0c => return self.mov_b_rn(opcode),
-            0xf0..=0xf7 => return self.mov_b_imm(opcode),
+            0xf0..=0xfb => return self.mov_b_imm(opcode),
             0x68 => return self.mov_b_ern(opcode),
             0x6e => return self.mov_b_disp16(opcode),
             0x6c => return self.mov_b_inc_or_dec(opcode),
-            0x20..=0x27 | 0x30..=0x37 => return self.mov_b_abs8(opcode),
+            0x20..=0x2f | 0x30..=0x3f => return self.mov_b_abs8(opcode),
             0x6a => return self.mov_b_abs_16_or_24(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
