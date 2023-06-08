@@ -4,7 +4,6 @@ use anyhow::Result;
 impl<'a> Cpu<'a> {
     pub(in super::super) fn inc_b(&mut self, opcode: u16) -> Result<usize> {
         let result = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)? + 1;
-        // (self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)? as i8).overflowing_add(1);
         self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, result)?;
         if (result as i8) < 0 {
             self.write_ccr(CCR::N, 1);
