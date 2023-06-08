@@ -12,7 +12,7 @@ impl<'a> Cpu<'a> {
 
     fn add_l_proc(&mut self, dest: u32, src: u32) -> u32 {
         let (value, overflowed) = (dest as i32).overflowing_add(src as i32);
-        if (dest >> 27) & 1 == 0 && (value >> 27) & 1 == 1 {
+        if (dest & 0x0fffffff) + (src & 0x0fffffff) > 0x0fffffff {
             self.write_ccr(CCR::H, 1);
         } else {
             self.write_ccr(CCR::H, 0);
@@ -36,7 +36,7 @@ impl<'a> Cpu<'a> {
             self.write_ccr(CCR::V, 0);
         }
 
-        if (dest >> 31) & 1 == 0 && (value >> 31) & 1 == 1 {
+        if (dest as u64) + (src as u64) > 0xffffffff {
             self.write_ccr(CCR::C, 1);
         } else {
             self.write_ccr(CCR::C, 0);
