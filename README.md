@@ -19,7 +19,7 @@
 | ADDS        | <ul><li>[x] L</ul>                     |
 | SUBS        | <ul><li>[x] L</ul>                     |
 | INC         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| DEC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| DEC         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | DAA         | <ul><li>[ ] B</ul>                     |
 | DAS         | <ul><li>[ ] B</ul>                     |
 | MULXU       | <ul><li>[ ] B<li> [ ] W</ul>           |

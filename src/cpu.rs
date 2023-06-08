@@ -168,13 +168,28 @@ impl<'a> Cpu<'a> {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x1a => match opcode as u8 {
+                0x00..=0x07 => return self.dec_b(opcode),
+                0x80..=0xf7 => return self.sub_l(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
+            0x1b => match opcode as u8 {
+                0x50..=0x57 => return self.dec_w_1(opcode),
+                0xd0..=0xd7 => return self.dec_w_2(opcode),
+                0x70..=0x77 => return self.dec_l_1(opcode),
+                0xf0..=0xf7 => return self.dec_l_2(opcode),
+                0x00..=0x07 => return self.subs1(opcode),
+                0x80..=0x87 => return self.subs2(opcode),
+                0x90..=0x97 => return self.subs4(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
             0x80..=0x8f | 0x08 => return self.add_b(opcode),
             0x09 => return self.add_w(opcode),
 
             0x18 => return self.sub_b(opcode),
             0x19 => return self.sub_w(opcode),
-            0x1a => return self.sub_l(opcode),
-            0x1b => return self.subs(opcode),
 
             0x1c | 0xa0..=0xa7 => return self.cmp_b(opcode),
             0x1d => return self.cmp_w(opcode),
