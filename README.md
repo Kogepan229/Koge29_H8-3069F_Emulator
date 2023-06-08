@@ -29,7 +29,7 @@
 | NEG         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | EXTU        | <ul><li>[ ] W<li> [ ] L</ul>           |
 | EXTS        | <ul><li>[ ] W<li> [ ] L</ul>           |
-| AND         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| AND         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | OR          | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | XOR         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | Shift       | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |

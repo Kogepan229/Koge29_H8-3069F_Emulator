@@ -2,6 +2,7 @@ mod add_b;
 mod add_l;
 mod add_w;
 mod adds;
+mod and;
 mod bcc;
 mod cmp_b;
 mod cmp_l;

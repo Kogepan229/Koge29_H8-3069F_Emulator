@@ -124,7 +124,13 @@ impl<'a> Cpu<'a> {
             }
             0x0d => return self.mov_w(opcode),
             0x69 | 0x6f | 0x6d | 0x6b => return self.mov_w(opcode),
-            0x01 | 0x0f => return self.mov_l(opcode),
+            0x0f => return self.mov_l(opcode),
+
+            0x01 => match opcode as u8 {
+                0x00 => return self.mov_l(opcode),
+                0xf0 => return self.and_l_rn(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
 
             0x78 => {
                 let opcode2 = self.fetch();
@@ -140,6 +146,7 @@ impl<'a> Cpu<'a> {
                 0x0010 => return self.add_w(opcode),
                 0x0020 => return self.cmp_w(opcode),
                 0x0030 => return self.sub_w(opcode),
+                0x0060 => return self.and_w_imm(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -148,6 +155,7 @@ impl<'a> Cpu<'a> {
                 0x0010 => return self.add_l(opcode),
                 0x0020 => return self.cmp_l(opcode),
                 0x0030 => return self.sub_l(opcode),
+                0x0060 => return self.and_l_imm(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -194,6 +202,10 @@ impl<'a> Cpu<'a> {
             0x1c | 0xa0..=0xa7 => return self.cmp_b(opcode),
             0x1d => return self.cmp_w(opcode),
             0x1f => return self.cmp_l(opcode),
+
+            0xe0..=0xe7 => return self.and_b_imm(opcode),
+            0x16 => return self.and_b_rn(opcode),
+            0x66 => return self.and_w_rn(opcode),
 
             0x59 | 0x5a | 0x5b => return self.jmp(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
