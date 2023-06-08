@@ -78,7 +78,7 @@ impl<'a> Cpu<'a> {
         } else {
             self.write_ccr(CCR::Z, 0);
         }
-        if result == 0x8000 {
+        if result == 0x80000000 {
             self.write_ccr(CCR::V, 1);
         } else {
             self.write_ccr(CCR::V, 0);
@@ -99,7 +99,7 @@ impl<'a> Cpu<'a> {
         } else {
             self.write_ccr(CCR::Z, 0);
         }
-        if result == 0x8000 || result == 0x8001 {
+        if result == 0x80000000 || result == 0x80000001 {
             self.write_ccr(CCR::V, 1);
         } else {
             self.write_ccr(CCR::V, 0);
