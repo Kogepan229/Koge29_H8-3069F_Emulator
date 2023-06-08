@@ -151,10 +151,23 @@ impl<'a> Cpu<'a> {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x0a => match opcode as u8 {
+                0x00..=0x07 => return self.inc_b(opcode),
+                0x80..=0xf7 => return self.add_l(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
+            0x0b => match opcode as u8 {
+                0x50..=0x57 => return self.inc_w_1(opcode),
+                0xd0..=0xd7 => return self.inc_w_2(opcode),
+                0x70..=0x77 => return self.inc_l_1(opcode),
+                0xf0..=0xf7 => return self.inc_l_2(opcode),
+                0x00..=0x07 | 0x80..=0x87 | 0x90..=0x97 => return self.adds(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
             0x80..=0x8f | 0x08 => return self.add_b(opcode),
             0x09 => return self.add_w(opcode),
-            0x0a => return self.add_l(opcode),
-            0x0b => return self.adds(opcode),
 
             0x18 => return self.sub_b(opcode),
             0x19 => return self.sub_w(opcode),

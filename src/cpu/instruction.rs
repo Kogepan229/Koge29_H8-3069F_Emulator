@@ -6,6 +6,7 @@ mod bcc;
 mod cmp_b;
 mod cmp_l;
 mod cmp_w;
+mod inc;
 mod jmp;
 mod jsr;
 mod mov_b;

@@ -18,7 +18,7 @@
 | SUBX        | <ul><li>[ ] B</ul>                     |
 | ADDS        | <ul><li>[x] L</ul>                     |
 | SUBS        | <ul><li>[x] L</ul>                     |
-| INC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| INC         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | DEC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | DAA         | <ul><li>[ ] B</ul>                     |
 | DAS         | <ul><li>[ ] B</ul>                     |
