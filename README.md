@@ -7,9 +7,9 @@
 | Instruction | Implemented                            |
 | ----------- | -------------------------------------- |
 | MOV         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| POP         | <ul><li>[ ] W<li> [ ] L</ul>           |
-| PUSH        | <ul><li>[ ] W<li> [ ] L</ul>           |
-| MOVEPE      | <ul><li>[ ] B</ul>                     |
+| POP         | <ul><li>[x] W<li> [x] L</ul>           |
+| PUSH        | <ul><li>[x] W<li> [x] L</ul>           |
+| MOVFPE      | <ul><li>[ ] B</ul>                     |
 | MOVTPE      | <ul><li>[ ] B</ul>                     |
 | ADD         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | CMP         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
