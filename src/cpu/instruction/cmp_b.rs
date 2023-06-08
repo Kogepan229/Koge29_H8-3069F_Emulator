@@ -4,7 +4,7 @@ use anyhow::{bail, Result};
 impl<'a> Cpu<'a> {
     pub(in super::super) fn cmp_b(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
-            0xa0..=0xa7 => return self.cmp_b_imm(opcode),
+            0xa0..=0xaf => return self.cmp_b_imm(opcode),
             0x1c => return self.cmp_b_rn(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }

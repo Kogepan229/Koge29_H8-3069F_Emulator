@@ -119,7 +119,7 @@ impl<'a> Cpu<'a> {
 
     fn exec(&mut self, opcode: u16) -> Result<usize> {
         match ((opcode & 0xff00) >> 8) as u8 {
-            0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x27 | 0x6a => {
+            0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x2f | 0x30..=0x3f | 0x6a => {
                 return self.mov_b(opcode)
             }
             0x0d => return self.mov_w(opcode),
@@ -160,14 +160,14 @@ impl<'a> Cpu<'a> {
             },
 
             0x0a => match opcode as u8 {
-                0x00..=0x07 => return self.inc_b(opcode),
+                0x00..=0x0f => return self.inc_b(opcode),
                 0x80..=0xf7 => return self.add_l(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x0b => match opcode as u8 {
-                0x50..=0x57 => return self.inc_w_1(opcode),
-                0xd0..=0xd7 => return self.inc_w_2(opcode),
+                0x50..=0x5f => return self.inc_w_1(opcode),
+                0xd0..=0xdf => return self.inc_w_2(opcode),
                 0x70..=0x77 => return self.inc_l_1(opcode),
                 0xf0..=0xf7 => return self.inc_l_2(opcode),
                 0x00..=0x07 => return self.adds1(opcode),
@@ -177,14 +177,14 @@ impl<'a> Cpu<'a> {
             },
 
             0x1a => match opcode as u8 {
-                0x00..=0x07 => return self.dec_b(opcode),
+                0x00..=0x0f => return self.dec_b(opcode),
                 0x80..=0xf7 => return self.sub_l(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x1b => match opcode as u8 {
-                0x50..=0x57 => return self.dec_w_1(opcode),
-                0xd0..=0xd7 => return self.dec_w_2(opcode),
+                0x50..=0x5f => return self.dec_w_1(opcode),
+                0xd0..=0xdf => return self.dec_w_2(opcode),
                 0x70..=0x77 => return self.dec_l_1(opcode),
                 0xf0..=0xf7 => return self.dec_l_2(opcode),
                 0x00..=0x07 => return self.subs1(opcode),
@@ -199,11 +199,11 @@ impl<'a> Cpu<'a> {
             0x18 => return self.sub_b(opcode),
             0x19 => return self.sub_w(opcode),
 
-            0x1c | 0xa0..=0xa7 => return self.cmp_b(opcode),
+            0x1c | 0xa0..=0xaf => return self.cmp_b(opcode),
             0x1d => return self.cmp_w(opcode),
             0x1f => return self.cmp_l(opcode),
 
-            0xe0..=0xe7 => return self.and_b_imm(opcode),
+            0xe0..=0xef => return self.and_b_imm(opcode),
             0x16 => return self.and_b_rn(opcode),
             0x66 => return self.and_w_rn(opcode),
 
