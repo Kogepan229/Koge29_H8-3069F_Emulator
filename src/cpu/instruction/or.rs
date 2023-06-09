@@ -11,7 +11,7 @@ impl<'a> Cpu<'a> {
         } else {
             self.write_ccr(CCR::N, 0);
         }
-        if (result as i8) == 0 {
+        if result == 0 {
             self.write_ccr(CCR::Z, 1);
         } else {
             self.write_ccr(CCR::Z, 0);
