@@ -199,7 +199,7 @@ mod tests {
         let opcode = cpu.fetch();
         cpu.exec(opcode).unwrap();
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_rn_b(0).unwrap(), 0);
+        assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0);
     }
 
     #[test]
@@ -272,7 +272,7 @@ mod tests {
         let opcode = cpu.fetch();
         cpu.exec(opcode).unwrap();
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_rn_w(0).unwrap(), 0);
+        assert_eq!(cpu.read_rn_w(0xf).unwrap(), 0);
     }
 
     #[test]
