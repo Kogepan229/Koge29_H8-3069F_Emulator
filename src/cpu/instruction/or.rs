@@ -104,9 +104,7 @@ impl<'a> Cpu<'a> {
         f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))
     }
 
-    pub(in super::super) fn or_l_rn(&mut self, _opcode: u16) -> Result<usize> {
-        let opcode2 = self.fetch();
-
+    pub(in super::super) fn or_l_rn(&mut self, _opcode: u16, opcode2: u16) -> Result<usize> {
         let mut f = || -> Result<usize> {
             let register_src = Cpu::get_nibble_opcode(opcode2, 3)?;
             let register_dest = Cpu::get_nibble_opcode(opcode2, 4)?;

@@ -131,8 +131,8 @@ impl<'a> Cpu<'a> {
                 0xf0 => {
                     let opcode2 = self.fetch();
                     match (opcode2 >> 8) as u8 {
-                        0x64 => return self.or_l_rn(opcode),
-                        0x66 => return self.and_l_rn(opcode),
+                        0x64 => return self.or_l_rn(opcode, opcode2),
+                        0x66 => return self.and_l_rn(opcode, opcode2),
                         _ => unimpl!(opcode, self.pc),
                     }
                 }
