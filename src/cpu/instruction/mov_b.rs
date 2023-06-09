@@ -5,7 +5,7 @@ impl<'a> Cpu<'a> {
     pub(in super::super) fn mov_b(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x0c => return self.mov_b_rn(opcode),
-            0xf0..=0xfb => return self.mov_b_imm(opcode),
+            0xf0..=0xff => return self.mov_b_imm(opcode),
             0x68 => return self.mov_b_ern(opcode),
             0x6e => return self.mov_b_disp16(opcode),
             0x6c => return self.mov_b_inc_or_dec(opcode),
