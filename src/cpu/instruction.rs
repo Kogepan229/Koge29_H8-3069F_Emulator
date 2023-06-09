@@ -24,7 +24,7 @@ mod subs;
 use crate::cpu::Cpu;
 use anyhow::{bail, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     // order: 1 ~ 4 [0x1234]
     pub fn get_nibble_opcode(opcode: u16, order: u8) -> Result<u8> {
         match order {

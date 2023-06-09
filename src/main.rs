@@ -7,7 +7,6 @@ mod setting;
 use clap::Parser;
 
 use crate::cpu::Cpu;
-use mcu::Mcu;
 
 #[derive(Parser)]
 struct Args {
@@ -26,8 +25,7 @@ fn main() {
         *setting::ENABLE_PRINT_OPCODE.write().unwrap() = v;
     }
 
-    let mut mcu = Mcu::new();
-    let mut cpu = Cpu::new(&mut mcu);
+    let mut cpu = Cpu::new();
 
     elf::load(args.elf, &mut cpu);
     // print_memory(&cpu.mcu.memory);

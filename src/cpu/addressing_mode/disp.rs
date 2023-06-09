@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{anyhow, Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     fn add_disp16(addr: u32, disp: u16) -> Result<u32> {
         (addr.checked_add_signed((0xffff0000 + disp as u32) as i32)).ok_or_else(|| {
             anyhow!(
@@ -237,12 +237,11 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu};
+    use crate::cpu::Cpu;
 
     #[test]
     fn test_write_disp16_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp16_ern_b(0, 0x0f10, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
@@ -254,8 +253,7 @@ mod tests {
 
     #[test]
     fn test_read_disp16_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         assert_eq!(cpu.read_disp16_ern_b(0, 0x0f10).unwrap(), 0xff);
@@ -267,8 +265,7 @@ mod tests {
 
     #[test]
     fn test_write_disp16_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp16_ern_w(0, 0x0f10, 0x0fff).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
@@ -280,8 +277,7 @@ mod tests {
 
     #[test]
     fn test_read_disp16_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(cpu.read_disp16_ern_w(0, 0x0f10).unwrap(), 0x0fff);
@@ -293,8 +289,7 @@ mod tests {
 
     #[test]
     fn test_write_disp16_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp16_ern_l(0, 0x0f10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f);
@@ -306,8 +301,7 @@ mod tests {
 
     #[test]
     fn test_read_disp16_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_disp16_ern_l(0, 0x0f10).unwrap(), 0x0f0fff0f);
@@ -319,8 +313,7 @@ mod tests {
 
     #[test]
     fn test_write_disp24_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp24_ern_b(0, 0x000f10, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
@@ -332,8 +325,7 @@ mod tests {
 
     #[test]
     fn test_read_disp24_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         assert_eq!(cpu.read_disp24_ern_b(0, 0x000f10).unwrap(), 0xff);
@@ -345,8 +337,7 @@ mod tests {
 
     #[test]
     fn test_write_disp24_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp24_ern_w(0, 0x000f10, 0x0fff).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
@@ -358,8 +349,7 @@ mod tests {
 
     #[test]
     fn test_read_disp24_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(cpu.read_disp24_ern_w(0, 0x000f10).unwrap(), 0x0fff);
@@ -371,8 +361,7 @@ mod tests {
 
     #[test]
     fn test_write_disp24_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_disp24_ern_l(0, 0x000f10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f);
@@ -384,8 +373,7 @@ mod tests {
 
     #[test]
     fn test_read_disp24_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_disp24_ern_l(0, 0x000f10).unwrap(), 0x0f0fff0f);

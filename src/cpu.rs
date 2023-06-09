@@ -12,8 +12,8 @@ mod instruction;
 
 const CPUCLOCK: usize = 20000000;
 
-pub struct Cpu<'a> {
-    pub mcu: &'a mut Mcu,
+pub struct Cpu {
+    pub mcu: Mcu,
     pc: u32,
     ccr: u8,
     pub er: [u32; 8],
@@ -42,10 +42,10 @@ macro_rules! unimpl {
     };
 }
 
-impl<'a> Cpu<'a> {
-    pub fn new(mcu: &'a mut Mcu) -> Self {
+impl Cpu {
+    pub fn new() -> Self {
         Cpu {
-            mcu: mcu,
+            mcu: Mcu::new(),
             pc: MEMORY_START_ADDR,
             ccr: 0,
             er: [0; 8],

@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{bail, Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn jsr(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x5d => return self.jsr_ern(opcode),

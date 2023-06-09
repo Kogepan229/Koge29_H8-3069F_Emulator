@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn write_ern_b(&mut self, register_field: u8, value: u8) -> Result<()> {
         let addr = self
             .read_rn_l(register_field)
@@ -56,11 +56,10 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu};
+    use crate::cpu::Cpu;
     #[test]
     fn test_write_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_ern_b(0, 0xff).unwrap();
 
@@ -69,8 +68,7 @@ mod tests {
 
     #[test]
     fn test_read_ern_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xff)
@@ -78,8 +76,7 @@ mod tests {
 
     #[test]
     fn test_write_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_ern_w(0, 0x0fff).unwrap();
 
@@ -88,8 +85,7 @@ mod tests {
 
     #[test]
     fn test_read_ern_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(cpu.read_ern_w(0).unwrap(), 0x0fff)
@@ -97,8 +93,7 @@ mod tests {
 
     #[test]
     fn test_write_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_ern_l(0, 0x0f0fff0f).unwrap();
 
@@ -107,8 +102,7 @@ mod tests {
 
     #[test]
     fn test_read_ern_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(cpu.read_ern_l(0).unwrap(), 0x0f0fff0f)

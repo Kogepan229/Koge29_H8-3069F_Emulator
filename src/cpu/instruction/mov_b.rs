@@ -1,7 +1,7 @@
 use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn mov_b(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x0c => return self.mov_b_rn(opcode),
@@ -175,12 +175,11 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu, memory::MEMORY_START_ADDR};
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[test]
     fn test_mov_b_rn() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
@@ -191,8 +190,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0xf0]);
@@ -203,8 +201,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
@@ -218,8 +215,7 @@ mod tests {
 
     #[test]
     fn test_mov_b_imm() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0xf0, 0xa5]);
@@ -229,8 +225,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0xff, 0xa5]);
@@ -240,8 +235,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0xf0, 0x00]);
@@ -257,8 +251,7 @@ mod tests {
         ////////
         // EAs to Rd
 
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -270,8 +263,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -283,8 +275,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -299,8 +290,7 @@ mod tests {
         ////////
         // Rs to ERs
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0, 0xa5).unwrap();
@@ -312,8 +302,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_abs24_b(0xffcf20).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
@@ -325,8 +314,7 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_abs24_b(0xffcf20).unwrap(), 0xa5);
 
-        mcu = Mcu::new();
-        cpu = Cpu::new(&mut mcu);
+        cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
         cpu.write_rn_b(0, 0).unwrap();

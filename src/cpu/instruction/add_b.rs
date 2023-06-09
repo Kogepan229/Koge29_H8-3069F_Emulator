@@ -1,7 +1,7 @@
 use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn add_b(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x80..=0x8f => return self.add_b_imm(opcode),

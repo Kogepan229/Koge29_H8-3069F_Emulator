@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{bail, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn jmp(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x59 => return self.jmp_ern(opcode),

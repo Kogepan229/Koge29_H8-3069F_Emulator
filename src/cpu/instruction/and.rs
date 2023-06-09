@@ -1,7 +1,7 @@
 use crate::cpu::{Cpu, CCR};
 use anyhow::{Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn and_b_imm(&mut self, opcode: u16) -> Result<usize> {
         let register = Cpu::get_nibble_opcode(opcode, 2)?;
         let result = self.read_rn_b(register)? & opcode as u8;
@@ -129,12 +129,11 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu, memory::MEMORY_START_ADDR};
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[test]
     fn test_and_b_imm() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0xe0, 0x80]);
         cpu.write_rn_b(0, 0xaf).unwrap();
@@ -164,8 +163,7 @@ mod tests {
 
     #[test]
     fn test_and_b_rn() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0x16, 0x0f]);
         cpu.write_rn_b(0, 0xaf).unwrap();
@@ -204,8 +202,7 @@ mod tests {
 
     #[test]
     fn test_and_w_imm() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..4].copy_from_slice(&[0x79, 0x60, 0x80, 0x80]);
         cpu.write_rn_w(0, 0xafaf).unwrap();
@@ -235,8 +232,7 @@ mod tests {
 
     #[test]
     fn test_and_w_rn() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..2].copy_from_slice(&[0x66, 0x0f]);
         cpu.write_rn_w(0, 0xafaf).unwrap();
@@ -277,8 +273,7 @@ mod tests {
 
     #[test]
     fn test_and_l_imm() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..6].copy_from_slice(&[0x7a, 0x60, 0x80, 0x80, 0x80, 0x80]);
         cpu.write_rn_l(0, 0xafafafaf).unwrap();
@@ -308,8 +303,7 @@ mod tests {
 
     #[test]
     fn test_and_l_rn() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
 
         cpu.mcu.memory[0..4].copy_from_slice(&[0x01, 0xf0, 0x66, 0x07]);
         cpu.write_rn_l(0, 0xafafafaf).unwrap();

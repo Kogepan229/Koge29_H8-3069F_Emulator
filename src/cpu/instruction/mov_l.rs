@@ -1,7 +1,7 @@
 use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Context as _, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn mov_l(&mut self, opcode: u16) -> Result<usize> {
         if opcode & 0xff00 == 0x0f00 {
             return self.mov_l_rn(opcode);

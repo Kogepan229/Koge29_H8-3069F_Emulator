@@ -1,7 +1,7 @@
 use crate::cpu::{Cpu, CCR};
 use anyhow::Result;
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn dec_b(&mut self, opcode: u16) -> Result<usize> {
         let result = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)? - 1;
         self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, result)?;

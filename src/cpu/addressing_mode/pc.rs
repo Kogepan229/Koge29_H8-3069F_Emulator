@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{anyhow, bail, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn pc_disp8(&mut self, disp: u8) -> Result<()> {
         let mut _disp = disp as u32;
         if (disp & 0x80) == 0x80 {
@@ -41,12 +41,11 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu};
+    use crate::cpu::Cpu;
 
     #[test]
     fn pc_disp8() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.pc = 0xffff02;
         cpu.pc_disp8(0xfe).unwrap();
         assert_eq!(cpu.pc, 0xffff00);
@@ -58,8 +57,7 @@ mod tests {
 
     #[test]
     fn pc_disp16() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.pc = 0xffff02;
         cpu.pc_disp16(0xfffe).unwrap();
         assert_eq!(cpu.pc, 0xffff00);

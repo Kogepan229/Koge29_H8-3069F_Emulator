@@ -1,7 +1,7 @@
 use crate::cpu::Cpu;
 use anyhow::{bail, Result};
 
-impl<'a> Cpu<'a> {
+impl Cpu {
     pub(in super::super) fn write_rn_b(&mut self, register_field: u8, value: u8) -> Result<()> {
         match register_field {
             // R0H..=R7H
@@ -76,12 +76,11 @@ impl<'a> Cpu<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, mcu::Mcu};
+    use crate::cpu::Cpu;
 
     #[test]
     fn test_write_rn_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.write_rn_b(0b0000, 0xff).unwrap(); // R0H
         cpu.write_rn_b(0b0111, 0xff).unwrap(); // R7H
         assert_eq!(cpu.er[0], 0x0000ff00);
@@ -98,8 +97,7 @@ mod tests {
 
     #[test]
     fn test_read_rn_b() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0x0000ff00;
         cpu.er[7] = 0x0000ff00;
         assert_eq!(cpu.read_rn_b(0b0000).unwrap(), 0xff); // R0H
@@ -115,8 +113,7 @@ mod tests {
 
     #[test]
     fn test_write_rn_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.write_rn_w(0b0000, 0xffff).unwrap(); // R0
         cpu.write_rn_w(0b0111, 0xffff).unwrap(); // R7
         assert_eq!(cpu.er[0], 0x0000ffff);
@@ -133,8 +130,7 @@ mod tests {
 
     #[test]
     fn test_read_rn_w() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0x0000ffff;
         cpu.er[7] = 0x0000ffff;
         assert_eq!(cpu.read_rn_w(0b0000).unwrap(), 0xffff); // R0
@@ -150,8 +146,7 @@ mod tests {
 
     #[test]
     fn test_write_rn_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.write_rn_l(0b0000, 0xffffffff).unwrap(); // ER0
         cpu.write_rn_l(0b0001, 0xf0f0f0f0).unwrap(); // ER1
         cpu.write_rn_l(0b0111, 0x00000000).unwrap(); // ER7
@@ -164,8 +159,7 @@ mod tests {
 
     #[test]
     fn test_read_rn_l() {
-        let mut mcu = Mcu::new();
-        let mut cpu = Cpu::new(&mut mcu);
+        let mut cpu = Cpu::new();
         cpu.er[0] = 0xffffffff;
         cpu.er[7] = 0xf0f0f0f0;
         assert_eq!(cpu.read_rn_l(0b0000).unwrap(), 0xffffffff); // E0
