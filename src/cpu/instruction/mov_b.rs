@@ -726,4 +726,79 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
         assert_eq!(cpu.read_abs24_b(0xffff02).unwrap(), 0);
     }
+
+    #[test]
+    fn test_mov_b_abs24() {
+        ////////
+        // EAs to Rd
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x04;
+
+        cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
+        assert_eq!(cpu.read_rn_b(0).unwrap(), 0xa5);
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x04;
+
+        cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x2f, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
+        assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xa5);
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x0a;
+
+        cpu.write_abs24_b(0xffff02, 0).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
+        assert_eq!(cpu.read_rn_b(0).unwrap(), 0);
+
+        ////////
+        // Rs to ERs
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x04;
+
+        cpu.write_rn_b(0, 0xa5).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
+        assert_eq!(cpu.read_abs24_b(0xffff02).unwrap(), 0xa5);
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x04;
+
+        cpu.write_rn_b(0xf, 0xa5).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xaf, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
+        assert_eq!(cpu.read_abs24_b(0xffff02).unwrap(), 0xa5);
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0x0a;
+
+        cpu.write_rn_b(0, 0).unwrap();
+        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 8);
+        assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
+        assert_eq!(cpu.read_abs24_b(0xffff02).unwrap(), 0);
+    }
 }
