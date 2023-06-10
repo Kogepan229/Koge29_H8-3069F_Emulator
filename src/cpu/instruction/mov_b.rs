@@ -84,7 +84,7 @@ impl Cpu {
     pub(in super::super) fn mov_b_disp24(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
         let disp = ((self.fetch() as u32) << 16) | self.fetch() as u32;
         let mut f = || -> Result<usize> {
-            if opcode2 & 0xfff0 == 0x6b20 {
+            if opcode2 & 0xfff0 == 0x6a20 {
                 let value = self.read_disp24_ern_b(Cpu::get_nibble_opcode(opcode, 3)?, disp)?;
                 self.write_rn_b(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
                 self.mov_b_proc_pcc(value);
