@@ -141,8 +141,9 @@ impl Cpu {
     fn mov_b_abs16(&mut self, opcode: u16) -> Result<usize> {
         let abs_addr = self.fetch();
         let mut f = || -> Result<usize> {
-            if opcode & 0xfff0 == 0x6b00 {
+            if opcode & 0xfff0 == 0x6a00 {
                 let value = self.read_abs16_b(abs_addr)?;
+                println!("{:x}", value);
                 self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
                 self.mov_b_proc_pcc(value);
             } else {
@@ -158,7 +159,7 @@ impl Cpu {
     fn mov_b_abs24(&mut self, opcode: u16) -> Result<usize> {
         let abs_addr = ((self.fetch() as u32) << 16) | self.fetch() as u32;
         let mut f = || -> Result<usize> {
-            if opcode & 0xfff0 == 0x6b20 {
+            if opcode & 0xfff0 == 0x6a20 {
                 let value = self.read_abs24_b(abs_addr)?;
                 self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
                 self.mov_b_proc_pcc(value);
