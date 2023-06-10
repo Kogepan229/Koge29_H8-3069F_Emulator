@@ -176,7 +176,7 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
+    use crate::cpu::Cpu;
 
     #[test]
     fn test_mov_b_rn() {
