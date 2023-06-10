@@ -90,6 +90,7 @@ impl Cpu {
                 return Ok(());
             }
 
+            // sleep every 1msec (Windows timer max precision)
             if loop_count >= 20000 {
                 spin_sleep::sleep(
                     Duration::from_secs_f64(loop_count as f64 * 1.0 / CPUCLOCK as f64)
