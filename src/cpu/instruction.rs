@@ -18,11 +18,12 @@ mod or;
 mod rts;
 mod shal;
 mod shar;
+mod shll;
+mod shlr;
 mod sub_b;
 mod sub_l;
 mod sub_w;
 mod subs;
-mod shll;
 
 use crate::cpu::Cpu;
 use anyhow::{bail, Result};

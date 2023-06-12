@@ -197,6 +197,9 @@ impl Cpu {
             },
 
             0x11 => match opcode as u8 {
+                0x00..=0x0f => return self.shlr_b(opcode),
+                0x10..=0x1f => return self.shlr_w(opcode),
+                0x30..=0x3f => return self.shlr_l(opcode),
                 0x80..=0x8f => return self.shar_b(opcode),
                 0x90..=0x9f => return self.shar_w(opcode),
                 0xb0..=0xb7 => return self.shar_l(opcode),
