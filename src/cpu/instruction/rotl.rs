@@ -190,7 +190,7 @@ mod tests {
             0b1010_1010_1010_1010_1010_1010_1010_1010
         );
 
-        // check register 0xf
+        // check register 7
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
