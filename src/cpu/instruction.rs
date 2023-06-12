@@ -22,6 +22,7 @@ mod sub_b;
 mod sub_l;
 mod sub_w;
 mod subs;
+mod shll;
 
 use crate::cpu::Cpu;
 use anyhow::{bail, Result};

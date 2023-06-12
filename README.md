@@ -34,7 +34,7 @@
 | XOR         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | SHAL        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SHAR        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| SHLL        | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| SHLL        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SHLR        | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | ROTL        | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | ROTR        | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
