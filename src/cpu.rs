@@ -209,7 +209,7 @@ impl Cpu {
             0x12 => match opcode as u8 {
                 0x80..=0x8f => return self.rotl_b(opcode),
                 0x90..=0x9f => return self.rotl_w(opcode),
-                0xb0..=0xbf => return self.rotl_l(opcode),
+                0xb0..=0xb7 => return self.rotl_l(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
