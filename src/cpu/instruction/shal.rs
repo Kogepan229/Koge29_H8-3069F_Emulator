@@ -103,6 +103,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0b00001000);
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0b1010_1010);
 
+        // check V
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001100;
 
@@ -114,6 +115,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0b00000011);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0b0101_0100);
 
+        // check CCR C, Z
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001000;
 
@@ -150,6 +152,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0b00001000);
         assert_eq!(cpu.read_rn_w(0xf).unwrap(), 0b1010_1010_1010_1010);
 
+        // check V
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001100;
 
@@ -161,6 +164,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0b00000011);
         assert_eq!(cpu.read_rn_w(0).unwrap(), 0b0101_0101_0101_0100);
 
+        // check CCR C, Z
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001000;
 
@@ -205,6 +209,7 @@ mod tests {
             0b1010_1010_1010_1010_1010_1010_1010_1010
         );
 
+        // check V
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001100;
 
@@ -220,6 +225,7 @@ mod tests {
             0b0101_0101_0101_0101_0101_0101_0101_0100
         );
 
+        // check CCR C, Z
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001000;
 
