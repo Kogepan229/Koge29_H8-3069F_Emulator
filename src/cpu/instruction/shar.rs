@@ -188,4 +188,81 @@ mod tests {
         assert_eq!(cpu.ccr, 0b00000100);
         assert_eq!(cpu.read_rn_w(0).unwrap(), 0);
     }
+
+    #[test]
+    fn test_shar_l() {
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0b00001111;
+
+        cpu.mcu.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
+        cpu.write_rn_l(0, 0b0101_0101_0101_0101_0101_0101_0101_1010)
+            .unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0b00000000);
+        assert_eq!(
+            cpu.read_rn_l(0).unwrap(),
+            0b0010_1010_1010_1010_1010_1010_1010_1101
+        );
+
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0b00001111;
+
+        cpu.mcu.memory[0..2].copy_from_slice(&[0x11, 0xb7]);
+        cpu.write_rn_l(7, 0b0101_0101_0101_0101_0101_0101_0101_1010)
+            .unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0b00000000);
+        assert_eq!(
+            cpu.read_rn_l(7).unwrap(),
+            0b0010_1010_1010_1010_1010_1010_1010_1101
+        );
+
+        // check CCR N
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0b00000111;
+
+        cpu.mcu.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
+        cpu.write_rn_l(0, 0b1010_1010_1010_1010_1010_1010_1010_1010)
+            .unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0b00001000);
+        assert_eq!(
+            cpu.read_rn_l(0).unwrap(),
+            0b1101_0101_0101_0101_0101_0101_0101_0101
+        );
+
+        // check CCR C
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0b00001110;
+
+        cpu.mcu.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
+        cpu.write_rn_l(0, 0b0101_0101_0101_0101_0101_0101_0101_0101)
+            .unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0b00000001);
+        assert_eq!(
+            cpu.read_rn_l(0).unwrap(),
+            0b0010_1010_1010_1010_1010_1010_1010_1010
+        );
+
+        // check CCR Z
+        let mut cpu = Cpu::new();
+        cpu.ccr = 0b00001011;
+
+        cpu.mcu.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
+        cpu.write_rn_l(0, 0).unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0b00000100);
+        assert_eq!(cpu.read_rn_l(0).unwrap(), 0);
+    }
 }
