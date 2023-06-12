@@ -15,6 +15,7 @@ mod mov_b;
 mod mov_l;
 mod mov_w;
 mod or;
+mod rotl;
 mod rts;
 mod shal;
 mod shar;
