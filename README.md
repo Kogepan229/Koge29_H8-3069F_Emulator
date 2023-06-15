@@ -39,7 +39,7 @@
 | ROTL        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTR        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTXL       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| ROTXR       | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| ROTXR       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | Bit         | <ul><li>[ ] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
 | BSR         | <ul><li>[ ] </ul>                      |

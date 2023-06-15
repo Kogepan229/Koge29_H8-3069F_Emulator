@@ -18,6 +18,7 @@ mod or;
 mod rotl;
 mod rotr;
 mod rotxl;
+mod rotxr;
 mod rts;
 mod shal;
 mod shar;

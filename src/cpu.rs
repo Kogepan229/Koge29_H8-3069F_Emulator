@@ -209,7 +209,7 @@ impl Cpu {
             0x12 => match opcode as u8 {
                 0x00..=0x0f => return self.rotxl_b(opcode),
                 0x10..=0x1f => return self.rotxl_w(opcode),
-                0x30..=0x3f => return self.rotxl_l(opcode),
+                0x30..=0x37 => return self.rotxl_l(opcode),
                 0x80..=0x8f => return self.rotl_b(opcode),
                 0x90..=0x9f => return self.rotl_w(opcode),
                 0xb0..=0xb7 => return self.rotl_l(opcode),
@@ -217,6 +217,9 @@ impl Cpu {
             },
 
             0x13 => match opcode as u8 {
+                0x00..=0x0f => return self.rotxr_b(opcode),
+                0x10..=0x1f => return self.rotxr_w(opcode),
+                0x30..=0x37 => return self.rotxr_l(opcode),
                 0x80..=0x8f => return self.rotr_b(opcode),
                 0x90..=0x9f => return self.rotr_w(opcode),
                 0xb0..=0xb7 => return self.rotr_l(opcode),
