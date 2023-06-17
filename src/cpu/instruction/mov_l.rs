@@ -15,7 +15,11 @@ impl Cpu {
             0x6f => return self.mov_l_disp16(opcode2),
             0x78 => return self.mov_l_disp24(opcode2),
             0x6d => return self.mov_l_inc_or_dec(opcode2),
-            0x6b => return self.mov_l_abs(opcode2),
+            0x6b => match opcode2 & 0xfff0 {
+                0x6b00 | 0x6b80 => return self.mov_l_abs16(opcode2),
+                0x6b20 | 0x6ba0 => return self.mov_l_abs24(opcode2),
+                _ => bail!("invalid opcode2 [{:x}]", opcode2),
+            },
             _ => bail!("invalid opcode [{:>04x} {:>04x}]", opcode, opcode2),
         }
     }
@@ -124,14 +128,6 @@ impl Cpu {
             return Ok(10);
         };
         f().with_context(|| format!("opcode2 [{:x}]", opcode2))
-    }
-
-    fn mov_l_abs(&mut self, opcode2: u16) -> Result<usize> {
-        match opcode2 & 0xfff0 {
-            0x6b00 | 0x6b80 => return self.mov_l_abs16(opcode2),
-            0x6b20 | 0x6ba0 => return self.mov_l_abs24(opcode2),
-            _ => bail!("invalid opcode2 [{:x}]", opcode2),
-        }
     }
 
     fn mov_l_abs16(&mut self, opcode2: u16) -> Result<usize> {
