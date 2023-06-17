@@ -55,10 +55,14 @@ impl Cpu {
 
     pub fn run(&mut self) -> Result<()> {
         let mut state_sum: usize = 0;
-        let mut loop_count: usize = 0;
-        self.er[7] = MEMORY_END_ADDR - 0xf;
         let exec_time = time::Instant::now();
+
+        let mut loop_count: usize = 0;
         let mut loop_time = time::Instant::now();
+
+        // set stack pointer
+        self.er[7] = MEMORY_END_ADDR - 0xf;
+
         loop {
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
