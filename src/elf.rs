@@ -55,7 +55,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
     // load to memory
     for ph in pht {
         if ph.ty == SegmentType::Load {
-            cpu.mcu.memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
+            cpu.bus.memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
                 .copy_from_slice(
                     &program[ph.offset as usize..(ph.offset + ph.size_in_file) as usize],
                 );
@@ -70,13 +70,13 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
 
             // Add start address of program to Global Offset
             for i in 0..(s.header.size / 4) {
-                let mut global_off = ((cpu.mcu.memory[(s.header.addr + 4 * i) as usize] as u32)
+                let mut global_off = ((cpu.bus.memory[(s.header.addr + 4 * i) as usize] as u32)
                     << 24)
-                    | ((cpu.mcu.memory[(s.header.addr + 4 * i + 1) as usize] as u32) << 16)
-                    | ((cpu.mcu.memory[(s.header.addr + 4 * i + 2) as usize] as u32) << 8)
-                    | (cpu.mcu.memory[(s.header.addr + 4 * i + 3) as usize] as u32);
+                    | ((cpu.bus.memory[(s.header.addr + 4 * i + 1) as usize] as u32) << 16)
+                    | ((cpu.bus.memory[(s.header.addr + 4 * i + 2) as usize] as u32) << 8)
+                    | (cpu.bus.memory[(s.header.addr + 4 * i + 3) as usize] as u32);
                 global_off += MEMORY_START_ADDR;
-                cpu.mcu.memory
+                cpu.bus.memory
                     [((s.header.addr + 4 * i) as usize)..((s.header.addr + 4 * i + 4) as usize)]
                     .copy_from_slice(&global_off.to_be_bytes());
             }

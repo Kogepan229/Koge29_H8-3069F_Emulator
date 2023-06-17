@@ -1,5 +1,5 @@
 use crate::{
-    mcu::Mcu,
+    bus::Bus,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     setting,
 };
@@ -13,7 +13,7 @@ mod instruction;
 const CPUCLOCK: usize = 20000000;
 
 pub struct Cpu {
-    pub mcu: Mcu,
+    pub bus: Bus,
     pc: u32,
     ccr: u8,
     pub er: [u32; 8],
@@ -45,7 +45,7 @@ macro_rules! unimpl {
 impl Cpu {
     pub fn new() -> Self {
         Cpu {
-            mcu: Mcu::new(),
+            bus: Bus::new(),
             pc: MEMORY_START_ADDR,
             ccr: 0,
             er: [0; 8],
@@ -107,8 +107,8 @@ impl Cpu {
         if _pc < MEMORY_START_ADDR || _pc > MEMORY_END_ADDR {
             panic!("fetch error [pc: {:0>8x}]", self.pc)
         }
-        let op = (self.mcu.memory[(_pc - MEMORY_START_ADDR) as usize] as u16) << 8
-            | (self.mcu.memory[(_pc - MEMORY_START_ADDR + 1) as usize] as u16);
+        let op = (self.bus.memory[(_pc - MEMORY_START_ADDR) as usize] as u16) << 8
+            | (self.bus.memory[(_pc - MEMORY_START_ADDR + 1) as usize] as u16);
 
         if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
             print!("{:0>2x} {:0>2x} ", (op >> 8) as u8, op as u8);

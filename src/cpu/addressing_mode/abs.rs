@@ -3,25 +3,25 @@ use anyhow::{Context as _, Result};
 
 impl Cpu {
     pub(in super::super) fn write_abs8_b(&mut self, addr: u8, value: u8) -> Result<()> {
-        self.mcu
+        self.bus
             .write(0xffff00 | addr as u32, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         Ok(())
     }
 
     pub(in super::super) fn read_abs8_b(&self, addr: u8) -> Result<u8> {
-        self.mcu
+        self.bus
             .read(0xffff00 | addr as u32)
             .with_context(|| format!("addr [{:x}]", addr))
     }
 
     pub(in super::super) fn write_abs16_b(&mut self, addr: u16, value: u8) -> Result<()> {
         if addr & 0x8000 == 0x0000 {
-            self.mcu
+            self.bus
                 .write(addr as u32, value)
                 .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         } else {
-            self.mcu
+            self.bus
                 .write(0xff0000 | addr as u32, value)
                 .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         }
@@ -31,26 +31,26 @@ impl Cpu {
     pub(in super::super) fn read_abs16_b(&self, addr: u16) -> Result<u8> {
         if addr & 0x8000 == 0x0000 {
             return self
-                .mcu
+                .bus
                 .read(addr as u32)
                 .with_context(|| format!("addr [{:x}]", addr));
         } else {
             return self
-                .mcu
+                .bus
                 .read(0xff0000 | addr as u32)
                 .with_context(|| format!("addr [{:x}]", addr));
         }
     }
 
     pub(in super::super) fn write_abs24_b(&mut self, addr: u32, value: u8) -> Result<()> {
-        self.mcu
+        self.bus
             .write(addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         Ok(())
     }
 
     pub(in super::super) fn read_abs24_b(&self, addr: u32) -> Result<u8> {
-        self.mcu
+        self.bus
             .read(addr)
             .with_context(|| format!("addr [{:x}]", addr))
     }
@@ -59,10 +59,10 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        self.mcu
+        self.bus
             .write(0xffff00 | addr as u32, (value >> 8) as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.mcu
+        self.bus
             .write((0xffff00 | addr as u32) + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         Ok(())
@@ -73,12 +73,12 @@ impl Cpu {
             addr &= !1;
         }
         Ok((self
-            .mcu
+            .bus
             .read(0xffff00 | addr as u32)
             .with_context(|| format!("addr [{:x}]", addr))? as u16)
             << 8
             | self
-                .mcu
+                .bus
                 .read((0xffff00 | addr as u32) + 1)
                 .with_context(|| format!("addr [{:x}]", addr))? as u16)
     }
@@ -89,11 +89,11 @@ impl Cpu {
                 addr &= !1;
             }
             if addr & 0x8000 == 0x0000 {
-                self.mcu.write(addr as u32, (value >> 8) as u8)?;
-                self.mcu.write((addr + 1) as u32, value as u8)?;
+                self.bus.write(addr as u32, (value >> 8) as u8)?;
+                self.bus.write((addr + 1) as u32, value as u8)?;
             } else {
-                self.mcu.write(0xff0000 | addr as u32, (value >> 8) as u8)?;
-                self.mcu.write((0xff0000 | addr as u32) + 1, value as u8)?;
+                self.bus.write(0xff0000 | addr as u32, (value >> 8) as u8)?;
+                self.bus.write((0xff0000 | addr as u32) + 1, value as u8)?;
             }
             Ok(())
         };
@@ -106,11 +106,11 @@ impl Cpu {
                 addr &= !1;
             }
             if addr & 0x8000 == 0x0000 {
-                return Ok((self.mcu.read(addr as u32)? as u16) << 8
-                    | self.mcu.read((addr + 1) as u32)? as u16);
+                return Ok((self.bus.read(addr as u32)? as u16) << 8
+                    | self.bus.read((addr + 1) as u32)? as u16);
             } else {
-                return Ok((self.mcu.read(0xff0000 | addr as u32)? as u16) << 8
-                    | self.mcu.read((0xff0000 | addr as u32) + 1)? as u16);
+                return Ok((self.bus.read(0xff0000 | addr as u32)? as u16) << 8
+                    | self.bus.read((0xff0000 | addr as u32) + 1)? as u16);
             }
         };
         f().with_context(|| format!("addr [{:x}]", addr))
@@ -120,10 +120,10 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        self.mcu
+        self.bus
             .write(addr, (value >> 8) as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.mcu
+        self.bus
             .write(addr + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         Ok(())
@@ -134,12 +134,12 @@ impl Cpu {
             addr &= !1;
         }
         Ok((self
-            .mcu
+            .bus
             .read(addr)
             .with_context(|| format!("addr [{:x}]", addr))? as u16)
             << 8
             | self
-                .mcu
+                .bus
                 .read(addr + 1)
                 .with_context(|| format!("addr [{:x}]", addr))? as u16)
     }
@@ -235,15 +235,15 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs8_b(0x10, 0xff).unwrap();
         cpu.write_abs8_b(0x1f, 0xff).unwrap();
-        assert_eq!(cpu.mcu.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(cpu.mcu.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff10).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff1f).unwrap(), 0xff);
     }
 
     #[test]
     fn test_read_abs8_b() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff10, 0xff).unwrap();
-        cpu.mcu.write(0xffff1f, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0xff).unwrap();
+        cpu.bus.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_b(0x10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs8_b(0x1f).unwrap(), 0xff);
     }
@@ -253,15 +253,15 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs16_b(0xff10, 0xff).unwrap();
         cpu.write_abs16_b(0xff1f, 0xff).unwrap();
-        assert_eq!(cpu.mcu.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(cpu.mcu.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff10).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff1f).unwrap(), 0xff);
     }
 
     #[test]
     fn test_read_abs16_b() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff10, 0xff).unwrap();
-        cpu.mcu.write(0xffff1f, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0xff).unwrap();
+        cpu.bus.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs16_b(0xff10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs16_b(0xff1f).unwrap(), 0xff);
     }
@@ -271,15 +271,15 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         cpu.write_abs24_b(0xffff1f, 0xff).unwrap();
-        assert_eq!(cpu.mcu.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(cpu.mcu.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff10).unwrap(), 0xff);
+        assert_eq!(cpu.bus.read(0xffff1f).unwrap(), 0xff);
     }
 
     #[test]
     fn test_read_abs24_b() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff10, 0xff).unwrap();
-        cpu.mcu.write(0xffff1f, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0xff).unwrap();
+        cpu.bus.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs24_b(0xffff1f).unwrap(), 0xff);
     }
@@ -289,13 +289,13 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs8_w(0x10, 0x0fff).unwrap();
         assert_eq!(
-            (cpu.mcu.read(0xffff10).unwrap() as u16) << 8 | cpu.mcu.read(0xffff11).unwrap() as u16,
+            (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
         );
 
         cpu.write_abs8_w(0x01, 0x0fff).unwrap();
         assert_eq!(
-            (cpu.mcu.read(0xffff00).unwrap() as u16) << 8 | cpu.mcu.read(0xffff01).unwrap() as u16,
+            (cpu.bus.read(0xffff00).unwrap() as u16) << 8 | cpu.bus.read(0xffff01).unwrap() as u16,
             0x0fff
         );
     }
@@ -303,8 +303,8 @@ mod tests {
     #[test]
     fn test_read_abs8_w() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff10, 0x0f).unwrap();
-        cpu.mcu.write(0xffff11, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0x0f).unwrap();
+        cpu.bus.write(0xffff11, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_w(0x10).unwrap(), 0x0fff);
     }
 
@@ -314,7 +314,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs16_w(0xff10, 0x0fff).unwrap();
         assert_eq!(
-            (cpu.mcu.read(0xffff10).unwrap() as u16) << 8 | cpu.mcu.read(0xffff11).unwrap() as u16,
+            (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
         );
     }
@@ -323,12 +323,12 @@ mod tests {
     #[test]
     fn test_read_abs16_w() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff00, 0x0f).unwrap();
-        cpu.mcu.write(0xffff01, 0x0f).unwrap();
+        cpu.bus.write(0xffff00, 0x0f).unwrap();
+        cpu.bus.write(0xffff01, 0x0f).unwrap();
         assert_eq!(cpu.read_abs16_w(0xff00).unwrap(), 0x0f0f);
 
-        cpu.mcu.write(0xffff10, 0x0f).unwrap();
-        cpu.mcu.write(0xffff11, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0x0f).unwrap();
+        cpu.bus.write(0xffff11, 0xff).unwrap();
         assert_eq!(cpu.read_abs16_w(0xff10).unwrap(), 0x0fff);
     }
 
@@ -337,7 +337,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
         assert_eq!(
-            (cpu.mcu.read(0xffff10).unwrap() as u16) << 8 | cpu.mcu.read(0xffff11).unwrap() as u16,
+            (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
         );
     }
@@ -345,12 +345,12 @@ mod tests {
     #[test]
     fn test_read_abs24_w() {
         let mut cpu = Cpu::new();
-        cpu.mcu.write(0xffff00, 0x0f).unwrap();
-        cpu.mcu.write(0xffff01, 0x0f).unwrap();
+        cpu.bus.write(0xffff00, 0x0f).unwrap();
+        cpu.bus.write(0xffff01, 0x0f).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff00).unwrap(), 0x0f0f);
 
-        cpu.mcu.write(0xffff10, 0x0f).unwrap();
-        cpu.mcu.write(0xffff11, 0xff).unwrap();
+        cpu.bus.write(0xffff10, 0x0f).unwrap();
+        cpu.bus.write(0xffff11, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
     }
 

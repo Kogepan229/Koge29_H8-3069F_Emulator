@@ -76,7 +76,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x80]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x80]);
         cpu.write_rn_b(0, 0b1010_0010).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -88,7 +88,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x8f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x8f]);
         cpu.write_rn_b(0xf, 0b1010_0010).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -100,7 +100,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000110;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x80]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x80]);
         cpu.write_rn_b(0, 0b0100_0101).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -112,7 +112,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001011;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x80]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x80]);
         cpu.write_rn_b(0, 0).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -127,7 +127,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x90]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x90]);
         cpu.write_rn_w(0, 0b1000_1010_1010_0010).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -139,7 +139,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x9f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x9f]);
         cpu.write_rn_w(0xf, 0b1000_1010_1010_0010).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -151,7 +151,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000110;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x90]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x90]);
         cpu.write_rn_w(0, 0b0001_0101_0101_0001).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -163,7 +163,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001011;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0x90]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0x90]);
         cpu.write_rn_w(0, 0).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -178,7 +178,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
         cpu.write_rn_l(0, 0b1000_1010_1010_1010_1010_1010_1010_0010)
             .unwrap();
         let opcode = cpu.fetch();
@@ -194,7 +194,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001111;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0xb7]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0xb7]);
         cpu.write_rn_l(7, 0b1000_1010_1010_1010_1010_1010_1010_0010)
             .unwrap();
         let opcode = cpu.fetch();
@@ -210,7 +210,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000110;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
         cpu.write_rn_l(0, 0b0001_0101_0101_0101_0101_0101_0101_0001)
             .unwrap();
         let opcode = cpu.fetch();
@@ -226,7 +226,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00001011;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x13, 0xb0]);
         cpu.write_rn_l(0, 0).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();

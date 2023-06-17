@@ -183,7 +183,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
         cpu.write_rn_b(0, 0xa5).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -194,7 +194,7 @@ mod tests {
         cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0xf0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x0c, 0xf0]);
         cpu.write_rn_b(0xf, 0xa5).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -205,7 +205,7 @@ mod tests {
         cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x0c, 0x0f]);
         cpu.write_rn_b(0, 0).unwrap();
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
@@ -219,7 +219,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0xf0, 0xa5]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0xf0, 0xa5]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 2);
@@ -229,7 +229,7 @@ mod tests {
         cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0xff, 0xa5]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0xff, 0xa5]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 2);
@@ -239,7 +239,7 @@ mod tests {
         cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
-        cpu.mcu.memory[0..2].copy_from_slice(&[0xf0, 0x00]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0xf0, 0x00]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 2);
@@ -257,7 +257,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0x0f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -269,7 +269,7 @@ mod tests {
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0x70]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0x70]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -281,7 +281,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0x0f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -296,7 +296,7 @@ mod tests {
 
         cpu.write_rn_b(0, 0xa5).unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0xf0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0xf0]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -308,7 +308,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0x8f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0x8f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -320,7 +320,7 @@ mod tests {
 
         cpu.write_rn_b(0, 0).unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x68, 0xf0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x68, 0xf0]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -338,7 +338,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffde0e, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0x0f, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0x0f, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -350,7 +350,7 @@ mod tests {
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffde0e, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0x70, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0x70, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -362,7 +362,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffde0e, 0).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0x0f, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0x0f, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -377,7 +377,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0x8f, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0x8f, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -389,7 +389,7 @@ mod tests {
 
         cpu.write_rn_b(0, 0xa5).unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0xf0, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0xf0, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -401,7 +401,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6e, 0x8f, 0x0e, 0xee]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6e, 0x8f, 0x0e, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -419,7 +419,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffce0e, 0xa5).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0x2f, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0x2f, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -431,7 +431,7 @@ mod tests {
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffce0e, 0xa5).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x70, 0x6a, 0x20, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x70, 0x6a, 0x20, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -443,7 +443,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffce0e, 0).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0x2f, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0x2f, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -458,7 +458,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0xaf, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0xaf, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -470,7 +470,7 @@ mod tests {
 
         cpu.write_rn_b(0, 0xa5).unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x70, 0x6a, 0xa0, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x70, 0x6a, 0xa0, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -482,7 +482,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.mcu.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0xaf, 0x00, 0xff, 0xfe, 0xee]);
+        cpu.bus.memory[0..8].copy_from_slice(&[0x78, 0x00, 0x6a, 0xaf, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 10);
@@ -500,7 +500,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0x0f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -513,7 +513,7 @@ mod tests {
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0x70]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0x70]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -526,7 +526,7 @@ mod tests {
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_abs24_b(0xffcf20, 0).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0x0f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0x0f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -542,7 +542,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
         cpu.write_rn_l(0, 0xffcf21).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0x8f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0x8f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -555,7 +555,7 @@ mod tests {
 
         cpu.write_rn_b(0, 0xa5).unwrap();
         cpu.write_rn_l(7, 0xffcf21).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0xf0]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0xf0]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -568,7 +568,7 @@ mod tests {
 
         cpu.write_rn_b(0xf, 0).unwrap();
         cpu.write_rn_l(0, 0xffcf21).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x6c, 0x8f]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x6c, 0x8f]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -586,7 +586,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x20, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x20, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -597,7 +597,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x2f, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x2f, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -608,7 +608,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_abs24_b(0xffff02, 0).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x20, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x20, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -622,7 +622,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x30, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x30, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -633,7 +633,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x3f, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x3f, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -644,7 +644,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_b(0, 0).unwrap();
-        cpu.mcu.memory[0..2].copy_from_slice(&[0x30, 0x02]);
+        cpu.bus.memory[0..2].copy_from_slice(&[0x30, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 4);
@@ -661,7 +661,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x00, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x00, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -672,7 +672,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x0f, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x0f, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -683,7 +683,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_abs24_b(0xffff02, 0).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x00, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x00, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -697,7 +697,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x80, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x80, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -708,7 +708,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x8f, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x8f, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -719,7 +719,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_b(0, 0).unwrap();
-        cpu.mcu.memory[0..4].copy_from_slice(&[0x6a, 0x80, 0xff, 0x02]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x6a, 0x80, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
@@ -736,7 +736,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
@@ -747,7 +747,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_abs24_b(0xffff02, 0xa5).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x2f, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0x2f, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
@@ -758,7 +758,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_abs24_b(0xffff02, 0).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0x20, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
@@ -772,7 +772,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0, 0xa5).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
@@ -783,7 +783,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_b(0xf, 0xa5).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xaf, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0xaf, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
@@ -794,7 +794,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_b(0, 0).unwrap();
-        cpu.mcu.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
+        cpu.bus.memory[0..6].copy_from_slice(&[0x6a, 0xa0, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);

@@ -1,6 +1,6 @@
+mod bus;
 mod cpu;
 mod elf;
-mod mcu;
 mod memory;
 mod setting;
 
@@ -28,7 +28,7 @@ fn main() {
     let mut cpu = Cpu::new();
 
     elf::load(args.elf, &mut cpu);
-    // print_memory(&cpu.mcu.memory);
+    // print_memory(&cpu.bus.memory);
 
     cpu.run().unwrap();
 }
