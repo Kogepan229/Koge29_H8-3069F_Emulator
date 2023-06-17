@@ -40,7 +40,20 @@
 | ROTR        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTXL       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTXR       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| Bit         | <ul><li>[ ] B</ul>                     |
+| BSET        | <ul><li>[ ] B</ul>                     |
+| BCLR        | <ul><li>[ ] B</ul>                     |
+| BNOT        | <ul><li>[ ] B</ul>                     |
+| BTST        | <ul><li>[ ] B</ul>                     |
+| BAND        | <ul><li>[ ] B</ul>                     |
+| BIAND       | <ul><li>[ ] B</ul>                     |
+| BOR         | <ul><li>[ ] B</ul>                     |
+| BIOR        | <ul><li>[ ] B</ul>                     |
+| BXOR        | <ul><li>[ ] B</ul>                     |
+| BIXOR       | <ul><li>[ ] B</ul>                     |
+| BLD         | <ul><li>[ ] B</ul>                     |
+| BILD        | <ul><li>[ ] B</ul>                     |
+| BST         | <ul><li>[ ] B</ul>                     |
+| BIST        | <ul><li>[ ] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
 | BSR         | <ul><li>[ ] </ul>                      |
 | JMP         | <ul><li>[x] </ul>                      |
