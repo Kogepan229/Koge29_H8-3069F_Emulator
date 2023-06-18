@@ -154,6 +154,8 @@ impl Cpu {
             0x72 => return self.bclr_rn_from_imm(opcode),
             0x73 => return self.btst_rn_from_imm(opcode),
 
+            0x76 => return self.band_rn(opcode),
+
             0x78 => {
                 let opcode2 = self.fetch();
                 match (opcode2 >> 8) as u8 {
@@ -183,6 +185,14 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x7c => {
+                let opcode2 = self.fetch();
+                match (opcode2 >> 8) as u8 {
+                    0x76 => return self.band_ern(opcode, opcode2),
+                    _ => unimpl!(opcode, self.pc),
+                }
+            }
+
             0x7d => {
                 let opcode2 = self.fetch();
                 match (opcode2 >> 8) as u8 {
@@ -190,6 +200,14 @@ impl Cpu {
                     0x61 | 0x71 => return self.bnot_ern(opcode, opcode2),
                     0x62 | 0x72 => return self.bclr_ern(opcode, opcode2),
                     0x63 | 0x73 => return self.btst_ern(opcode, opcode2),
+                    _ => unimpl!(opcode, self.pc),
+                }
+            }
+
+            0x7e => {
+                let opcode2 = self.fetch();
+                match (opcode2 >> 8) as u8 {
+                    0x76 => return self.band_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
