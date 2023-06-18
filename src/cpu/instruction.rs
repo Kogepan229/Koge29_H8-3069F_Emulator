@@ -4,6 +4,7 @@ mod add_w;
 mod adds;
 mod and;
 mod bcc;
+mod bclr;
 mod bset;
 mod cmp_b;
 mod cmp_l;

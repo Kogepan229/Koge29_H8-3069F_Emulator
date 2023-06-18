@@ -145,7 +145,10 @@ impl Cpu {
             },
 
             0x60 => return self.bset_rn_from_rn(opcode),
+            0x62 => return self.bclr_rn_from_rn(opcode),
+
             0x70 => return self.bset_rn_from_imm(opcode),
+            0x72 => return self.bclr_rn_from_imm(opcode),
 
             0x78 => {
                 let opcode2 = self.fetch();
@@ -176,8 +179,23 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
-            0x7d => return self.bset_ern(opcode),
-            0x7f => return self.bset_abs(opcode),
+            0x7d => {
+                let opcode2 = self.fetch();
+                match (opcode2 >> 8) as u8 {
+                    0x60 | 0x70 => return self.bset_ern(opcode, opcode2),
+                    0x62 | 0x72 => return self.bclr_ern(opcode, opcode2),
+                    _ => unimpl!(opcode, self.pc),
+                }
+            }
+
+            0x7f => {
+                let opcode2 = self.fetch();
+                match (opcode2 >> 8) as u8 {
+                    0x60 | 0x70 => return self.bset_abs(opcode, opcode2),
+                    0x62 | 0x72 => return self.bclr_abs(opcode, opcode2),
+                    _ => unimpl!(opcode, self.pc),
+                }
+            }
 
             0x0a => match opcode as u8 {
                 0x00..=0x0f => return self.inc_b(opcode),
