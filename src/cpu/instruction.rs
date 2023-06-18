@@ -5,6 +5,7 @@ mod adds;
 mod and;
 mod bcc;
 mod bclr;
+mod bnot;
 mod bset;
 mod cmp_b;
 mod cmp_l;
