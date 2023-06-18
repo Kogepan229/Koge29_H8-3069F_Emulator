@@ -47,7 +47,7 @@
 | BAND        | <ul><li>[x] B</ul>                     |
 | BIAND       | <ul><li>[x] B</ul>                     |
 | BOR         | <ul><li>[x] B</ul>                     |
-| BIOR        | <ul><li>[ ] B</ul>                     |
+| BIOR        | <ul><li>[x] B</ul>                     |
 | BXOR        | <ul><li>[ ] B</ul>                     |
 | BIXOR       | <ul><li>[ ] B</ul>                     |
 | BLD         | <ul><li>[ ] B</ul>                     |
