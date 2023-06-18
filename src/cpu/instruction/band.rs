@@ -87,7 +87,7 @@ mod tests {
     }
 
     #[test]
-    fn test_btst_ern() {
+    fn test_band_ern() {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0x01).unwrap();
@@ -142,7 +142,7 @@ mod tests {
     }
 
     #[test]
-    fn test_btst_abs() {
+    fn test_band_abs() {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0x01).unwrap();
