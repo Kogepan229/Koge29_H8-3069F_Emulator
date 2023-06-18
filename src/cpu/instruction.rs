@@ -6,6 +6,7 @@ mod and;
 mod band;
 mod bcc;
 mod bclr;
+mod biand;
 mod bnot;
 mod bset;
 mod btst;

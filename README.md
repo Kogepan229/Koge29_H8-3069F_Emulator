@@ -45,7 +45,7 @@
 | BNOT        | <ul><li>[x] B</ul>                     |
 | BTST        | <ul><li>[x] B</ul>                     |
 | BAND        | <ul><li>[x] B</ul>                     |
-| BIAND       | <ul><li>[ ] B</ul>                     |
+| BIAND       | <ul><li>[x] B</ul>                     |
 | BOR         | <ul><li>[ ] B</ul>                     |
 | BIOR        | <ul><li>[ ] B</ul>                     |
 | BXOR        | <ul><li>[ ] B</ul>                     |
