@@ -40,7 +40,7 @@
 | ROTR        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTXL       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ROTXR       | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| BSET        | <ul><li>[ ] B</ul>                     |
+| BSET        | <ul><li>[x] B</ul>                     |
 | BCLR        | <ul><li>[ ] B</ul>                     |
 | BNOT        | <ul><li>[ ] B</ul>                     |
 | BTST        | <ul><li>[ ] B</ul>                     |
