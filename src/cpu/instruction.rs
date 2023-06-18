@@ -7,6 +7,7 @@ mod bcc;
 mod bclr;
 mod bnot;
 mod bset;
+mod btst;
 mod cmp_b;
 mod cmp_l;
 mod cmp_w;

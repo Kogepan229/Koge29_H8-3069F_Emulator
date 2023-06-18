@@ -147,10 +147,12 @@ impl Cpu {
             0x60 => return self.bset_rn_from_rn(opcode),
             0x61 => return self.bnot_rn_from_rn(opcode),
             0x62 => return self.bclr_rn_from_rn(opcode),
+            0x63 => return self.btst_rn_from_rn(opcode),
 
             0x70 => return self.bset_rn_from_imm(opcode),
             0x71 => return self.bnot_rn_from_imm(opcode),
             0x72 => return self.bclr_rn_from_imm(opcode),
+            0x73 => return self.btst_rn_from_imm(opcode),
 
             0x78 => {
                 let opcode2 = self.fetch();
@@ -187,6 +189,7 @@ impl Cpu {
                     0x60 | 0x70 => return self.bset_ern(opcode, opcode2),
                     0x61 | 0x71 => return self.bnot_ern(opcode, opcode2),
                     0x62 | 0x72 => return self.bclr_ern(opcode, opcode2),
+                    0x63 | 0x73 => return self.btst_ern(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -197,6 +200,7 @@ impl Cpu {
                     0x60 | 0x70 => return self.bset_abs(opcode, opcode2),
                     0x61 | 0x71 => return self.bnot_abs(opcode, opcode2),
                     0x62 | 0x72 => return self.bclr_abs(opcode, opcode2),
+                    0x63 | 0x73 => return self.btst_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }

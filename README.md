@@ -43,7 +43,7 @@
 | BSET        | <ul><li>[x] B</ul>                     |
 | BCLR        | <ul><li>[x] B</ul>                     |
 | BNOT        | <ul><li>[x] B</ul>                     |
-| BTST        | <ul><li>[ ] B</ul>                     |
+| BTST        | <ul><li>[x] B</ul>                     |
 | BAND        | <ul><li>[ ] B</ul>                     |
 | BIAND       | <ul><li>[ ] B</ul>                     |
 | BOR         | <ul><li>[ ] B</ul>                     |
