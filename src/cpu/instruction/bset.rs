@@ -31,10 +31,8 @@ impl Cpu {
                 0x6000 => {
                     let register_bit = Cpu::get_nibble_opcode(opcode2, 3)?;
                     let register_value = Cpu::get_nibble_opcode(opcode, 3)?;
-                    println!("\n{:x}", register_value);
                     let bit = self.read_rn_b(register_bit)? & 7;
                     let value = self.read_ern_b(register_value)?;
-                    println!("\n{:x}", value);
                     self.write_ern_b(register_value, value | (1 << bit))?;
                 }
                 _ => bail!("invalid opcode [{:>04x}]", opcode),
