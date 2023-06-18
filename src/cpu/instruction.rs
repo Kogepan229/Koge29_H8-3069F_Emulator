@@ -8,6 +8,7 @@ mod bcc;
 mod bclr;
 mod biand;
 mod bnot;
+mod bor;
 mod bset;
 mod btst;
 mod cmp_b;

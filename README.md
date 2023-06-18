@@ -46,7 +46,7 @@
 | BTST        | <ul><li>[x] B</ul>                     |
 | BAND        | <ul><li>[x] B</ul>                     |
 | BIAND       | <ul><li>[x] B</ul>                     |
-| BOR         | <ul><li>[ ] B</ul>                     |
+| BOR         | <ul><li>[x] B</ul>                     |
 | BIOR        | <ul><li>[ ] B</ul>                     |
 | BXOR        | <ul><li>[ ] B</ul>                     |
 | BIXOR       | <ul><li>[ ] B</ul>                     |
