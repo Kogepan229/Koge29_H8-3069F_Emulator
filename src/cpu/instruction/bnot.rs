@@ -269,7 +269,7 @@ mod tests {
         // 1 -> 0
         let mut cpu = Cpu::new();
         cpu.write_abs24_b(0xffff12, 0xff).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x72, 0x00]);
+        cpu.bus.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x71, 0x00]);
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 8);
