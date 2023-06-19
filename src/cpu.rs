@@ -210,6 +210,7 @@ impl Cpu {
             0x7c => {
                 let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
+                    0x6300 | 0x6380 | 0x7300 => return self.btst_ern(opcode, opcode2),
                     0x7400 => return self.bor_ern(opcode, opcode2),
                     0x7480 => return self.bior_ern(opcode, opcode2),
                     0x7500 => return self.bxor_ern(opcode, opcode2),
@@ -236,6 +237,7 @@ impl Cpu {
             0x7e => {
                 let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
+                    0x6300 | 0x6380 | 0x7300 => return self.btst_abs(opcode, opcode2),
                     0x7400 => return self.bor_abs(opcode, opcode2),
                     0x7480 => return self.bior_abs(opcode, opcode2),
                     0x7500 => return self.bxor_abs(opcode, opcode2),
