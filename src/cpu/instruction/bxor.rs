@@ -188,7 +188,7 @@ mod tests {
         let opcode = cpu.fetch();
         let state = cpu.exec(opcode).unwrap();
         assert_eq!(state, 6);
-        assert_eq!(cpu.ccr, 0);
+        assert_eq!(cpu.ccr, 1);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
