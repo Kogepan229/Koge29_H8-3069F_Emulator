@@ -8,6 +8,7 @@ mod bcc;
 mod bclr;
 mod biand;
 mod bior;
+mod bixor;
 mod bnot;
 mod bor;
 mod bset;

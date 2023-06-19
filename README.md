@@ -49,7 +49,7 @@
 | BOR         | <ul><li>[x] B</ul>                     |
 | BIOR        | <ul><li>[x] B</ul>                     |
 | BXOR        | <ul><li>[x] B</ul>                     |
-| BIXOR       | <ul><li>[ ] B</ul>                     |
+| BIXOR       | <ul><li>[x] B</ul>                     |
 | BLD         | <ul><li>[ ] B</ul>                     |
 | BILD        | <ul><li>[ ] B</ul>                     |
 | BST         | <ul><li>[ ] B</ul>                     |
