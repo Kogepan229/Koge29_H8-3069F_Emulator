@@ -174,6 +174,7 @@ impl Cpu {
 
             0x77 => match opcode & 0x80 {
                 0x00 => return self.bld_rn(opcode),
+                0x080 => return self.bild_rn(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -216,6 +217,7 @@ impl Cpu {
                     0x7600 => return self.band_ern(opcode, opcode2),
                     0x7680 => return self.biand_ern(opcode, opcode2),
                     0x7700 => return self.bld_ern(opcode, opcode2),
+                    0x7780 => return self.bild_ern(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -241,6 +243,7 @@ impl Cpu {
                     0x7600 => return self.band_abs(opcode, opcode2),
                     0x7680 => return self.biand_abs(opcode, opcode2),
                     0x7700 => return self.bld_abs(opcode, opcode2),
+                    0x7780 => return self.bild_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }

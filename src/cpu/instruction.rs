@@ -7,6 +7,7 @@ mod band;
 mod bcc;
 mod bclr;
 mod biand;
+mod bild;
 mod bior;
 mod bixor;
 mod bld;

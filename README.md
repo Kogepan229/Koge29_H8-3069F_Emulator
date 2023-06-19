@@ -51,7 +51,7 @@
 | BXOR        | <ul><li>[x] B</ul>                     |
 | BIXOR       | <ul><li>[x] B</ul>                     |
 | BLD         | <ul><li>[x] B</ul>                     |
-| BILD        | <ul><li>[ ] B</ul>                     |
+| BILD        | <ul><li>[x] B</ul>                     |
 | BST         | <ul><li>[ ] B</ul>                     |
 | BIST        | <ul><li>[ ] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
