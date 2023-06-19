@@ -50,7 +50,7 @@
 | BIOR        | <ul><li>[x] B</ul>                     |
 | BXOR        | <ul><li>[x] B</ul>                     |
 | BIXOR       | <ul><li>[x] B</ul>                     |
-| BLD         | <ul><li>[ ] B</ul>                     |
+| BLD         | <ul><li>[x] B</ul>                     |
 | BILD        | <ul><li>[ ] B</ul>                     |
 | BST         | <ul><li>[ ] B</ul>                     |
 | BIST        | <ul><li>[ ] B</ul>                     |
