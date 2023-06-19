@@ -12,6 +12,7 @@ mod bnot;
 mod bor;
 mod bset;
 mod btst;
+mod bxor;
 mod cmp_b;
 mod cmp_l;
 mod cmp_w;

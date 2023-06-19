@@ -160,6 +160,11 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x75 => match opcode & 0x80 {
+                0x00 => return self.bxor_rn(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
             0x76 => match opcode & 0x80 {
                 0x00 => return self.band_rn(opcode),
                 0x80 => return self.biand_rn(opcode),
@@ -200,6 +205,7 @@ impl Cpu {
                 match opcode2 & 0xff80 {
                     0x7400 => return self.bor_ern(opcode, opcode2),
                     0x7480 => return self.bior_ern(opcode, opcode2),
+                    0x7500 => return self.bxor_ern(opcode, opcode2),
                     0x7600 => return self.band_ern(opcode, opcode2),
                     0x7680 => return self.biand_ern(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
@@ -222,6 +228,7 @@ impl Cpu {
                 match opcode2 & 0xff80 {
                     0x7400 => return self.bor_abs(opcode, opcode2),
                     0x7480 => return self.bior_abs(opcode, opcode2),
+                    0x7500 => return self.bxor_abs(opcode, opcode2),
                     0x7600 => return self.band_abs(opcode, opcode2),
                     0x7680 => return self.biand_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
