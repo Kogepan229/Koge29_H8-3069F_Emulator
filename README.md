@@ -52,7 +52,7 @@
 | BIXOR       | <ul><li>[x] B</ul>                     |
 | BLD         | <ul><li>[x] B</ul>                     |
 | BILD        | <ul><li>[x] B</ul>                     |
-| BST         | <ul><li>[ ] B</ul>                     |
+| BST         | <ul><li>[x] B</ul>                     |
 | BIST        | <ul><li>[ ] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
 | BSR         | <ul><li>[ ] </ul>                      |

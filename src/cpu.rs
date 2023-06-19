@@ -149,6 +149,11 @@ impl Cpu {
             0x62 => return self.bclr_rn_from_rn(opcode),
             0x63 => return self.btst_rn_from_rn(opcode),
 
+            0x67 => match opcode & 0x80 {
+                0x00 => return self.bst_rn(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
             0x70 => return self.bset_rn_from_imm(opcode),
             0x71 => return self.bnot_rn_from_imm(opcode),
             0x72 => return self.bclr_rn_from_imm(opcode),
@@ -225,11 +230,11 @@ impl Cpu {
 
             0x7d => {
                 let opcode2 = self.fetch();
-                match (opcode2 >> 8) as u8 {
-                    0x60 | 0x70 => return self.bset_ern(opcode, opcode2),
-                    0x61 | 0x71 => return self.bnot_ern(opcode, opcode2),
-                    0x62 | 0x72 => return self.bclr_ern(opcode, opcode2),
-                    0x63 | 0x73 => return self.btst_ern(opcode, opcode2),
+                match opcode2 & 0xff80 {
+                    0x6000 | 0x6080 | 0x7000 => return self.bset_ern(opcode, opcode2),
+                    0x6100 | 0x6180 | 0x7100 => return self.bnot_ern(opcode, opcode2),
+                    0x6200 | 0x6280 | 0x7200 => return self.bclr_ern(opcode, opcode2),
+                    0x6700 => return self.bst_ern(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -252,11 +257,11 @@ impl Cpu {
 
             0x7f => {
                 let opcode2 = self.fetch();
-                match (opcode2 >> 8) as u8 {
-                    0x60 | 0x70 => return self.bset_abs(opcode, opcode2),
-                    0x61 | 0x71 => return self.bnot_abs(opcode, opcode2),
-                    0x62 | 0x72 => return self.bclr_abs(opcode, opcode2),
-                    0x63 | 0x73 => return self.btst_abs(opcode, opcode2),
+                match opcode2 & 0xff80 {
+                    0x6000 | 0x6080 | 0x7000 => return self.bset_abs(opcode, opcode2),
+                    0x6100 | 0x6180 | 0x7100 => return self.bnot_abs(opcode, opcode2),
+                    0x6200 | 0x6280 | 0x7200 => return self.bclr_abs(opcode, opcode2),
+                    0x6700 => return self.bst_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
