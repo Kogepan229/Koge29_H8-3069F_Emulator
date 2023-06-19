@@ -37,7 +37,7 @@ mod tests {
     use crate::cpu::Cpu;
 
     #[test]
-    fn test_bior_rn() {
+    fn test_bixor_rn() {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_rn_b(0, 0xfe).unwrap();
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bior_ern() {
+    fn test_bixor_ern() {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0xfe).unwrap();
@@ -161,7 +161,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bior_abs() {
+    fn test_bixor_abs() {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0xfe).unwrap();
