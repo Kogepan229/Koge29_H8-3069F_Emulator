@@ -151,6 +151,7 @@ impl Cpu {
 
             0x67 => match opcode & 0x80 {
                 0x00 => return self.bst_rn(opcode),
+                0x80 => return self.bist_rn(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -235,6 +236,7 @@ impl Cpu {
                     0x6100 | 0x6180 | 0x7100 => return self.bnot_ern(opcode, opcode2),
                     0x6200 | 0x6280 | 0x7200 => return self.bclr_ern(opcode, opcode2),
                     0x6700 => return self.bst_ern(opcode, opcode2),
+                    0x6780 => return self.bist_ern(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -262,6 +264,7 @@ impl Cpu {
                     0x6100 | 0x6180 | 0x7100 => return self.bnot_abs(opcode, opcode2),
                     0x6200 | 0x6280 | 0x7200 => return self.bclr_abs(opcode, opcode2),
                     0x6700 => return self.bst_abs(opcode, opcode2),
+                    0x6780 => return self.bist_abs(opcode, opcode2),
                     _ => unimpl!(opcode, self.pc),
                 }
             }

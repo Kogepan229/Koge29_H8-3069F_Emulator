@@ -53,7 +53,7 @@
 | BLD         | <ul><li>[x] B</ul>                     |
 | BILD        | <ul><li>[x] B</ul>                     |
 | BST         | <ul><li>[x] B</ul>                     |
-| BIST        | <ul><li>[ ] B</ul>                     |
+| BIST        | <ul><li>[x] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
 | BSR         | <ul><li>[ ] </ul>                      |
 | JMP         | <ul><li>[x] </ul>                      |

@@ -9,6 +9,7 @@ mod bclr;
 mod biand;
 mod bild;
 mod bior;
+mod bist;
 mod bixor;
 mod bld;
 mod bnot;
