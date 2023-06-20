@@ -12,7 +12,7 @@ impl Cpu {
 
     fn sub_w_proc(&mut self, dest: u16, src: u16) -> u16 {
         let (value, overflowed) = (dest as i16).overflowing_sub(src as i16);
-        if (dest & 0x0fff) + !(src & 0x0fff) + 1 > 0x0fff {
+        if (dest & 0x0fff) + (!src & 0x0fff) + 1 > 0x0fff {
             self.write_ccr(CCR::H, 1);
         } else {
             self.write_ccr(CCR::H, 0);
@@ -36,7 +36,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
         }
 
-        if (dest as u32) + !(src as u32) + 1 > 0xffff {
+        if (dest as u32) + (!src as u32) + 1 > 0xffff {
             self.write_ccr(CCR::C, 1);
         } else {
             self.write_ccr(CCR::C, 0);
