@@ -23,6 +23,7 @@ mod cmp_b;
 mod cmp_l;
 mod cmp_w;
 mod dec;
+mod extu;
 mod inc;
 mod jmp;
 mod jsr;

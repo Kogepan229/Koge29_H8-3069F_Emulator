@@ -329,6 +329,12 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x17 => match opcode as u8 {
+                0x50..=0x5f => return self.extu_w(opcode),
+                0x70..=0x77 => return self.extu_l(opcode),
+                _ => unimpl!(opcode, self.pc),
+            },
+
             0x1a => match opcode as u8 {
                 0x00..=0x0f => return self.dec_b(opcode),
                 0x80..=0xf7 => return self.sub_l(opcode),
