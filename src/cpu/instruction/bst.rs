@@ -1,4 +1,4 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::Cpu;
 use anyhow::{Context as _, Result};
 
 impl Cpu {

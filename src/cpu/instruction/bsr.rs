@@ -1,5 +1,5 @@
 use crate::cpu::Cpu;
-use anyhow::{bail, Context as _, Result};
+use anyhow::{Context as _, Result};
 
 impl Cpu {
     pub(in super::super) fn bsr_disp16(&mut self, opcode: u16) -> Result<usize> {
