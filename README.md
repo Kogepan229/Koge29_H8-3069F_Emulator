@@ -55,7 +55,7 @@
 | BST         | <ul><li>[x] B</ul>                     |
 | BIST        | <ul><li>[x] B</ul>                     |
 | Bcc         | <ul><li>[x] </ul>                      |
-| BSR         | <ul><li>[ ] </ul>                      |
+| BSR         | <ul><li>[x] </ul>                      |
 | JMP         | <ul><li>[x] </ul>                      |
 | JSR         | <ul><li>[x] </ul>                      |
 | RTS         | <ul><li>[x] </ul>                      |

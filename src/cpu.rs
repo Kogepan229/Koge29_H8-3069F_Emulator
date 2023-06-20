@@ -144,6 +144,9 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
+            0x55 => return self.bsr_disp16(opcode),
+            0x5c => return self.bsr_disp24(opcode),
+
             0x60 => return self.bset_rn_from_rn(opcode),
             0x61 => return self.bnot_rn_from_rn(opcode),
             0x62 => return self.bclr_rn_from_rn(opcode),

@@ -15,6 +15,7 @@ mod bld;
 mod bnot;
 mod bor;
 mod bset;
+mod bsr;
 mod bst;
 mod btst;
 mod bxor;
