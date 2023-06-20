@@ -5,7 +5,6 @@ impl Cpu {
     pub(in super::super) fn bsr_disp16(&mut self, opcode: u16) -> Result<usize> {
         self.write_dec_ern_l(7, self.pc)?;
         let disp = ((opcode as u8) as i8) as i32;
-        println!("[{}][{}]", self.pc as i32, disp);
         self.pc = (self.pc as i32 + disp) as u32;
         Ok(8)
     }
