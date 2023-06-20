@@ -12,7 +12,7 @@ impl Cpu {
 
     fn cmp_b_proc(&mut self, dest: u8, src: u8) -> u8 {
         let (value, overflowed) = (dest as i8).overflowing_sub(src as i8);
-        if (dest & 0x0f) - (src & 0x0f) > 0x0f {
+        if (dest & 0x0f) + !(src & 0x0f) + 1 > 0x0f {
             self.write_ccr(CCR::H, 1);
         } else {
             self.write_ccr(CCR::H, 0);
@@ -36,7 +36,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
         }
 
-        if (dest as u16) - (src as u16) > 0xff {
+        if (dest as u16) + !(src as u16) + 1 > 0xff {
             self.write_ccr(CCR::C, 1);
         } else {
             self.write_ccr(CCR::C, 0);

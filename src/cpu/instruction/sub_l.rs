@@ -12,7 +12,7 @@ impl Cpu {
 
     fn sub_l_proc(&mut self, dest: u32, src: u32) -> u32 {
         let (value, overflowed) = (dest as i32).overflowing_sub(src as i32);
-        if (dest & 0x0fffffff) - (src & 0x0fffffff) > 0x0fffffff {
+        if (dest & 0x0fffffff) + !(src & 0x0fffffff) + 1 > 0x0fffffff {
             self.write_ccr(CCR::H, 1);
         } else {
             self.write_ccr(CCR::H, 0);
@@ -36,7 +36,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
         }
 
-        if (dest as u64) - (src as u64) > 0xffffffff {
+        if (dest as u64) + !(src as u64) + 1 > 0xffffffff {
             self.write_ccr(CCR::C, 1);
         } else {
             self.write_ccr(CCR::C, 0);
