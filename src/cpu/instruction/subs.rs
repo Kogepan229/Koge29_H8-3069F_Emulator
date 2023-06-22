@@ -6,7 +6,7 @@ impl Cpu {
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let value = self.read_rn_l(register)?;
-            self.write_rn_l(register, value - 1)?;
+            self.write_rn_l(register, value.wrapping_add_signed(-1))?;
             Ok(2)
         };
         f()
@@ -16,7 +16,7 @@ impl Cpu {
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let value = self.read_rn_l(register)?;
-            self.write_rn_l(register, value - 2)?;
+            self.write_rn_l(register, value.wrapping_add_signed(-2))?;
             Ok(2)
         };
         f()
@@ -26,7 +26,7 @@ impl Cpu {
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let value = self.read_rn_l(register)?;
-            self.write_rn_l(register, value - 4)?;
+            self.write_rn_l(register, value.wrapping_add_signed(-4))?;
             Ok(2)
         };
         f()
