@@ -212,9 +212,6 @@ mod tests {
 
     #[test]
     fn test_xor_w_imm() {
-        // 01101001 0x69
-        // 10011110 0x9e
-        // 11110111 0xf7
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
         cpu.bus.memory[0..4].copy_from_slice(&[0x79, 0x50, 0x7a, 0x69]);
@@ -294,10 +291,6 @@ mod tests {
 
     #[test]
     fn test_xor_l_imm() {
-        // 0101 1000 0100 0111
-        // 1000 1101 0111 1100
-        // 1101 0101 0011 1011
-
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
         cpu.bus.memory[0..6].copy_from_slice(&[0x7a, 0x50, 0x7a, 0x69, 0x58, 0x47]);
