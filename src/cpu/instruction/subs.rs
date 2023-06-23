@@ -68,6 +68,16 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_rn_l(0).unwrap(), std::i32::MAX as u32);
 
+        // overflow2
+        let mut cpu = Cpu::new();
+        cpu.bus.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
+        cpu.write_rn_l(0, std::u32::MIN).unwrap();
+        let opcode = cpu.fetch();
+        let state = cpu.exec(opcode).unwrap();
+        assert_eq!(state, 2);
+        assert_eq!(cpu.ccr, 0);
+        assert_eq!(cpu.read_rn_l(0).unwrap(), std::u32::MAX);
+
         // u32 MAX - 1
         let mut cpu = Cpu::new();
         cpu.bus.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
