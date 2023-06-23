@@ -31,7 +31,7 @@
 | EXTS        | <ul><li>[ ] W<li> [ ] L</ul>           |
 | AND         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | OR          | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| XOR         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| XOR         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SHAL        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SHAR        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SHLL        | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |

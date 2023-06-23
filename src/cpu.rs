@@ -137,6 +137,7 @@ impl Cpu {
                     let opcode2 = self.fetch();
                     match (opcode2 >> 8) as u8 {
                         0x64 => return self.or_l_rn(opcode, opcode2),
+                        0x65 => return self.xor_l_rn(opcode, opcode2),
                         0x66 => return self.and_l_rn(opcode, opcode2),
                         _ => unimpl!(opcode, self.pc),
                     }
@@ -202,6 +203,7 @@ impl Cpu {
                 0x0020 => return self.cmp_w(opcode),
                 0x0030 => return self.sub_w(opcode),
                 0x0040 => return self.or_w_imm(opcode),
+                0x0050 => return self.xor_w_imm(opcode),
                 0x0060 => return self.and_w_imm(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
@@ -212,6 +214,7 @@ impl Cpu {
                 0x0020 => return self.cmp_l(opcode),
                 0x0030 => return self.sub_l(opcode),
                 0x0040 => return self.or_l_imm(opcode),
+                0x0050 => return self.xor_l_imm(opcode),
                 0x0060 => return self.and_l_imm(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
@@ -365,6 +368,10 @@ impl Cpu {
             0xc0..=0xcf => return self.or_b_imm(opcode),
             0x14 => return self.or_b_rn(opcode),
             0x64 => return self.or_w_rn(opcode),
+
+            0xd0..=0xdf => return self.xor_b_imm(opcode),
+            0x15 => return self.xor_b_rn(opcode),
+            0x65 => return self.xor_w_rn(opcode),
 
             0xe0..=0xef => return self.and_b_imm(opcode),
             0x16 => return self.and_b_rn(opcode),
