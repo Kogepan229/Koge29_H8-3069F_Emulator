@@ -14,7 +14,7 @@
 | ADD         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | CMP         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | SUB         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
-| ADDX        | <ul><li>[ ] B</ul>                     |
+| ADDX        | <ul><li>[x] B</ul>                     |
 | SUBX        | <ul><li>[ ] B</ul>                     |
 | ADDS        | <ul><li>[x] L</ul>                     |
 | SUBS        | <ul><li>[x] L</ul>                     |

@@ -2,6 +2,7 @@ mod add_b;
 mod add_l;
 mod add_w;
 mod adds;
+mod addx;
 mod and;
 mod band;
 mod bcc;

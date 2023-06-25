@@ -377,6 +377,9 @@ impl Cpu {
             0x16 => return self.and_b_rn(opcode),
             0x66 => return self.and_w_rn(opcode),
 
+            0x90..=0x9f => return self.addx_imm(opcode),
+            0x0e => return self.addx_rn(opcode),
+
             0x59 | 0x5a | 0x5b => return self.jmp(opcode),
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
             0x40..=0x4f | 0x58 => return self.bcc(opcode),
