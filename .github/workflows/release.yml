@@ -1,0 +1,89 @@
+name: release
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Cargo.toml
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-musl
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Check verson
+        uses: salsify/action-detect-and-tag-new-version@v2
+        id: check_version
+        with:
+          create-tag: false
+          version-command: cargo read-manifest | jq -r .version
+
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt install -qq -y musl-tools --no-install-recommends
+
+      - name: Set rust-toolchain
+        if: ${{ steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        if: ${{ steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        run: cargo build --release --target=${{matrix.target}}
+
+      - name: Create tag
+        if: ${{ steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        uses: mathieudutour/github-tag-action@v6.1
+        id: tag_version
+        with:
+          custom_tag: ${{ steps.check_version.outputs.current-version }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create a GitHub release
+        if: ${{ steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          allowUpdates: true
+          makeLatest: "latest"
+
+      - name: Package for linux-musl
+        if: ${{ matrix.target == 'x86_64-unknown-linux-musl' && steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        run: |
+          zip --junk-paths h8-3069f_emulator-${{matrix.target}}-${{steps.check_version.outputs.current-version}}.zip target/${{matrix.target}}/release/koge29_h8-3069f_emulator
+
+      - name: Package for windows
+        if: ${{ matrix.target == 'x86_64-pc-windows-msvc' && steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        run: |
+          powershell Compress-Archive -Path target/${{matrix.target}}/release/koge29_h8-3069f_emulator.exe -DestinationPath h8-3069f_emulator-${{matrix.target}}-${{steps.check_version.outputs.current-version}}.zip
+
+      - name: Upload release asset
+        if: ${{ steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./h8-3069f_emulator-${{matrix.target}}-${{steps.check_version.outputs.current-version}}.zip
+          asset_name: h8-3069f_emulator-${{matrix.target}}-${{steps.check_version.outputs.current-version}}.zip
+          asset_content_type: application/zip
