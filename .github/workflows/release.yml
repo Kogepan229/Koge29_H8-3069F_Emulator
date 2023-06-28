@@ -35,7 +35,7 @@ jobs:
           version-command: cargo read-manifest | jq -r .version
 
       - name: Install musl tools
-        if: matrix.target == 'x86_64-unknown-linux-musl'
+        if: ${{ matrix.target == 'x86_64-unknown-linux-musl' && steps.check_version.outputs.previous-version != steps.check_version.outputs.current-version }}
         run: sudo apt install -qq -y musl-tools --no-install-recommends
 
       - name: Set rust-toolchain
