@@ -53,7 +53,7 @@ impl Cpu {
         }
     }
 
-    pub fn run(&mut self) -> Result<()> {
+    pub async fn run(&mut self) -> Result<()> {
         let mut state_sum: usize = 0;
         let exec_time = time::Instant::now();
 
@@ -96,10 +96,11 @@ impl Cpu {
 
             // sleep every 1msec (Windows timer max precision)
             if loop_count >= 20000 {
-                spin_sleep::sleep(
+                spin_sleep_tokio::sleep(
                     Duration::from_secs_f64(loop_count as f64 * 1.0 / CPUCLOCK as f64)
                         .saturating_sub(loop_time.elapsed()),
-                );
+                )
+                .await;
                 loop_count = 0;
                 loop_time = time::Instant::now();
             }
@@ -399,6 +400,10 @@ impl Cpu {
 
     pub fn read_ccr(&self, target: CCR) -> u8 {
         (self.ccr >> target as u8) & 1
+    }
+
+    pub fn read_pc(&self) -> u32 {
+        self.pc
     }
 
     fn print_er(&self) {

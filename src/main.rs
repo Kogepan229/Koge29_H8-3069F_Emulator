@@ -31,5 +31,5 @@ async fn main() {
     elf::load(args.elf, &mut cpu);
     // print_memory(&cpu.bus.memory);
 
-    cpu.run().unwrap();
+    cpu.run().await.unwrap();
 }
