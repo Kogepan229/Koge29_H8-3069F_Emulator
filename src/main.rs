@@ -19,7 +19,8 @@ struct Args {
     debug_instruction: Option<bool>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Args::parse();
     if let Some(v) = args.debug_instruction {
         *setting::ENABLE_PRINT_OPCODE.write().unwrap() = v;
