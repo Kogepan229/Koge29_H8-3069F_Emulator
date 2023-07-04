@@ -9,8 +9,8 @@ impl Cpu {
         Ok(8)
     }
 
-    pub(in super::super) fn bsr_disp24(&mut self, _opcode: u16) -> Result<usize> {
-        let opcode2 = self.fetch();
+    pub(in super::super) async fn bsr_disp24(&mut self, _opcode: u16) -> Result<usize> {
+        let opcode2 = self.fetch().await;
         let mut f = || -> Result<usize> {
             self.write_dec_ern_l(7, self.pc)?;
             let disp = (opcode2 as i16) as i32;
@@ -28,13 +28,13 @@ mod tests {
         memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     };
 
-    #[test]
-    fn test_bsr_disp16() {
+    #[tokio::test]
+    async fn test_bsr_disp16() {
         let mut cpu = Cpu::new();
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
-        cpu.bus.memory[0..2].copy_from_slice(&[0x55, 0x15]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x55, 0x15]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 2);
@@ -43,22 +43,22 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.pc = MEMORY_START_ADDR + 100;
-        cpu.bus.memory[100..102].copy_from_slice(&[0x55, 0xf6]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[100..102].copy_from_slice(&[0x55, 0xf6]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 102);
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 102 - 10);
     }
 
-    #[test]
-    fn test_bsr_disp24() {
+    #[tokio::test]
+    async fn test_bsr_disp24() {
         let mut cpu = Cpu::new();
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
-        cpu.bus.memory[0..4].copy_from_slice(&[0x5c, 0x00, 0x00, 0x15]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x5c, 0x00, 0x00, 0x15]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 4);
@@ -67,9 +67,9 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.pc = MEMORY_START_ADDR + 100;
-        cpu.bus.memory[100..104].copy_from_slice(&[0x5c, 0x00, 0xff, 0xf6]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[100..104].copy_from_slice(&[0x5c, 0x00, 0xff, 0xf6]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 104);

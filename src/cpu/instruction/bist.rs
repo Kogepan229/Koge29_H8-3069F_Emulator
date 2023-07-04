@@ -51,14 +51,14 @@ impl Cpu {
 mod tests {
     use crate::cpu::Cpu;
 
-    #[test]
-    fn test_bist_rn() {
+    #[tokio::test]
+    async fn test_bist_rn() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_rn_b(0, 0xfe).unwrap();
-        cpu.bus.memory[0..2].copy_from_slice(&[0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 2);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xff);
@@ -67,9 +67,9 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_rn_b(0, 0x7f).unwrap();
-        cpu.bus.memory[0..2].copy_from_slice(&[0x67, 0xf0]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x67, 0xf0]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 2);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xff);
@@ -78,9 +78,9 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_rn_b(0xf, 0xfe).unwrap();
-        cpu.bus.memory[0..2].copy_from_slice(&[0x67, 0x8f]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x67, 0x8f]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 2);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xff);
@@ -88,23 +88,23 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_rn_b(0, 0xfe).unwrap();
-        cpu.bus.memory[0..2].copy_from_slice(&[0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 2);
         assert_eq!(cpu.ccr, 1);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xfe);
     }
 
-    #[test]
-    fn test_bist_ern() {
+    #[tokio::test]
+    async fn test_bist_ern() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffcf20, 0xfe).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xff);
@@ -114,9 +114,9 @@ mod tests {
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffcf20, 0x7f).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0xf0]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0xf0]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xff);
@@ -126,9 +126,9 @@ mod tests {
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffcf20, 0xfe).unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7d, 0x70, 0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x70, 0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_ern_b(7).unwrap(), 0xff);
@@ -137,22 +137,22 @@ mod tests {
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0xfe).unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 1);
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xfe);
     }
 
-    #[test]
-    fn test_bist_abs() {
+    #[tokio::test]
+    async fn test_bist_abs() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffff12, 0xfe).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_abs24_b(0xffff12).unwrap(), 0xff);
@@ -161,9 +161,9 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffff12, 0x7f).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0xf0]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0xf0]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
         assert_eq!(cpu.read_abs24_b(0xffff12).unwrap(), 0xff);
@@ -171,9 +171,9 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0xfe).unwrap();
-        cpu.bus.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0x80]);
-        let opcode = cpu.fetch();
-        let state = cpu.exec(opcode).unwrap();
+        cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x67, 0x80]);
+        let opcode = cpu.fetch().await;
+        let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 1);
         assert_eq!(cpu.read_abs24_b(0xffff12).unwrap(), 0xfe);

@@ -21,7 +21,7 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub fn load(elf_path: String, cpu: &mut Cpu) {
+pub async fn load(elf_path: String, cpu: &mut Cpu) {
     let program = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&program).unwrap();
     // println!("{:?}", hd);
@@ -52,10 +52,13 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
     .unwrap();
     // println!("{:#?}", pht);
 
+    let mut memory_lock = cpu.bus.lock().await;
+
     // load to memory
     for ph in pht {
         if ph.ty == SegmentType::Load {
-            cpu.bus.memory[ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
+            memory_lock.memory
+                [ph.virtual_addr as usize..(ph.virtual_addr + ph.size_in_file) as usize]
                 .copy_from_slice(
                     &program[ph.offset as usize..(ph.offset + ph.size_in_file) as usize],
                 );
@@ -70,13 +73,13 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
 
             // Add start address of program to Global Offset
             for i in 0..(s.header.size / 4) {
-                let mut global_off = ((cpu.bus.memory[(s.header.addr + 4 * i) as usize] as u32)
-                    << 24)
-                    | ((cpu.bus.memory[(s.header.addr + 4 * i + 1) as usize] as u32) << 16)
-                    | ((cpu.bus.memory[(s.header.addr + 4 * i + 2) as usize] as u32) << 8)
-                    | (cpu.bus.memory[(s.header.addr + 4 * i + 3) as usize] as u32);
+                let mut global_off =
+                    ((memory_lock.memory[(s.header.addr + 4 * i) as usize] as u32) << 24)
+                        | ((memory_lock.memory[(s.header.addr + 4 * i + 1) as usize] as u32) << 16)
+                        | ((memory_lock.memory[(s.header.addr + 4 * i + 2) as usize] as u32) << 8)
+                        | (memory_lock.memory[(s.header.addr + 4 * i + 3) as usize] as u32);
                 global_off += MEMORY_START_ADDR;
-                cpu.bus.memory
+                memory_lock.memory
                     [((s.header.addr + 4 * i) as usize)..((s.header.addr + 4 * i + 4) as usize)]
                     .copy_from_slice(&global_off.to_be_bytes());
             }

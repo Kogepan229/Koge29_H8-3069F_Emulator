@@ -2,10 +2,10 @@ use crate::cpu::Cpu;
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) fn jsr(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn jsr(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x5d => return self.jsr_ern(opcode),
-            0x5e => return self.jsr_abs(opcode),
+            0x5e => return self.jsr_abs(opcode).await,
             0x5f => return self.jsr_indirect(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
@@ -21,8 +21,8 @@ impl Cpu {
         f()
     }
 
-    fn jsr_abs(&mut self, opcode: u16) -> Result<usize> {
-        let opcode2 = self.fetch();
+    async fn jsr_abs(&mut self, opcode: u16) -> Result<usize> {
+        let opcode2 = self.fetch().await;
         let abs_addr = (((opcode & 0x00ff) as u32) << 16) | opcode2 as u32;
         let mut f = || -> Result<usize> {
             self.write_dec_ern_l(7, self.pc)?;

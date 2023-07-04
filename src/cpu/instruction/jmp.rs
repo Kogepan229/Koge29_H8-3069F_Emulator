@@ -2,10 +2,10 @@ use crate::cpu::Cpu;
 use anyhow::{bail, Result};
 
 impl Cpu {
-    pub(in super::super) fn jmp(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn jmp(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
             0x59 => return self.jmp_ern(opcode),
-            0x5a => return self.jmp_abs(opcode),
+            0x5a => return self.jmp_abs(opcode).await,
             0x5b => return self.jmp_indirect(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
@@ -16,8 +16,8 @@ impl Cpu {
         self.pc = addr;
         Ok(4)
     }
-    fn jmp_abs(&mut self, opcode: u16) -> Result<usize> {
-        let abs_addr = ((opcode & 0x00ff) as u32) << 16 | self.fetch() as u32;
+    async fn jmp_abs(&mut self, opcode: u16) -> Result<usize> {
+        let abs_addr = ((opcode & 0x00ff) as u32) << 16 | self.fetch().await as u32;
         self.pc = abs_addr;
         Ok(6)
     }
