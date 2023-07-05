@@ -7,7 +7,6 @@ mod setting;
 use clap::Parser;
 
 use crate::cpu::Cpu;
-use crate::memory::MEMORY_SIZE;
 
 #[derive(Parser)]
 struct Args {

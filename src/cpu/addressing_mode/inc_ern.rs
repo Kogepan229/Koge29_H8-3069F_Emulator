@@ -1,5 +1,5 @@
 use crate::cpu::Cpu;
-use anyhow::{Context as _, Result};
+use anyhow::Result;
 
 impl Cpu {
     pub(in super::super) async fn write_inc_ern_b(
