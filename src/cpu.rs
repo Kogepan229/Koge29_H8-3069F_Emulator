@@ -14,12 +14,29 @@ mod instruction;
 
 const CPUCLOCK: usize = 20000000;
 
+pub struct EmulatorShareCpuValues {
+    pub pc: u32,
+    pub ccr: u8,
+    pub er: [u32; 8],
+}
+
+impl EmulatorShareCpuValues {
+    pub fn new() -> Self {
+        EmulatorShareCpuValues {
+            pc: MEMORY_START_ADDR,
+            ccr: 0,
+            er: [0; 8],
+        }
+    }
+}
+
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
     pc: u32,
     ccr: u8,
     pub er: [u32; 8],
     pub exit_addr: u32, // address of ___exit
+    pub emu_share_values: Arc<Mutex<EmulatorShareCpuValues>>,
 }
 
 pub enum CCR {
@@ -52,6 +69,7 @@ impl Cpu {
             ccr: 0,
             er: [0; 8],
             exit_addr: 0,
+            emu_share_values: Arc::new(Mutex::new(EmulatorShareCpuValues::new())),
         }
     }
 
@@ -94,6 +112,14 @@ impl Cpu {
                     exec_time.elapsed().as_secs_f64()
                 );
                 return Ok(());
+            }
+
+            // Copu EmulatorShareCpuValues
+            {
+                let mut e = self.emu_share_values.lock().await;
+                (*e).pc = self.pc;
+                (*e).ccr = self.ccr;
+                (*e).er = self.er;
             }
 
             // sleep every 1msec (Windows timer max precision)

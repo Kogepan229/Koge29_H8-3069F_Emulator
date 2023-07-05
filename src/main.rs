@@ -7,6 +7,7 @@ mod setting;
 use clap::Parser;
 
 use crate::cpu::Cpu;
+use crate::memory::MEMORY_SIZE;
 
 #[derive(Parser)]
 struct Args {
@@ -27,6 +28,15 @@ async fn main() {
     }
 
     let mut cpu = Cpu::new();
+
+    /* // test code
+    let cpu_emu_share = cpu.emu_share_values.clone();
+    tokio::spawn(async move {
+        loop {
+            println!("{}", cpu_emu_share.lock().await.pc)
+        }
+    });
+     */
 
     elf::load(args.elf, &mut cpu).await;
     // print_memory(&cpu.bus.memory);
