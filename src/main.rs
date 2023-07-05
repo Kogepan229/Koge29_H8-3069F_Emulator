@@ -28,7 +28,7 @@ async fn main() {
 
     let mut cpu = Cpu::new();
 
-    elf::load(args.elf, &mut cpu);
+    elf::load(args.elf, &mut cpu).await;
     // print_memory(&cpu.bus.memory);
 
     cpu.run().await.unwrap();

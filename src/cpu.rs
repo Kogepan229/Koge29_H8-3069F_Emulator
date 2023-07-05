@@ -152,7 +152,7 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
-            0x55 => return self.bsr_disp16(opcode),
+            0x55 => return self.bsr_disp16(opcode).await,
             0x5c => return self.bsr_disp24(opcode).await,
 
             0x60 => return self.bset_rn_from_rn(opcode),
@@ -229,15 +229,15 @@ impl Cpu {
             0x7c => {
                 let opcode2 = self.fetch().await;
                 match opcode2 & 0xff80 {
-                    0x6300 | 0x6380 | 0x7300 => return self.btst_ern(opcode, opcode2),
-                    0x7400 => return self.bor_ern(opcode, opcode2),
-                    0x7480 => return self.bior_ern(opcode, opcode2),
-                    0x7500 => return self.bxor_ern(opcode, opcode2),
-                    0x7580 => return self.bixor_ern(opcode, opcode2),
-                    0x7600 => return self.band_ern(opcode, opcode2),
-                    0x7680 => return self.biand_ern(opcode, opcode2),
-                    0x7700 => return self.bld_ern(opcode, opcode2),
-                    0x7780 => return self.bild_ern(opcode, opcode2),
+                    0x6300 | 0x6380 | 0x7300 => return self.btst_ern(opcode, opcode2).await,
+                    0x7400 => return self.bor_ern(opcode, opcode2).await,
+                    0x7480 => return self.bior_ern(opcode, opcode2).await,
+                    0x7500 => return self.bxor_ern(opcode, opcode2).await,
+                    0x7580 => return self.bixor_ern(opcode, opcode2).await,
+                    0x7600 => return self.band_ern(opcode, opcode2).await,
+                    0x7680 => return self.biand_ern(opcode, opcode2).await,
+                    0x7700 => return self.bld_ern(opcode, opcode2).await,
+                    0x7780 => return self.bild_ern(opcode, opcode2).await,
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -245,11 +245,11 @@ impl Cpu {
             0x7d => {
                 let opcode2 = self.fetch().await;
                 match opcode2 & 0xff80 {
-                    0x6000 | 0x6080 | 0x7000 => return self.bset_ern(opcode, opcode2),
-                    0x6100 | 0x6180 | 0x7100 => return self.bnot_ern(opcode, opcode2),
-                    0x6200 | 0x6280 | 0x7200 => return self.bclr_ern(opcode, opcode2),
-                    0x6700 => return self.bst_ern(opcode, opcode2),
-                    0x6780 => return self.bist_ern(opcode, opcode2),
+                    0x6000 | 0x6080 | 0x7000 => return self.bset_ern(opcode, opcode2).await,
+                    0x6100 | 0x6180 | 0x7100 => return self.bnot_ern(opcode, opcode2).await,
+                    0x6200 | 0x6280 | 0x7200 => return self.bclr_ern(opcode, opcode2).await,
+                    0x6700 => return self.bst_ern(opcode, opcode2).await,
+                    0x6780 => return self.bist_ern(opcode, opcode2).await,
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -257,15 +257,15 @@ impl Cpu {
             0x7e => {
                 let opcode2 = self.fetch().await;
                 match opcode2 & 0xff80 {
-                    0x6300 | 0x6380 | 0x7300 => return self.btst_abs(opcode, opcode2),
-                    0x7400 => return self.bor_abs(opcode, opcode2),
-                    0x7480 => return self.bior_abs(opcode, opcode2),
-                    0x7500 => return self.bxor_abs(opcode, opcode2),
-                    0x7580 => return self.bixor_abs(opcode, opcode2),
-                    0x7600 => return self.band_abs(opcode, opcode2),
-                    0x7680 => return self.biand_abs(opcode, opcode2),
-                    0x7700 => return self.bld_abs(opcode, opcode2),
-                    0x7780 => return self.bild_abs(opcode, opcode2),
+                    0x6300 | 0x6380 | 0x7300 => return self.btst_abs(opcode, opcode2).await,
+                    0x7400 => return self.bor_abs(opcode, opcode2).await,
+                    0x7480 => return self.bior_abs(opcode, opcode2).await,
+                    0x7500 => return self.bxor_abs(opcode, opcode2).await,
+                    0x7580 => return self.bixor_abs(opcode, opcode2).await,
+                    0x7600 => return self.band_abs(opcode, opcode2).await,
+                    0x7680 => return self.biand_abs(opcode, opcode2).await,
+                    0x7700 => return self.bld_abs(opcode, opcode2).await,
+                    0x7780 => return self.bild_abs(opcode, opcode2).await,
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -273,11 +273,11 @@ impl Cpu {
             0x7f => {
                 let opcode2 = self.fetch().await;
                 match opcode2 & 0xff80 {
-                    0x6000 | 0x6080 | 0x7000 => return self.bset_abs(opcode, opcode2),
-                    0x6100 | 0x6180 | 0x7100 => return self.bnot_abs(opcode, opcode2),
-                    0x6200 | 0x6280 | 0x7200 => return self.bclr_abs(opcode, opcode2),
-                    0x6700 => return self.bst_abs(opcode, opcode2),
-                    0x6780 => return self.bist_abs(opcode, opcode2),
+                    0x6000 | 0x6080 | 0x7000 => return self.bset_abs(opcode, opcode2).await,
+                    0x6100 | 0x6180 | 0x7100 => return self.bnot_abs(opcode, opcode2).await,
+                    0x6200 | 0x6280 | 0x7200 => return self.bclr_abs(opcode, opcode2).await,
+                    0x6700 => return self.bst_abs(opcode, opcode2).await,
+                    0x6780 => return self.bist_abs(opcode, opcode2).await,
                     _ => unimpl!(opcode, self.pc),
                 }
             }
@@ -390,7 +390,7 @@ impl Cpu {
             0x59 | 0x5a | 0x5b => return self.jmp(opcode).await,
             0x5d | 0x5e | 0x5f => return self.jsr(opcode).await,
             0x40..=0x4f | 0x58 => return self.bcc(opcode).await,
-            0x54 => return self.rts(),
+            0x54 => return self.rts().await,
             0x57 => Ok(14), // Ignore TRAPA
             _ => unimpl!(opcode, self.pc),
         }

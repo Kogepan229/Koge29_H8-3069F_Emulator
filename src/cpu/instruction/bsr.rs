@@ -1,9 +1,9 @@
 use crate::cpu::Cpu;
-use anyhow::{Context as _, Result};
+use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) fn bsr_disp16(&mut self, opcode: u16) -> Result<usize> {
-        self.write_dec_ern_l(7, self.pc)?;
+    pub(in super::super) async fn bsr_disp16(&mut self, opcode: u16) -> Result<usize> {
+        self.write_dec_ern_l(7, self.pc).await?;
         let disp = ((opcode as u8) as i8) as i32;
         self.pc = (self.pc as i32 + disp) as u32;
         Ok(8)
@@ -11,13 +11,10 @@ impl Cpu {
 
     pub(in super::super) async fn bsr_disp24(&mut self, _opcode: u16) -> Result<usize> {
         let opcode2 = self.fetch().await;
-        let mut f = || -> Result<usize> {
-            self.write_dec_ern_l(7, self.pc)?;
-            let disp = (opcode2 as i16) as i32;
-            self.pc = (self.pc as i32 + disp) as u32;
-            Ok(10)
-        };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
+        self.write_dec_ern_l(7, self.pc).await?;
+        let disp = (opcode2 as i16) as i32;
+        self.pc = (self.pc as i32 + disp) as u32;
+        Ok(10)
     }
 }
 
@@ -37,7 +34,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
-        assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 2);
+        assert_eq!(cpu.read_ern_l(7).await.unwrap(), MEMORY_START_ADDR + 2);
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 2 + 0x15);
 
         let mut cpu = Cpu::new();
@@ -48,7 +45,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr, 0);
-        assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 102);
+        assert_eq!(cpu.read_ern_l(7).await.unwrap(), MEMORY_START_ADDR + 102);
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 102 - 10);
     }
 
@@ -61,7 +58,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr, 0);
-        assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 4);
+        assert_eq!(cpu.read_ern_l(7).await.unwrap(), MEMORY_START_ADDR + 4);
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 4 + 0x15);
 
         let mut cpu = Cpu::new();
@@ -72,7 +69,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr, 0);
-        assert_eq!(cpu.read_ern_l(7).unwrap(), MEMORY_START_ADDR + 104);
+        assert_eq!(cpu.read_ern_l(7).await.unwrap(), MEMORY_START_ADDR + 104);
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 104 - 10);
     }
 }

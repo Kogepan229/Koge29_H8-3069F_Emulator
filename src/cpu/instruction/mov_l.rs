@@ -11,10 +11,10 @@ impl Cpu {
         }
         let opcode2 = self.fetch().await;
         match (opcode2 >> 8) as u8 {
-            0x69 => return self.mov_l_ern(opcode2),
+            0x69 => return self.mov_l_ern(opcode2).await,
             0x6f => return self.mov_l_disp16(opcode2).await,
             0x78 => return self.mov_l_disp24(opcode2).await,
-            0x6d => return self.mov_l_inc_or_dec(opcode2),
+            0x6d => return self.mov_l_inc_or_dec(opcode2).await,
             0x6b => match opcode2 & 0xfff0 {
                 0x6b00 | 0x6b80 => return self.mov_l_abs16(opcode2).await,
                 0x6b20 | 0x6ba0 => return self.mov_l_abs24(opcode2).await,
@@ -58,110 +58,97 @@ impl Cpu {
         f().with_context(|| format!("opcode [{:x}]", opcode))
     }
 
-    fn mov_l_ern(&mut self, opcode2: u16) -> Result<usize> {
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0x0080 == 0 {
-                let value = self.read_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(8);
-        };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
+    async fn mov_l_ern(&mut self, opcode2: u16) -> Result<usize> {
+        if opcode2 & 0x0080 == 0 {
+            let value = self.read_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?).await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+            self.write_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)
+                .await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(8);
     }
 
     async fn mov_l_disp16(&mut self, opcode2: u16) -> Result<usize> {
         let disp = self.fetch().await;
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0x0080 == 0 {
-                let value = self.read_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(10);
-        };
-        f().with_context(|| format!("opcode2 [{:x}] disp [{:x}]", opcode2, disp))
+        if opcode2 & 0x0080 == 0 {
+            let value = self
+                .read_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)
+                .await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+            self.write_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)
+                .await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(10);
     }
 
     async fn mov_l_disp24(&mut self, opcode2: u16) -> Result<usize> {
         let opcode3 = self.fetch().await;
         let disp = ((self.fetch().await as u32) << 16) | self.fetch().await as u32;
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0x0080 == 0 {
-                let value = self.read_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?)?;
-                self.write_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(14);
-        };
-        f().with_context(|| {
-            format!(
-                "opcode2 [{:x}] opcode3 [{:x}] disp [{:x}]",
-                opcode2, opcode3, disp
-            )
-        })
+        if opcode2 & 0x0080 == 0 {
+            let value = self
+                .read_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)
+                .await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?)?;
+            self.write_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)
+                .await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(14);
     }
 
-    fn mov_l_inc_or_dec(&mut self, opcode2: u16) -> Result<usize> {
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0x0080 == 0 {
-                let value = self.read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_dec_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(10);
-        };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
+    async fn mov_l_inc_or_dec(&mut self, opcode2: u16) -> Result<usize> {
+        if opcode2 & 0x0080 == 0 {
+            let value = self
+                .read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)
+                .await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+            self.write_dec_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)
+                .await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(10);
     }
 
     async fn mov_l_abs16(&mut self, opcode2: u16) -> Result<usize> {
         let abs_addr = self.fetch().await;
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0xfff0 == 0x6b00 {
-                let value = self.read_abs16_l(abs_addr)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_abs16_l(abs_addr, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(10);
-        };
-        f().with_context(|| format!("opcode2 [{:x}] abs_addr [{:x}]", opcode2, abs_addr))
+        if opcode2 & 0xfff0 == 0x6b00 {
+            let value = self.read_abs16_l(abs_addr).await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+            self.write_abs16_l(abs_addr, value).await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(10);
     }
 
     async fn mov_l_abs24(&mut self, opcode2: u16) -> Result<usize> {
         let abs_addr = ((self.fetch().await as u32) << 16) | self.fetch().await as u32;
-        let mut f = || -> Result<usize> {
-            if opcode2 & 0xfff0 == 0x6b20 {
-                let value = self.read_abs24_l(abs_addr)?;
-                self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
-                self.mov_l_proc_pcc(value);
-            } else {
-                let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-                self.write_abs24_l(abs_addr, value)?;
-                self.mov_l_proc_pcc(value);
-            }
-            return Ok(12);
-        };
-        f().with_context(|| format!("opcode2 [{:x}] abs_addr [{:x}]", opcode2, abs_addr))
+        if opcode2 & 0xfff0 == 0x6b20 {
+            let value = self.read_abs24_l(abs_addr).await?;
+            self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
+            self.mov_l_proc_pcc(value);
+        } else {
+            let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
+            self.write_abs24_l(abs_addr, value).await?;
+            self.mov_l_proc_pcc(value);
+        }
+        return Ok(12);
     }
 }
 
@@ -247,7 +234,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x69, 0x07]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -259,7 +246,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x69, 0x70]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -271,7 +258,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x69, 0x07]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -292,7 +279,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
 
         cpu = Cpu::new();
         cpu.ccr = 0x04;
@@ -304,7 +291,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
 
         cpu = Cpu::new();
         cpu.ccr = 0x0a;
@@ -316,7 +303,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 8);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0);
     }
 
     #[tokio::test]
@@ -328,7 +315,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffde0e, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffde0e, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6f, 0x07, 0x0e, 0xee]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -340,7 +327,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffde0e, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffde0e, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6f, 0x70, 0x0e, 0xee]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -352,7 +339,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffde0e, 0).unwrap();
+        cpu.write_abs24_l(0xffde0e, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6f, 0x07, 0x0e, 0xee]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -373,7 +360,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffde0e).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffde0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
@@ -385,7 +372,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffde0e).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffde0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
@@ -397,7 +384,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffde0e).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffde0e).await.unwrap(), 0);
     }
 
     #[tokio::test]
@@ -409,7 +396,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffce0e, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffce0e, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..10]
             .copy_from_slice(&[0x01, 0x00, 0x78, 0x00, 0x6b, 0x27, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch().await;
@@ -422,7 +409,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffce0e, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffce0e, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..10]
             .copy_from_slice(&[0x01, 0x00, 0x78, 0x70, 0x6b, 0x20, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch().await;
@@ -435,7 +422,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffce0e, 0).unwrap();
+        cpu.write_abs24_l(0xffce0e, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..10]
             .copy_from_slice(&[0x01, 0x00, 0x78, 0x00, 0x6b, 0x27, 0x00, 0xff, 0xfe, 0xee]);
         let opcode = cpu.fetch().await;
@@ -458,7 +445,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 14);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffce0e).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffce0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
@@ -471,7 +458,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 14);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffce0e).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffce0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
@@ -484,7 +471,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 14);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffce0e).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffce0e).await.unwrap(), 0);
     }
 
     #[tokio::test]
@@ -496,7 +483,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x6d, 0x07]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -509,7 +496,7 @@ mod tests {
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x6d, 0x70]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -522,7 +509,7 @@ mod tests {
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
-        cpu.write_abs24_l(0xffcf20, 0).unwrap();
+        cpu.write_abs24_l(0xffcf20, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0x00, 0x6d, 0x07]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -544,7 +531,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xffcf20);
 
         let mut cpu = Cpu::new();
@@ -557,7 +544,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xffcf20);
 
         let mut cpu = Cpu::new();
@@ -570,7 +557,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0);
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xffcf20);
     }
 
@@ -582,7 +569,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6b, 0x00, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -593,7 +580,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6b, 0x07, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -604,7 +591,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
-        cpu.write_abs24_l(0xffff02, 0).unwrap();
+        cpu.write_abs24_l(0xffff02, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x01, 0x00, 0x6b, 0x00, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
         let state = cpu.exec(opcode).await.unwrap();
@@ -624,7 +611,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
@@ -635,7 +622,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
@@ -646,7 +633,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 10);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0);
     }
 
     #[tokio::test]
@@ -657,7 +644,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..8]
             .copy_from_slice(&[0x01, 0x00, 0x6b, 0x20, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
@@ -669,7 +656,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
 
-        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).unwrap();
+        cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
         cpu.bus.lock().await.memory[0..8]
             .copy_from_slice(&[0x01, 0x00, 0x6b, 0x27, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
@@ -681,7 +668,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
 
-        cpu.write_abs24_l(0xffff02, 0).unwrap();
+        cpu.write_abs24_l(0xffff02, 0).await.unwrap();
         cpu.bus.lock().await.memory[0..8]
             .copy_from_slice(&[0x01, 0x00, 0x6b, 0x20, 0x00, 0xff, 0xff, 0x02]);
         let opcode = cpu.fetch().await;
@@ -703,7 +690,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 12);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x04;
@@ -715,7 +702,7 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 12);
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0xd8c7b6a5);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
         cpu.ccr = 0x0a;
@@ -727,6 +714,6 @@ mod tests {
         let state = cpu.exec(opcode).await.unwrap();
         assert_eq!(state, 12);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
-        assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0);
+        assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0);
     }
 }
