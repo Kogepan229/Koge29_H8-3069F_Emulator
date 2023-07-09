@@ -2,12 +2,68 @@ use crate::cpu::Cpu;
 use anyhow::{Context as _, Result};
 
 impl Cpu {
+    async fn send_port_value8(&mut self, addr: u32, value: u8) {
+        if addr >= 0xffffd0 && addr <= 0xffffda {
+            let s = self.emu_share_values.lock().await.socket_writer.clone();
+            match s {
+                Some(v) => {
+                    tokio::spawn(async move {
+                        let c = v.clone();
+                        let writer_lock = c.lock().await;
+                        writer_lock.writable().await.unwrap();
+                        let str = format!("v8:{}:{}", addr, value);
+                        writer_lock.try_write(str.as_bytes())
+                    });
+                }
+                None => return,
+            }
+        }
+    }
+
+    async fn send_port_value16(&mut self, addr: u32, value: u16) {
+        if addr >= 0xffffd0 && addr <= 0xffffda {
+            let s = self.emu_share_values.lock().await.socket_writer.clone();
+            match s {
+                Some(v) => {
+                    tokio::spawn(async move {
+                        let c = v.clone();
+                        let writer_lock = c.lock().await;
+                        writer_lock.writable().await.unwrap();
+                        let str = format!("v16:{}:{}", addr, value);
+                        writer_lock.try_write(str.as_bytes())
+                    });
+                }
+                None => return,
+            }
+        }
+    }
+
+    async fn send_port_value32(&mut self, addr: u32, value: u32) {
+        if addr >= 0xffffd0 && addr <= 0xffffda {
+            let s = self.emu_share_values.lock().await.socket_writer.clone();
+            match s {
+                Some(v) => {
+                    tokio::spawn(async move {
+                        let c = v.clone();
+                        let writer_lock = c.lock().await;
+                        writer_lock.writable().await.unwrap();
+                        let str = format!("v32:{}:{}", addr, value);
+                        writer_lock.try_write(str.as_bytes())
+                    });
+                }
+                None => return,
+            }
+        }
+    }
+
     pub(in super::super) async fn write_abs8_b(&mut self, addr: u8, value: u8) -> Result<()> {
+        let real_addr = 0xffff00 | addr as u32;
         self.bus
             .lock()
             .await
-            .write(0xffff00 | addr as u32, value)
+            .write(real_addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value8(real_addr, value).await;
         Ok(())
     }
 
@@ -21,17 +77,21 @@ impl Cpu {
 
     pub(in super::super) async fn write_abs16_b(&mut self, addr: u16, value: u8) -> Result<()> {
         if addr & 0x8000 == 0x0000 {
+            let real_addr = addr as u32;
             self.bus
                 .lock()
                 .await
-                .write(addr as u32, value)
+                .write(real_addr, value)
                 .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+            self.send_port_value8(real_addr, value).await;
         } else {
+            let real_addr = 0xff0000 | addr as u32;
             self.bus
                 .lock()
                 .await
                 .write(0xff0000 | addr as u32, value)
                 .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+            self.send_port_value8(real_addr, value).await;
         }
         Ok(())
     }
@@ -60,6 +120,7 @@ impl Cpu {
             .await
             .write(addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value8(addr, value).await;
         Ok(())
     }
 
@@ -75,13 +136,16 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        let mut bus_lock = self.bus.lock().await;
+
+        let bus = self.bus.clone();
+        let mut bus_lock = bus.lock().await;
         bus_lock
             .write(0xffff00 | addr as u32, (value >> 8) as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         bus_lock
             .write((0xffff00 | addr as u32) + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value16(0xffff00 | addr as u32, value).await;
         Ok(())
     }
 
@@ -104,13 +168,16 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        let mut bus_lock = self.bus.lock().await;
+        let bus = self.bus.clone();
+        let mut bus_lock = bus.lock().await;
         if addr & 0x8000 == 0x0000 {
             bus_lock.write(addr as u32, (value >> 8) as u8)?;
             bus_lock.write((addr + 1) as u32, value as u8)?;
+            self.send_port_value16(addr as u32, value).await;
         } else {
             bus_lock.write(0xff0000 | addr as u32, (value >> 8) as u8)?;
             bus_lock.write((0xff0000 | addr as u32) + 1, value as u8)?;
+            self.send_port_value16(0xff0000 | addr as u32, value).await;
         }
         Ok(())
     }
@@ -160,6 +227,7 @@ impl Cpu {
             .await
             .write(addr + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value16(addr, value).await;
         Ok(())
     }
 
@@ -187,6 +255,7 @@ impl Cpu {
         self.write_abs24_w((0xffff00 | addr as u32) + 2, value as u16)
             .await
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value32(0xffff00 | addr as u32, value).await;
         Ok(())
     }
 
@@ -218,11 +287,13 @@ impl Cpu {
             self.write_abs24_w(addr as u32, (value >> 16) as u16)
                 .await?;
             self.write_abs24_w((addr + 2) as u32, value as u16).await?;
+            self.send_port_value32(addr as u32, value).await;
         } else {
             self.write_abs24_w(0xff0000 | addr as u32, (value >> 16) as u16)
                 .await?;
             self.write_abs24_w((0xff0000 | addr as u32) + 2, value as u16)
                 .await?;
+            self.send_port_value32(0xff0000 | addr as u32, value).await;
         }
         Ok(())
     }
@@ -268,6 +339,7 @@ impl Cpu {
         self.write_abs24_w(addr + 2, value as u16)
             .await
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value32(addr, value).await;
         Ok(())
     }
 

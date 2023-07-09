@@ -5,6 +5,11 @@ mod memory;
 mod setting;
 
 use clap::Parser;
+use tokio::net::TcpListener;
+use tokio::net::TcpStream;
+
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 use crate::cpu::Cpu;
 
@@ -26,7 +31,13 @@ async fn main() {
         *setting::ENABLE_PRINT_OPCODE.write().unwrap() = v;
     }
 
+    let listener = TcpListener::bind("127.0.0.1:12345").await.unwrap();
+    let (stream, _) = listener.accept().await.unwrap();
+    let (reader, _writer) = stream.into_split();
+    let writer = Arc::new(Mutex::new(_writer));
+
     let mut cpu = Cpu::new();
+    cpu.emu_share_values.lock().await.socket_writer = Some(writer.clone());
 
     /* // test code
     let cpu_emu_share = cpu.emu_share_values.clone();

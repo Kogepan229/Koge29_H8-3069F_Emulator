@@ -7,6 +7,7 @@ use anyhow::{bail, Context as _, Result};
 use std::sync::Arc;
 use std::time;
 use std::time::Duration;
+use tokio::net::tcp::OwnedWriteHalf;
 use tokio::sync::Mutex;
 
 mod addressing_mode;
@@ -15,14 +16,16 @@ mod instruction;
 const CPUCLOCK: usize = 20000000;
 
 pub struct EmulatorSharedValues {
+    pub socket_writer: Option<Arc<Mutex<OwnedWriteHalf>>>,
     pub pc: u32,
     pub ccr: u8,
     pub er: [u32; 8],
 }
 
 impl EmulatorSharedValues {
-    pub fn new() -> Self {
+    pub fn new(socket_writer: Option<Arc<Mutex<OwnedWriteHalf>>>) -> Self {
         EmulatorSharedValues {
+            socket_writer,
             pc: MEMORY_START_ADDR,
             ccr: 0,
             er: [0; 8],
@@ -69,7 +72,7 @@ impl Cpu {
             ccr: 0,
             er: [0; 8],
             exit_addr: 0,
-            emu_share_values: Arc::new(Mutex::new(EmulatorSharedValues::new())),
+            emu_share_values: Arc::new(Mutex::new(EmulatorSharedValues::new(None))),
         }
     }
 
