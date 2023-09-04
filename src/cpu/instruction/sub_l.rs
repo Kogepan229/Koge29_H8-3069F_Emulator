@@ -2,9 +2,9 @@ use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) fn sub_l(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn sub_l(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
-            0x7a => return self.sub_l_imm(opcode),
+            0x7a => return self.sub_l_imm(opcode).await,
             0x1a => return self.sub_l_rn(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
@@ -46,8 +46,8 @@ impl Cpu {
     }
 
     // 仕様書の図ではimmが16bitになっているが実際は32bit
-    fn sub_l_imm(&mut self, opcode: u16) -> Result<usize> {
-        let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
+    async fn sub_l_imm(&mut self, opcode: u16) -> Result<usize> {
+        let imm = (self.fetch().await as u32) << 16 | self.fetch().await as u32;
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let dest = self.read_rn_l(register)?;

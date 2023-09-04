@@ -2,9 +2,9 @@ use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) fn add_w(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn add_w(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
-            0x79 => return self.add_w_imm(opcode),
+            0x79 => return self.add_w_imm(opcode).await,
             0x09 => return self.add_w_rn(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
@@ -45,8 +45,8 @@ impl Cpu {
         value as u16
     }
 
-    fn add_w_imm(&mut self, opcode: u16) -> Result<usize> {
-        let imm = self.fetch();
+    async fn add_w_imm(&mut self, opcode: u16) -> Result<usize> {
+        let imm = self.fetch().await;
         let mut f = || -> Result<usize> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let dest = self.read_rn_w(register)?;

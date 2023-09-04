@@ -2,9 +2,9 @@ use crate::cpu::{Cpu, CCR};
 use anyhow::{bail, Result};
 
 impl Cpu {
-    pub(in super::super) fn cmp_l(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn cmp_l(&mut self, opcode: u16) -> Result<usize> {
         match (opcode >> 8) as u8 {
-            0x7a => return self.cmp_l_imm(opcode),
+            0x7a => return self.cmp_l_imm(opcode).await,
             0x1f => return self.cmp_l_rn(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
@@ -45,8 +45,8 @@ impl Cpu {
         value as u32
     }
 
-    fn cmp_l_imm(&mut self, opcode: u16) -> Result<usize> {
-        let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
+    async fn cmp_l_imm(&mut self, opcode: u16) -> Result<usize> {
+        let imm = (self.fetch().await as u32) << 16 | self.fetch().await as u32;
         let dest = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 4)?)?;
         self.cmp_l_proc(dest, imm);
         Ok(6)
