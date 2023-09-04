@@ -26,6 +26,9 @@ struct Args {
 
     #[arg(short, long)]
     disable_socket: bool,
+
+    #[arg(short, long, default_value = "12345")]
+    port: u16
 }
 
 #[tokio::main]
@@ -38,7 +41,7 @@ async fn main() {
     let mut cpu = Cpu::new();
 
     if !args.disable_socket {
-        let listener = TcpListener::bind("127.0.0.1:12345").await.unwrap();
+        let listener = TcpListener::bind(format!("127.0.0.1:{}", args.port)).await.unwrap();
         let (stream, _) = listener.accept().await.unwrap();
         let (reader, _writer) = stream.into_split();
         let writer = Arc::new(Mutex::new(_writer));
