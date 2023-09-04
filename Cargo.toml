@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 spin_sleep_tokio = { git = "https://github.com/Kogepan229/spin-sleep-tokio" }
-tokio = { version = "1.29.1", features = ["full"] }
+tokio = { version = "1.32.0", features = ["full"] }
 nom = "7"
 anyhow = { version = "1.0", features = ["backtrace"] }
-clap = { version = "4.3.0", features = ["derive"] }
+clap = { version = "4.4.2", features = ["derive"] }
