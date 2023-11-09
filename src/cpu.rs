@@ -117,7 +117,7 @@ impl Cpu {
                 return Ok(());
             }
 
-            // Copu EmulatorShareCpuValues
+            // Copy EmulatorShareCpuValues
             {
                 let mut e = self.emu_share_values.lock().await;
                 (*e).pc = self.pc;
