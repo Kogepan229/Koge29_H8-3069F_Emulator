@@ -3,13 +3,9 @@ mod cpu;
 mod elf;
 mod memory;
 mod setting;
+mod socket;
 
 use clap::Parser;
-use tokio::net::TcpListener;
-use tokio::net::TcpStream;
-
-use std::sync::Arc;
-use tokio::sync::Mutex;
 
 use crate::cpu::Cpu;
 
@@ -41,13 +37,9 @@ async fn main() {
     let mut cpu = Cpu::new();
 
     if !args.disable_socket {
-        let listener = TcpListener::bind(format!("127.0.0.1:{}", args.port))
+        socket::listen(format!("127.0.0.1:{}", args.port))
             .await
             .unwrap();
-        let (stream, _) = listener.accept().await.unwrap();
-        let (reader, _writer) = stream.into_split();
-        let writer = Arc::new(Mutex::new(_writer));
-        cpu.emu_share_values.lock().await.socket_writer = Some(writer.clone());
     }
 
     /* // test code

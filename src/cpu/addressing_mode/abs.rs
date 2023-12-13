@@ -1,58 +1,23 @@
 use crate::cpu::Cpu;
+use crate::socket::{send_addr_value_u16, send_addr_value_u32, send_addr_value_u8};
 use anyhow::{Context as _, Result};
 
 impl Cpu {
     async fn send_port_value8(&mut self, addr: u32, value: u8) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            let s = self.emu_share_values.lock().await.socket_writer.clone();
-            match s {
-                Some(v) => {
-                    tokio::spawn(async move {
-                        let c = v.clone();
-                        let writer_lock = c.lock().await;
-                        writer_lock.writable().await.unwrap();
-                        let str = format!("v8:{}:{}", addr, value);
-                        writer_lock.try_write(str.as_bytes())
-                    });
-                }
-                None => return,
-            }
+            send_addr_value_u8(addr, value);
         }
     }
 
     async fn send_port_value16(&mut self, addr: u32, value: u16) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            let s = self.emu_share_values.lock().await.socket_writer.clone();
-            match s {
-                Some(v) => {
-                    tokio::spawn(async move {
-                        let c = v.clone();
-                        let writer_lock = c.lock().await;
-                        writer_lock.writable().await.unwrap();
-                        let str = format!("v16:{}:{}", addr, value);
-                        writer_lock.try_write(str.as_bytes())
-                    });
-                }
-                None => return,
-            }
+            send_addr_value_u16(addr, value);
         }
     }
 
     async fn send_port_value32(&mut self, addr: u32, value: u32) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            let s = self.emu_share_values.lock().await.socket_writer.clone();
-            match s {
-                Some(v) => {
-                    tokio::spawn(async move {
-                        let c = v.clone();
-                        let writer_lock = c.lock().await;
-                        writer_lock.writable().await.unwrap();
-                        let str = format!("v32:{}:{}", addr, value);
-                        writer_lock.try_write(str.as_bytes())
-                    });
-                }
-                None => return,
-            }
+            send_addr_value_u32(addr, value);
         }
     }
 
