@@ -7,7 +7,6 @@ use anyhow::{bail, Context as _, Result};
 use std::sync::Arc;
 use std::time;
 use std::time::Duration;
-use tokio::net::tcp::OwnedWriteHalf;
 use tokio::sync::Mutex;
 
 mod addressing_mode;
@@ -15,31 +14,12 @@ mod instruction;
 
 const CPUCLOCK: usize = 20000000;
 
-pub struct EmulatorSharedValues {
-    pub socket_writer: Option<Arc<Mutex<OwnedWriteHalf>>>,
-    pub pc: u32,
-    pub ccr: u8,
-    pub er: [u32; 8],
-}
-
-impl EmulatorSharedValues {
-    pub fn new(socket_writer: Option<Arc<Mutex<OwnedWriteHalf>>>) -> Self {
-        EmulatorSharedValues {
-            socket_writer,
-            pc: MEMORY_START_ADDR,
-            ccr: 0,
-            er: [0; 8],
-        }
-    }
-}
-
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
     pc: u32,
     ccr: u8,
     pub er: [u32; 8],
     pub exit_addr: u32, // address of ___exit
-    pub emu_share_values: Arc<Mutex<EmulatorSharedValues>>,
 }
 
 pub enum CCR {
@@ -72,7 +52,6 @@ impl Cpu {
             ccr: 0,
             er: [0; 8],
             exit_addr: 0,
-            emu_share_values: Arc::new(Mutex::new(EmulatorSharedValues::new(None))),
         }
     }
 
@@ -115,14 +94,6 @@ impl Cpu {
                     exec_time.elapsed().as_secs_f64()
                 );
                 return Ok(());
-            }
-
-            // Copy EmulatorShareCpuValues
-            {
-                let mut e = self.emu_share_values.lock().await;
-                (*e).pc = self.pc;
-                (*e).ccr = self.ccr;
-                (*e).er = self.er;
             }
 
             // sleep every 1msec (Windows timer max precision)
