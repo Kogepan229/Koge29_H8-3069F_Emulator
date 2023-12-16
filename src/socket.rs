@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
 use tokio::{
     io,
     net::{
@@ -10,6 +10,7 @@ use tokio::{
 
 static READER: OnceLock<OwnedReadHalf> = OnceLock::new();
 static WRITER: OnceLock<OwnedWriteHalf> = OnceLock::new();
+static READ_BUF: OnceLock<Mutex<Vec<String>>> = OnceLock::new();
 
 pub async fn listen(addr: String) -> Result<()> {
     let listener = TcpListener::bind(addr).await.unwrap();
@@ -17,6 +18,7 @@ pub async fn listen(addr: String) -> Result<()> {
     let (reader, writer) = stream.into_split();
     READER.set(reader).unwrap();
     WRITER.set(writer).unwrap();
+    READ_BUF.set(Mutex::new(Vec::<String>::new())).unwrap();
     receive();
     Ok(())
 }
@@ -31,7 +33,12 @@ fn receive() {
                     match s.try_read(&mut msg) {
                         Ok(n) => {
                             msg.truncate(n);
-                            println!("rec: {}", String::from_utf8(msg).unwrap());
+                            match READ_BUF.get() {
+                                Some(b) => {
+                                    b.lock().unwrap().push(String::from_utf8(msg).unwrap());
+                                }
+                                None => return,
+                            }
                         }
                         Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
                             continue;
@@ -45,6 +52,18 @@ fn receive() {
             });
         }
         None => return,
+    }
+}
+
+pub fn get_received_msgs() -> Option<Vec<String>> {
+    match READ_BUF.get() {
+        Some(b) => {
+            let mut v = b.lock().unwrap();
+            let r = Some(v.clone());
+            v.clear();
+            return r;
+        }
+        None => return None,
     }
 }
 

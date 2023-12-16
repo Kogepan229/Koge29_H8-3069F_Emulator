@@ -1,7 +1,7 @@
 use crate::{
     bus::Bus,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
-    setting,
+    setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
 use std::sync::Arc;
@@ -66,6 +66,13 @@ impl Cpu {
         self.er[7] = MEMORY_END_ADDR - 0xf;
 
         loop {
+            // Print received messages
+            if let Some(msgs) = socket::get_received_msgs() {
+                for val in msgs {
+                    println!("rec: {}", val);
+                }
+            }
+
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
             }
