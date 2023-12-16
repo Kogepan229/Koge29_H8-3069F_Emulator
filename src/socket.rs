@@ -23,7 +23,7 @@ pub fn send_addr_value_u8(addr: u32, value: u8) {
     match WRITER.get() {
         Some(v) => {
             tokio::spawn(async move {
-                let str = format!("u8:{}:{}", addr, value);
+                let str = format!("u8:{}:{}\n", addr, value);
                 let str_bytes = str.as_bytes();
                 let mut written_bytes = 0;
                 loop {
@@ -48,7 +48,7 @@ pub fn send_addr_value_u16(addr: u32, value: u16) {
     match WRITER.get() {
         Some(v) => {
             tokio::spawn(async move {
-                let str = format!("u16:{}:{}", addr, value);
+                let str = format!("u16:{}:{}\n", addr, value);
                 let str_bytes = str.as_bytes();
                 let mut written_bytes = 0;
                 loop {
@@ -73,7 +73,7 @@ pub fn send_addr_value_u32(addr: u32, value: u32) {
     match WRITER.get() {
         Some(v) => {
             tokio::spawn(async move {
-                let str = format!("u32:{}:{}", addr, value);
+                let str = format!("u32:{}:{}\n", addr, value);
                 let str_bytes = str.as_bytes();
                 let mut written_bytes = 0;
                 loop {
