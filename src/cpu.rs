@@ -69,7 +69,10 @@ impl Cpu {
             // Print received messages
             if let Some(msgs) = socket::get_received_msgs() {
                 for val in msgs {
-                    println!("rec: {}", val);
+                    let ls = val.lines();
+                    for l in ls {
+                        println!("rec: {}", l);
+                    }
                 }
             }
 
