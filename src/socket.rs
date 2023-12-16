@@ -1,8 +1,11 @@
 use anyhow::Result;
 use std::sync::OnceLock;
-use tokio::net::{
-    tcp::{OwnedReadHalf, OwnedWriteHalf},
-    TcpListener,
+use tokio::{
+    io,
+    net::{
+        tcp::{OwnedReadHalf, OwnedWriteHalf},
+        TcpListener,
+    },
 };
 
 static READER: OnceLock<OwnedReadHalf> = OnceLock::new();
@@ -14,10 +17,36 @@ pub async fn listen(addr: String) -> Result<()> {
     let (reader, writer) = stream.into_split();
     READER.set(reader).unwrap();
     WRITER.set(writer).unwrap();
+    receive();
     Ok(())
 }
 
-fn receive() {}
+fn receive() {
+    match READER.get() {
+        Some(s) => {
+            tokio::spawn(async move {
+                loop {
+                    let mut msg = vec![0; 1024];
+                    s.readable().await.unwrap();
+                    match s.try_read(&mut msg) {
+                        Ok(n) => {
+                            msg.truncate(n);
+                            println!("rec: {}", String::from_utf8(msg).unwrap());
+                        }
+                        Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
+                            continue;
+                        }
+                        Err(e) => {
+                            println!("{}", e.to_string());
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+        None => return,
+    }
+}
 
 pub fn send_addr_value_u8(addr: u32, value: u8) {
     match WRITER.get() {
