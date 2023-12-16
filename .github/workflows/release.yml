@@ -30,6 +30,10 @@ jobs:
     needs: check-version
     if: ${{needs.check-version.outputs.is_new_version}}
     runs-on: windows-latest
+    env:
+      ARTIFACT_NAME: h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
+    outputs:
+      artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,19 +48,23 @@ jobs:
 
       - name: Package
         run: |
-          powershell Compress-Archive -Path target/x86_64-pc-windows-msvc/release/koge29_h8-3069f_emulator.exe -DestinationPath h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
+          powershell Compress-Archive -Path target/x86_64-pc-windows-msvc/release/koge29_h8-3069f_emulator.exe -DestinationPath ${{env.ARTIFACT_NAME}}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
-          path: ./h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
+          name: ${{env.ARTIFACT_NAME}}
+          path: ./${{env.ARTIFACT_NAME}}
           if-no-files-found: error
 
   build-linux:
     needs: check-version
     if: ${{needs.check-version.outputs.is_new_version}}
     runs-on: ubuntu-latest
+    env:
+      ARTIFACT_NAME: h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
+    outputs:
+      artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -74,13 +82,13 @@ jobs:
 
       - name: Package
         run: |
-          zip --junk-paths h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip target/x86_64-unknown-linux-musl/release/koge29_h8-3069f_emulator
+          zip --junk-paths ${{env.ARTIFACT_NAME}} target/x86_64-unknown-linux-musl/release/koge29_h8-3069f_emulator
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
-          path: ./h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
+          name: ${{env.ARTIFACT_NAME}}
+          path: ./${{env.ARTIFACT_NAME}}
           if-no-files-found: error
 
   release:
@@ -107,6 +115,6 @@ jobs:
           name: Release ${{ steps.create_tag.outputs.new_tag }}
           body: ${{ steps.create_tag.outputs.changelog }}
           artifacts:
-            "./artifacts/h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip,
-            ./artifacts/h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip"
+            "./artifacts/${{needs.build-windows.outputs.artifact_name}}/${{needs.build-windows.outputs.artifact_name}},
+            ./artifacts/${{needs.build-linux.outputs.artifact_name}}/${{needs.build-linux.outputs.artifact_name}}"
           makeLatest: "latest"
