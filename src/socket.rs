@@ -67,6 +67,31 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
+pub fn send_one_sec_message() {
+    match WRITER.get() {
+        Some(v) => {
+            tokio::spawn(async move {
+                let str = "1sec\n";
+                let str_bytes = str.as_bytes();
+                let mut written_bytes = 0;
+                loop {
+                    v.writable().await.unwrap();
+                    match v.try_write(str_bytes) {
+                        Ok(n) => {
+                            written_bytes += n;
+                        }
+                        Err(_) => {}
+                    }
+                    if written_bytes == str_bytes.len() {
+                        break;
+                    }
+                }
+            });
+        }
+        None => return,
+    }
+}
+
 pub fn send_addr_value_u8(addr: u32, value: u8) {
     match WRITER.get() {
         Some(v) => {

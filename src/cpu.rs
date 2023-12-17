@@ -12,7 +12,7 @@ use tokio::sync::Mutex;
 mod addressing_mode;
 mod instruction;
 
-const CPUCLOCK: usize = 20000000;
+const CPUCLOCK: usize = 20_000_000;
 
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
@@ -59,8 +59,9 @@ impl Cpu {
         let mut state_sum: usize = 0;
         let exec_time = time::Instant::now();
 
-        let mut loop_count: usize = 0;
         let mut loop_time = time::Instant::now();
+        let mut loop_count: usize = 0;
+        let mut one_sec_count: usize = 0;
 
         // set stack pointer
         self.er[7] = MEMORY_END_ADDR - 0xf;
@@ -91,6 +92,7 @@ impl Cpu {
             })?;
             state_sum += state;
             loop_count += state;
+            one_sec_count += state;
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 println!("");
@@ -115,6 +117,11 @@ impl Cpu {
                 .await;
                 loop_count = 0;
                 loop_time = time::Instant::now();
+            }
+
+            if one_sec_count >= CPUCLOCK {
+                socket::send_one_sec_message();
+                one_sec_count = 0;
             }
         }
     }
