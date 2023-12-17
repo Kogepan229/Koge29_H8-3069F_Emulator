@@ -67,12 +67,12 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
-pub fn send_one_sec_message() {
+fn send_message(msg: String) {
     match WRITER.get() {
         Some(v) => {
             tokio::spawn(async move {
-                let str = "1sec\n";
-                let str_bytes = str.as_bytes();
+                let _msg = msg + "\n";
+                let str_bytes = _msg.as_bytes();
                 let mut written_bytes = 0;
                 loop {
                     v.writable().await.unwrap();
@@ -90,79 +90,23 @@ pub fn send_one_sec_message() {
         }
         None => return,
     }
+}
+
+pub fn send_one_sec_message() {
+    send_message("1sec".to_owned());
 }
 
 pub fn send_addr_value_u8(addr: u32, value: u8) {
-    match WRITER.get() {
-        Some(v) => {
-            tokio::spawn(async move {
-                let str = format!("u8:{}:{}\n", addr, value);
-                let str_bytes = str.as_bytes();
-                let mut written_bytes = 0;
-                loop {
-                    v.writable().await.unwrap();
-                    match v.try_write(str_bytes) {
-                        Ok(n) => {
-                            written_bytes += n;
-                        }
-                        Err(_) => {}
-                    }
-                    if written_bytes == str_bytes.len() {
-                        break;
-                    }
-                }
-            });
-        }
-        None => return,
-    }
+    let str = format!("u8:{}:{}", addr, value);
+    send_message(str);
 }
 
 pub fn send_addr_value_u16(addr: u32, value: u16) {
-    match WRITER.get() {
-        Some(v) => {
-            tokio::spawn(async move {
-                let str = format!("u16:{}:{}\n", addr, value);
-                let str_bytes = str.as_bytes();
-                let mut written_bytes = 0;
-                loop {
-                    v.writable().await.unwrap();
-                    match v.try_write(str_bytes) {
-                        Ok(n) => {
-                            written_bytes += n;
-                        }
-                        Err(_) => {}
-                    }
-                    if written_bytes == str_bytes.len() {
-                        break;
-                    }
-                }
-            });
-        }
-        None => return,
-    }
+    let str = format!("u16:{}:{}", addr, value);
+    send_message(str);
 }
 
 pub fn send_addr_value_u32(addr: u32, value: u32) {
-    match WRITER.get() {
-        Some(v) => {
-            tokio::spawn(async move {
-                let str = format!("u32:{}:{}\n", addr, value);
-                let str_bytes = str.as_bytes();
-                let mut written_bytes = 0;
-                loop {
-                    v.writable().await.unwrap();
-                    match v.try_write(str_bytes) {
-                        Ok(n) => {
-                            written_bytes += n;
-                        }
-                        Err(_) => {}
-                    }
-                    if written_bytes == str_bytes.len() {
-                        break;
-                    }
-                }
-            });
-        }
-        None => return,
-    }
+    let str = format!("u32:{}:{}", addr, value);
+    send_message(str);
 }
