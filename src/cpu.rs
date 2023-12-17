@@ -63,6 +63,8 @@ impl Cpu {
         let mut loop_count: usize = 0;
         let mut one_sec_count: usize = 0;
 
+        let mut is_paused = false;
+
         // set stack pointer
         self.er[7] = MEMORY_END_ADDR - 0xf;
 
@@ -73,8 +75,21 @@ impl Cpu {
                     let ls = val.lines();
                     for l in ls {
                         println!("rec: {}", l);
+                        if l == "pause" {
+                            is_paused = true;
+                        } else if l == "restart" {
+                            is_paused = false;
+                            loop_time = time::Instant::now();
+                        } else if l == "stop" {
+                            println!("Stopped by message.");
+                            return Ok(());
+                        }
                     }
                 }
+            }
+
+            if is_paused {
+                continue;
             }
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
