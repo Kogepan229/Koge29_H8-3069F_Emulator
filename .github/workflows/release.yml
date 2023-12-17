@@ -14,7 +14,7 @@ jobs:
       current_version: ${{steps.check_version.outputs.current-version}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -24,7 +24,6 @@ jobs:
         with:
           create-tag: false
           version-command: cargo read-manifest | jq -r .version
-
 
   build-windows:
     needs: check-version
@@ -36,7 +35,7 @@ jobs:
       artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set rust-toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -67,7 +66,7 @@ jobs:
       artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install musl tools
         run: sudo apt install -qq -y musl-tools --no-install-recommends
