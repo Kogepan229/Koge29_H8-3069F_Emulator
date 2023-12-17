@@ -67,7 +67,7 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
-fn send_message(msg: String) {
+pub fn send_message(msg: String) {
     match WRITER.get() {
         Some(v) => {
             tokio::spawn(async move {
