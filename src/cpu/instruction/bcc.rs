@@ -225,14 +225,14 @@ impl Cpu {
     }
 
     fn bge8(&mut self, opcode: u16) -> Result<usize> {
-        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1 == 0 {
+        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(4)
     }
 
     async fn bge16(&mut self) -> Result<usize> {
-        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1 == 0 {
+        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             let opcode2 = self.fetch().await;
             self.pc_disp16(opcode2)
                 .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
@@ -241,14 +241,14 @@ impl Cpu {
     }
 
     fn blt8(&mut self, opcode: u16) -> Result<usize> {
-        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1 == 1 {
+        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(4)
     }
 
     async fn blt16(&mut self) -> Result<usize> {
-        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1 == 1 {
+        if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             let opcode2 = self.fetch().await;
             self.pc_disp16(opcode2)
                 .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
@@ -257,14 +257,14 @@ impl Cpu {
     }
 
     fn bgt8(&mut self, opcode: u16) -> Result<usize> {
-        if self.read_ccr(CCR::Z) | ((self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1) == 0 {
+        if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(4)
     }
 
     async fn bgt16(&mut self) -> Result<usize> {
-        if self.read_ccr(CCR::Z) | ((self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1) == 0 {
+        if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             let opcode2 = self.fetch().await;
             self.pc_disp16(opcode2)
                 .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
@@ -273,14 +273,14 @@ impl Cpu {
     }
 
     fn ble8(&mut self, opcode: u16) -> Result<usize> {
-        if self.read_ccr(CCR::Z) | ((self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1) == 1 {
+        if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(4)
     }
 
     async fn ble16(&mut self) -> Result<usize> {
-        if self.read_ccr(CCR::Z) | ((self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) & 1) == 1 {
+        if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             let opcode2 = self.fetch().await;
             self.pc_disp16(opcode2)
                 .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
