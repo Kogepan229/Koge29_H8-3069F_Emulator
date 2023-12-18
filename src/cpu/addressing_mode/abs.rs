@@ -41,42 +41,32 @@ impl Cpu {
     }
 
     pub(in super::super) async fn write_abs16_b(&mut self, addr: u16, value: u8) -> Result<()> {
-        if addr & 0x8000 == 0x0000 {
-            let real_addr = addr as u32;
-            self.bus
-                .lock()
-                .await
-                .write(real_addr, value)
-                .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-            self.send_port_value8(real_addr, value).await;
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
         } else {
-            let real_addr = 0xff0000 | addr as u32;
-            self.bus
-                .lock()
-                .await
-                .write(0xff0000 | addr as u32, value)
-                .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-            self.send_port_value8(real_addr, value).await;
-        }
+            0xff0000 | addr as u32
+        };
+        self.bus
+            .lock()
+            .await
+            .write(real_addr, value)
+            .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
+        self.send_port_value8(real_addr, value).await;
         Ok(())
     }
 
     pub(in super::super) async fn read_abs16_b(&self, addr: u16) -> Result<u8> {
-        if addr & 0x8000 == 0x0000 {
-            return self
-                .bus
-                .lock()
-                .await
-                .read(addr as u32)
-                .with_context(|| format!("addr [{:x}]", addr));
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
         } else {
-            return self
-                .bus
-                .lock()
-                .await
-                .read(0xff0000 | addr as u32)
-                .with_context(|| format!("addr [{:x}]", addr));
-        }
+            0xff0000 | addr as u32
+        };
+        return self
+            .bus
+            .lock()
+            .await
+            .read(real_addr)
+            .with_context(|| format!("addr [{:x}]", addr));
     }
 
     pub(in super::super) async fn write_abs24_b(&mut self, addr: u32, value: u8) -> Result<()> {
@@ -133,17 +123,16 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
+        } else {
+            0xff0000 | addr as u32
+        };
         let bus = self.bus.clone();
         let mut bus_lock = bus.lock().await;
-        if addr & 0x8000 == 0x0000 {
-            bus_lock.write(addr as u32, (value >> 8) as u8)?;
-            bus_lock.write((addr + 1) as u32, value as u8)?;
-            self.send_port_value16(addr as u32, value).await;
-        } else {
-            bus_lock.write(0xff0000 | addr as u32, (value >> 8) as u8)?;
-            bus_lock.write((0xff0000 | addr as u32) + 1, value as u8)?;
-            self.send_port_value16(0xff0000 | addr as u32, value).await;
-        }
+        bus_lock.write(real_addr, (value >> 8) as u8)?;
+        bus_lock.write(real_addr + 1, value as u8)?;
+        self.send_port_value16(real_addr, value).await;
         Ok(())
     }
 
@@ -158,14 +147,13 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        let bus_lock = self.bus.lock().await;
-        if addr & 0x8000 == 0x0000 {
-            return Ok((bus_lock.read(addr as u32)? as u16) << 8
-                | bus_lock.read((addr + 1) as u32)? as u16);
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
         } else {
-            return Ok((bus_lock.read(0xff0000 | addr as u32)? as u16) << 8
-                | bus_lock.read((0xff0000 | addr as u32) + 1)? as u16);
-        }
+            0xff0000 | addr as u32
+        };
+        let bus_lock = self.bus.lock().await;
+        return Ok((bus_lock.read(real_addr)? as u16) << 8 | bus_lock.read(real_addr + 1)? as u16);
     }
 
     pub(in super::super) async fn read_abs16_w(&self, addr: u16) -> Result<u16> {
@@ -182,14 +170,12 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        self.bus
-            .lock()
-            .await
+        let bus = self.bus.clone();
+        let mut bus_lock = bus.lock().await;
+        bus_lock
             .write(addr, (value >> 8) as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.bus
-            .lock()
-            .await
+        bus_lock
             .write(addr + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         self.send_port_value16(addr, value).await;
@@ -248,18 +234,14 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        if addr & 0x8000 == 0x0000 {
-            self.write_abs24_w(addr as u32, (value >> 16) as u16)
-                .await?;
-            self.write_abs24_w((addr + 2) as u32, value as u16).await?;
-            self.send_port_value32(addr as u32, value).await;
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
         } else {
-            self.write_abs24_w(0xff0000 | addr as u32, (value >> 16) as u16)
-                .await?;
-            self.write_abs24_w((0xff0000 | addr as u32) + 2, value as u16)
-                .await?;
-            self.send_port_value32(0xff0000 | addr as u32, value).await;
-        }
+            0xff0000 | addr as u32
+        };
+        self.write_abs24_w(real_addr, (value >> 16) as u16).await?;
+        self.write_abs24_w(real_addr + 2, value as u16).await?;
+        self.send_port_value32(real_addr, value).await;
         Ok(())
     }
 
@@ -273,15 +255,13 @@ impl Cpu {
         if addr % 2 != 0 {
             addr &= !1;
         }
-        if addr & 0x8000 == 0x0000 {
-            return Ok((self.read_abs24_w(addr as u32).await? as u32) << 16
-                | self.read_abs24_w((addr + 2) as u32).await? as u32);
+        let real_addr = if addr & 0x8000 == 0x0000 {
+            addr as u32
         } else {
-            return Ok(
-                (self.read_abs24_w(0xff0000 | addr as u32).await? as u32) << 16
-                    | self.read_abs24_w((0xff0000 | addr as u32) + 2).await? as u32,
-            );
-        }
+            0xff0000 | addr as u32
+        };
+        return Ok((self.read_abs24_w(real_addr).await? as u32) << 16
+            | self.read_abs24_w(real_addr + 2).await? as u32);
     }
 
     pub(in super::super) async fn read_abs16_l(&self, addr: u16) -> Result<u32> {
@@ -339,7 +319,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_read_abs8_b() {
-        let mut cpu = Cpu::new();
+        let cpu = Cpu::new();
         cpu.bus.lock().await.write(0xffff10, 0xff).unwrap();
         cpu.bus.lock().await.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_b(0x10).await.unwrap(), 0xff);
