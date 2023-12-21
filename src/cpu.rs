@@ -12,7 +12,7 @@ use tokio::sync::Mutex;
 mod addressing_mode;
 mod instruction;
 
-const CPUCLOCK: usize = 20_000_000;
+const CPU_CLOCK: usize = 20_000_000;
 
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
@@ -126,17 +126,17 @@ impl Cpu {
             // sleep every 1msec (Windows timer max precision)
             if loop_count >= 20000 {
                 spin_sleep_tokio::sleep(
-                    Duration::from_secs_f64(loop_count as f64 * 1.0 / CPUCLOCK as f64)
+                    Duration::from_secs_f64(loop_count as f64 * 1.0 / CPU_CLOCK as f64)
                         .saturating_sub(loop_time.elapsed()),
                 )
                 .await;
-                loop_count = 0;
+                loop_count -= loop_count;
                 loop_time = time::Instant::now();
             }
 
-            if one_sec_count >= CPUCLOCK {
+            if one_sec_count >= CPU_CLOCK {
                 socket::send_one_sec_message();
-                one_sec_count = 0;
+                one_sec_count -= CPU_CLOCK;
             }
         }
     }
