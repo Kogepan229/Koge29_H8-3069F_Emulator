@@ -1,6 +1,7 @@
 use crate::{
-    bus::Bus,
+    bus::{Bus, AREA0_START_ADDR, AREA3_END_ADDR, AREA4_START_ADDR, AREA7_END_ADDR},
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
+    registers::{ABWCR, ASTCR, WCRH, WCRL},
     setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
@@ -31,6 +32,16 @@ pub enum CCR {
     H,
     UI,
     I,
+}
+
+#[derive(PartialEq)]
+pub enum StateType {
+    I,
+    J,
+    K,
+    L,
+    M,
+    N,
 }
 
 macro_rules! unimpl {
@@ -67,6 +78,8 @@ impl Cpu {
 
         // set stack pointer
         self.er[7] = MEMORY_END_ADDR - 0xf;
+
+        self.init_registers().await?;
 
         loop {
             // Print received messages
@@ -442,6 +455,88 @@ impl Cpu {
 
     pub fn read_pc(&self) -> u32 {
         self.pc
+    }
+
+    async fn get_wait_state(&self, target_addr: u32, area_index: u8) -> Result<u8> {
+        match target_addr {
+            AREA0_START_ADDR..=AREA3_END_ADDR => {
+                return Ok((self.bus.lock().await.read(WCRL)? >> (area_index * 2)) & 0x3)
+            }
+            AREA4_START_ADDR..=AREA7_END_ADDR => {
+                return Ok((self.bus.lock().await.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3)
+            }
+            _ => bail!("Invalid Addr [{}]", target_addr),
+        }
+    }
+
+    // todo 内蔵周辺モジュール
+    pub async fn calc_state(
+        &self,
+        target_addr: u32,
+        state_type: StateType,
+        state: u8,
+    ) -> Result<u8> {
+        if state_type == StateType::N {
+            return Ok(state * 1);
+        }
+        match target_addr {
+            MEMORY_START_ADDR..=MEMORY_END_ADDR => match state_type {
+                StateType::N => return Ok(state * 1),
+                _ => return Ok(state * 2),
+            },
+            AREA0_START_ADDR..=AREA7_END_ADDR => {
+                let area_index = Bus::get_area_index(target_addr)?;
+                if (self.bus.lock().await.read(ABWCR)? >> area_index) & 1 == 1 {
+                    // 8 bit
+                    if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
+                        // 2 state
+                        match state_type {
+                            StateType::I | StateType::J | StateType::K | StateType::M => {
+                                return Ok(state * 4)
+                            }
+                            StateType::L => return Ok(state * 2),
+                            StateType::N => return Ok(state * 1),
+                        }
+                    } else {
+                        // 3 state
+                        match state_type {
+                            StateType::I | StateType::J | StateType::K | StateType::M => {
+                                let wait_state: u8 =
+                                    self.get_wait_state(target_addr, area_index).await?;
+                                return Ok(state * (6 + 2 * wait_state));
+                            }
+                            StateType::L => {
+                                let wait_state: u8 =
+                                    self.get_wait_state(target_addr, area_index).await?;
+                                return Ok(state * (3 + wait_state));
+                            }
+                            StateType::N => return Ok(state * 1),
+                        }
+                    }
+                } else {
+                    // 16 bit
+                    if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
+                        // 2 state
+                        return Ok(state * 2);
+                    } else {
+                        // 3 state
+                        let wait_state: u8 = self.get_wait_state(target_addr, area_index).await?;
+                        return Ok(state * (3 + wait_state));
+                    }
+                }
+            }
+            _ => bail!("Invalid addr [{}]", target_addr),
+        }
+    }
+
+    async fn init_registers(&self) -> Result<()> {
+        let mut bus = self.bus.lock().await;
+        bus.write(ABWCR, 0xff)?;
+        bus.write(ASTCR, 0xfb)?;
+        bus.write(WCRH, 0xff)?;
+        bus.write(WCRL, 0xcf)?;
+
+        return Ok(());
     }
 
     fn print_er(&self) {

@@ -2,6 +2,7 @@ mod bus;
 mod cpu;
 mod elf;
 mod memory;
+mod registers;
 mod setting;
 mod socket;
 

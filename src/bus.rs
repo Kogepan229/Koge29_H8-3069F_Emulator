@@ -108,6 +108,36 @@ impl Bus {
             _ => bail!("Invalid address [{:x}]", addr),
         }
     }
+
+    pub fn get_area_index(target_addr: u32) -> Result<u8> {
+        match target_addr {
+            AREA0_START_ADDR..=AREA0_END_ADDR => {
+                return Ok(0);
+            }
+            AREA1_START_ADDR..=AREA1_END_ADDR => {
+                return Ok(1);
+            }
+            AREA2_START_ADDR..=AREA2_END_ADDR => {
+                return Ok(2);
+            }
+            AREA3_START_ADDR..=AREA3_END_ADDR => {
+                return Ok(3);
+            }
+            AREA4_START_ADDR..=AREA4_END_ADDR => {
+                return Ok(4);
+            }
+            AREA5_START_ADDR..=AREA5_END_ADDR => {
+                return Ok(5);
+            }
+            AREA6_START_ADDR..=AREA6_END_ADDR => {
+                return Ok(6);
+            }
+            AREA7_START_ADDR..=AREA7_END_ADDR => {
+                return Ok(7);
+            }
+            _ => bail!("Invalid Addr [{}].", target_addr),
+        }
+    }
 }
 
 #[cfg(test)]
