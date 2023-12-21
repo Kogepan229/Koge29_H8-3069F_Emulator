@@ -52,20 +52,20 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize =
 
 pub struct Bus {
     pub memory: Memory,
-    pub exception_handling_vector: [u8; EXCEPTION_HANDLING_VENCTOR_SIZE],
-    dram: [u8; AREA2_SIZE],
-    io_registrs1: [u8; IO_REGISTERS1_SIZE],
-    io_registrs2: [u8; IO_REGISTERS2_EMC1_SIZE],
+    pub exception_handling_vector: Vec<u8>,
+    dram: Vec<u8>,
+    io_registrs1: Vec<u8>,
+    io_registrs2: Vec<u8>,
 }
 
 impl Bus {
     pub fn new() -> Self {
         Bus {
             memory: create_memory(),
-            exception_handling_vector: [0; EXCEPTION_HANDLING_VENCTOR_SIZE],
-            dram: [0; AREA2_SIZE],
-            io_registrs1: [0; IO_REGISTERS1_SIZE],
-            io_registrs2: [0; IO_REGISTERS2_EMC1_SIZE],
+            exception_handling_vector: vec![0; EXCEPTION_HANDLING_VENCTOR_SIZE],
+            dram: vec![0; AREA2_SIZE],
+            io_registrs1: vec![0; IO_REGISTERS1_SIZE],
+            io_registrs2: vec![0; IO_REGISTERS2_EMC1_SIZE],
         }
     }
 
