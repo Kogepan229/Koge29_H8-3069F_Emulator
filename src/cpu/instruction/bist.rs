@@ -28,7 +28,7 @@ impl Cpu {
         }
         Ok(self.calc_state(StateType::I, 2).await?
             + self
-                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .calc_state_with_addr(StateType::L, 2, access_addr)
                 .await?)
     }
 
@@ -44,7 +44,7 @@ impl Cpu {
         let access_addr = self.get_addr_abs8(opcode as u8);
         Ok(self.calc_state(StateType::I, 2).await?
             + self
-                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .calc_state_with_addr(StateType::L, 2, access_addr)
                 .await?)
     }
 }

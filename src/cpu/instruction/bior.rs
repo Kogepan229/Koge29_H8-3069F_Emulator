@@ -18,7 +18,7 @@ impl Cpu {
         self.write_ccr(CCR::C, (!(value >> imm) & 1) | self.read_ccr(CCR::C));
         Ok(self.calc_state(StateType::I, 2).await?
             + self
-                .calc_state_with_addr(StateType::I, 1, access_addr)
+                .calc_state_with_addr(StateType::L, 1, access_addr)
                 .await?)
     }
 
@@ -29,7 +29,7 @@ impl Cpu {
         let access_addr = self.get_addr_abs8(opcode as u8);
         Ok(self.calc_state(StateType::I, 2).await?
             + self
-                .calc_state_with_addr(StateType::I, 1, access_addr)
+                .calc_state_with_addr(StateType::L, 1, access_addr)
                 .await?)
     }
 }
