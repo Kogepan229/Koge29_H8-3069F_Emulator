@@ -343,9 +343,9 @@ impl Cpu {
                 0xd0..=0xdf => return self.inc_w_2(opcode),
                 0x70..=0x77 => return self.inc_l_1(opcode),
                 0xf0..=0xf7 => return self.inc_l_2(opcode),
-                0x00..=0x07 => return self.adds1(opcode),
-                0x80..=0x87 => return self.adds2(opcode),
-                0x90..=0x97 => return self.adds4(opcode),
+                0x00..=0x07 => return self.adds1(opcode).await,
+                0x80..=0x87 => return self.adds2(opcode).await,
+                0x90..=0x97 => return self.adds4(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
