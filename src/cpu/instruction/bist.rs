@@ -1,8 +1,8 @@
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, StateType};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) fn bist_rn(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bist_rn(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let value = self.read_rn_b(register)?;
         let imm = Cpu::get_nibble_opcode(opcode, 3)? & 7;
@@ -12,11 +12,12 @@ impl Cpu {
         } else {
             self.write_rn_b(register, value & !(c << imm))?;
         }
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) async fn bist_ern(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bist_ern(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 3)?;
+        let access_addr = self.get_addr_ern(register)?;
         let value = self.read_ern_b(register).await?;
         let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
         let c = !self.ccr & 1;
@@ -25,10 +26,13 @@ impl Cpu {
         } else {
             self.write_ern_b(register, value & !(c << imm)).await?;
         }
-        return Ok(8);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .await?)
     }
 
-    pub(in super::super) async fn bist_abs(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bist_abs(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
         let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
         let value = self.read_abs8_b(opcode as u8).await?;
         let c = !self.ccr & 1;
@@ -37,7 +41,11 @@ impl Cpu {
         } else {
             self.write_abs8_b(opcode as u8, value & !(c << imm)).await?;
         }
-        return Ok(8);
+        let access_addr = self.get_addr_abs8(opcode as u8);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .await?)
     }
 }
 
