@@ -1,45 +1,48 @@
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, StateType};
 use anyhow::{bail, Result};
 
 impl Cpu {
-    pub(in super::super) fn bset_rn_from_imm(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bset_rn_from_imm(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let value = self.read_rn_b(register)?;
         let imm = Cpu::get_nibble_opcode(opcode, 3)? & 7;
         self.write_rn_b(register, value | (1 << imm))?;
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) fn bset_rn_from_rn(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bset_rn_from_rn(&mut self, opcode: u16) -> Result<u8> {
         let register_bit = Cpu::get_nibble_opcode(opcode, 3)?;
         let register_value = Cpu::get_nibble_opcode(opcode, 4)?;
         let bit = self.read_rn_b(register_bit)? & 7;
         let value = self.read_rn_b(register_value)?;
         self.write_rn_b(register_value, value | (1 << bit))?;
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) async fn bset_ern(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bset_ern(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
+        let register_ern = Cpu::get_nibble_opcode(opcode, 3)?;
+        let access_addr = self.get_addr_ern(register_ern)?;
         match opcode2 & 0xff0f {
             0x7000 => {
-                let register = Cpu::get_nibble_opcode(opcode, 3)?;
-                let value = self.read_ern_b(register).await?;
+                let value = self.read_ern_b(register_ern).await?;
                 let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
-                self.write_ern_b(register, value | (1 << imm)).await?;
+                self.write_ern_b(register_ern, value | (1 << imm)).await?;
             }
             0x6000 => {
                 let register_bit = Cpu::get_nibble_opcode(opcode2, 3)?;
-                let register_value = Cpu::get_nibble_opcode(opcode, 3)?;
                 let bit = self.read_rn_b(register_bit)? & 7;
-                let value = self.read_ern_b(register_value).await?;
-                self.write_ern_b(register_value, value | (1 << bit)).await?;
+                let value = self.read_ern_b(register_ern).await?;
+                self.write_ern_b(register_ern, value | (1 << bit)).await?;
             }
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
-        return Ok(8);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .await?)
     }
 
-    pub(in super::super) async fn bset_abs(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bset_abs(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
         match opcode2 & 0xff0f {
             0x7000 => {
                 let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
@@ -54,7 +57,11 @@ impl Cpu {
             }
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
-        return Ok(8);
+        let access_addr = self.get_addr_abs8(opcode as u8);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::I, 2, access_addr)
+                .await?)
     }
 }
 
