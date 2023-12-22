@@ -457,15 +457,13 @@ impl Cpu {
         self.pc
     }
 
-    async fn get_wait_state(&self, target_addr: u32, area_index: u8) -> Result<u8> {
-        match target_addr {
-            AREA0_START_ADDR..=AREA3_END_ADDR => {
-                return Ok((self.bus.lock().await.read(WCRL)? >> (area_index * 2)) & 0x3)
-            }
-            AREA4_START_ADDR..=AREA7_END_ADDR => {
+    async fn get_wait_state(&self, area_index: u8) -> Result<u8> {
+        match area_index {
+            0..=3 => return Ok((self.bus.lock().await.read(WCRL)? >> (area_index * 2)) & 0x3),
+            4..=7 => {
                 return Ok((self.bus.lock().await.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3)
             }
-            _ => bail!("Invalid Addr [{}]", target_addr),
+            _ => bail!("Invalid area_index [{}]", area_index),
         }
     }
 
@@ -501,13 +499,11 @@ impl Cpu {
                         // 3 state
                         match state_type {
                             StateType::I | StateType::J | StateType::K | StateType::M => {
-                                let wait_state: u8 =
-                                    self.get_wait_state(target_addr, area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index).await?;
                                 return Ok(state * (6 + 2 * wait_state));
                             }
                             StateType::L => {
-                                let wait_state: u8 =
-                                    self.get_wait_state(target_addr, area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index).await?;
                                 return Ok(state * (3 + wait_state));
                             }
                             StateType::N => return Ok(state * 1),
@@ -520,7 +516,7 @@ impl Cpu {
                         return Ok(state * 2);
                     } else {
                         // 3 state
-                        let wait_state: u8 = self.get_wait_state(target_addr, area_index).await?;
+                        let wait_state: u8 = self.get_wait_state(area_index).await?;
                         return Ok(state * (3 + wait_state));
                     }
                 }
