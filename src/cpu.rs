@@ -195,7 +195,7 @@ impl Cpu {
                     match (opcode2 >> 8) as u8 {
                         0x64 => return self.or_l_rn(opcode, opcode2),
                         0x65 => return self.xor_l_rn(opcode, opcode2),
-                        0x66 => return self.and_l_rn(opcode, opcode2),
+                        0x66 => return self.and_l_rn(opcode, opcode2).await,
                         _ => unimpl!(opcode, self.pc),
                     }
                 }
@@ -430,9 +430,9 @@ impl Cpu {
             0x15 => return self.xor_b_rn(opcode),
             0x65 => return self.xor_w_rn(opcode),
 
-            0xe0..=0xef => return self.and_b_imm(opcode),
-            0x16 => return self.and_b_rn(opcode),
-            0x66 => return self.and_w_rn(opcode),
+            0xe0..=0xef => return self.and_b_imm(opcode).await,
+            0x16 => return self.and_b_rn(opcode).await,
+            0x66 => return self.and_w_rn(opcode).await,
 
             0x90..=0x9f => return self.addx_imm(opcode).await,
             0x0e => return self.addx_rn(opcode).await,
