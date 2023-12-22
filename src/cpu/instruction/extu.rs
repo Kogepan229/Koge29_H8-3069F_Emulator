@@ -1,8 +1,8 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) fn extu_w(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn extu_w(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let result = self.read_rn_w(register)? & 0x00ff;
         self.write_rn_w(register, result)?;
@@ -15,10 +15,10 @@ impl Cpu {
         }
         self.write_ccr(CCR::V, 0);
 
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) fn extu_l(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn extu_l(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let result = self.read_rn_l(register)? & 0x0000ffff;
         self.write_rn_l(register, result)?;
@@ -31,7 +31,7 @@ impl Cpu {
         }
         self.write_ccr(CCR::V, 0);
 
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 }
 
