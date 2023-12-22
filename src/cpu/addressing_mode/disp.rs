@@ -2,7 +2,8 @@ use crate::cpu::Cpu;
 use anyhow::{anyhow, Result};
 
 impl Cpu {
-    pub(in super::super) fn get_addr_disp16(addr: u32, disp: u16) -> Result<u32> {
+    pub(in super::super) fn get_addr_disp16(&self, register_field: u8, disp: u16) -> Result<u32> {
+        let addr = self.read_rn_l(register_field)?;
         let result = addr
             .checked_add_signed((disp as i16) as i32)
             .ok_or_else(|| {
@@ -16,7 +17,8 @@ impl Cpu {
         Ok(result)
     }
 
-    pub(in super::super) fn get_addr_disp24(addr: u32, disp: u32) -> Result<u32> {
+    pub(in super::super) fn get_addr_disp24(&self, register_field: u8, disp: u32) -> Result<u32> {
+        let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
             Ok((addr + disp) & 0x00ffffff)
         } else {
@@ -40,8 +42,7 @@ impl Cpu {
         disp: u16,
         value: u8,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_b(Cpu::get_addr_disp16(addr, disp)?, value)
+        self.write_abs24_b(self.get_addr_disp16(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -51,8 +52,9 @@ impl Cpu {
         register_field: u8,
         disp: u16,
     ) -> Result<u8> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_b(Cpu::get_addr_disp16(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_b(self.get_addr_disp16(register_field, disp)?)
+            .await?)
     }
 
     pub(in super::super) async fn write_disp16_ern_w(
@@ -61,8 +63,7 @@ impl Cpu {
         disp: u16,
         value: u16,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_w(Cpu::get_addr_disp16(addr, disp)?, value)
+        self.write_abs24_w(self.get_addr_disp16(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -72,8 +73,9 @@ impl Cpu {
         register_field: u8,
         disp: u16,
     ) -> Result<u16> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_w(Cpu::get_addr_disp16(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_w(self.get_addr_disp16(register_field, disp)?)
+            .await?)
     }
 
     pub(in super::super) async fn write_disp16_ern_l(
@@ -82,8 +84,7 @@ impl Cpu {
         disp: u16,
         value: u32,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_l(Cpu::get_addr_disp16(addr, disp)?, value)
+        self.write_abs24_l(self.get_addr_disp16(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -93,8 +94,9 @@ impl Cpu {
         register_field: u8,
         disp: u16,
     ) -> Result<u32> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_l(Cpu::get_addr_disp16(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_l(self.get_addr_disp16(register_field, disp)?)
+            .await?)
     }
 
     ////
@@ -104,8 +106,7 @@ impl Cpu {
         disp: u32,
         value: u8,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_b(Cpu::get_addr_disp24(addr, disp)?, value)
+        self.write_abs24_b(self.get_addr_disp24(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -115,8 +116,9 @@ impl Cpu {
         register_field: u8,
         disp: u32,
     ) -> Result<u8> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_b(Cpu::get_addr_disp24(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_b(self.get_addr_disp24(register_field, disp)?)
+            .await?)
     }
 
     pub(in super::super) async fn write_disp24_ern_w(
@@ -125,8 +127,7 @@ impl Cpu {
         disp: u32,
         value: u16,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_w(Cpu::get_addr_disp24(addr, disp)?, value)
+        self.write_abs24_w(self.get_addr_disp24(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -136,8 +137,9 @@ impl Cpu {
         register_field: u8,
         disp: u32,
     ) -> Result<u16> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_w(Cpu::get_addr_disp24(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_w(self.get_addr_disp24(register_field, disp)?)
+            .await?)
     }
 
     pub(in super::super) async fn write_disp24_ern_l(
@@ -146,8 +148,7 @@ impl Cpu {
         disp: u32,
         value: u32,
     ) -> Result<()> {
-        let addr = self.read_rn_l(register_field)?;
-        self.write_abs24_l(Cpu::get_addr_disp24(addr, disp)?, value)
+        self.write_abs24_l(self.get_addr_disp24(register_field, disp)?, value)
             .await?;
         Ok(())
     }
@@ -157,8 +158,9 @@ impl Cpu {
         register_field: u8,
         disp: u32,
     ) -> Result<u32> {
-        let addr = self.read_rn_l(register_field)?;
-        Ok(self.read_abs24_l(Cpu::get_addr_disp24(addr, disp)?).await?)
+        Ok(self
+            .read_abs24_l(self.get_addr_disp24(register_field, disp)?)
+            .await?)
     }
 }
 
