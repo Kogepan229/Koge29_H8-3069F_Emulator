@@ -18,6 +18,7 @@ const CPU_CLOCK: usize = 20_000_000;
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
     pc: u32,
+    operating_pc: u32,
     ccr: u8,
     pub er: [u32; 8],
     pub exit_addr: u32, // address of ___exit
@@ -60,6 +61,7 @@ impl Cpu {
         Cpu {
             bus: Arc::new(Mutex::new(Bus::new())),
             pc: MEMORY_START_ADDR,
+            operating_pc: 0,
             ccr: 0,
             er: [0; 8],
             exit_addr: 0,
@@ -156,6 +158,9 @@ impl Cpu {
 
     pub async fn fetch(&mut self) -> u16 {
         let _pc = self.pc & !1;
+
+        self.operating_pc = _pc;
+
         if _pc < MEMORY_START_ADDR || _pc > MEMORY_END_ADDR {
             panic!("fetch error [pc: {:0>8x}]", self.pc)
         }
@@ -468,12 +473,8 @@ impl Cpu {
     }
 
     // todo 内蔵周辺モジュール
-    pub async fn calc_state(
-        &self,
-        target_addr: u32,
-        state_type: StateType,
-        state: u8,
-    ) -> Result<u8> {
+    pub async fn calc_state(&self, state_type: StateType, state: u8) -> Result<u8> {
+        let target_addr: u32 = self.operating_pc;
         if state_type == StateType::N {
             return Ok(state * 1);
         }
