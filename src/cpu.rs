@@ -472,9 +472,21 @@ impl Cpu {
         }
     }
 
-    // todo 内蔵周辺モジュール
     pub async fn calc_state(&self, state_type: StateType, state: u8) -> Result<u8> {
-        let target_addr: u32 = self.operating_pc;
+        if state_type == StateType::L || state_type == StateType::M {
+            bail!("StateType L or M must be specified address. Use calc_state_with_addr.")
+        }
+        self.calc_state_with_addr(state_type, state, self.operating_pc)
+            .await
+    }
+
+    // todo 内蔵周辺モジュール
+    pub async fn calc_state_with_addr(
+        &self,
+        state_type: StateType,
+        state: u8,
+        target_addr: u32,
+    ) -> Result<u8> {
         if state_type == StateType::N {
             return Ok(state * 1);
         }
