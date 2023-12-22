@@ -120,9 +120,9 @@ impl Cpu {
                     opcode
                 )
             })?;
-            state_sum += state;
-            loop_count += state;
-            one_sec_count += state;
+            state_sum += state as usize;
+            loop_count += state as usize;
+            one_sec_count += state as usize;
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 println!("");
@@ -179,7 +179,7 @@ impl Cpu {
         opcode
     }
 
-    async fn exec(&mut self, opcode: u16) -> Result<usize> {
+    async fn exec(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
             0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x2f | 0x30..=0x3f | 0x6a => {
                 return self.mov_b(opcode).await
@@ -412,7 +412,7 @@ impl Cpu {
                 _ => unimpl!(opcode, self.pc),
             },
 
-            0x80..=0x8f | 0x08 => return self.add_b(opcode),
+            0x80..=0x8f | 0x08 => return self.add_b(opcode).await,
             0x09 => return self.add_w(opcode).await,
 
             0x18 => return self.sub_b(opcode),
