@@ -2,10 +2,10 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) async fn mov_b(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn mov_b(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
-            0x0c => return self.mov_b_rn(opcode),
-            0xf0..=0xff => return self.mov_b_imm(opcode),
+            0x0c => return self.mov_b_rn(opcode).await,
+            0xf0..=0xff => return self.mov_b_imm(opcode).await,
             0x68 => return self.mov_b_ern(opcode).await,
             0x6e => return self.mov_b_disp16(opcode).await,
             0x6c => return self.mov_b_inc_or_dec(opcode).await,
@@ -169,7 +169,7 @@ impl Cpu {
                 .await?)
     }
 
-    async fn mov_b_abs_16_or_24(&mut self, opcode: u16) -> Result<usize> {
+    async fn mov_b_abs_16_or_24(&mut self, opcode: u16) -> Result<u8> {
         match opcode & 0xfff0 {
             0x6a00 | 0x6a80 => return self.mov_b_abs16(opcode).await,
             0x6a20 | 0x6aa0 => return self.mov_b_abs24(opcode).await,
