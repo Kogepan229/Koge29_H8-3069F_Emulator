@@ -542,3 +542,59 @@ impl Cpu {
         println!("");
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        cpu::Cpu,
+        registers::{ABWCR, WCRH, WCRL},
+    };
+
+    #[tokio::test]
+    async fn test_get_wait_state_wcrl() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(WCRL, 0xff).unwrap();
+        assert_eq!(cpu.get_wait_state(0).await.unwrap(), 3);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 3);
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRL, 0xaa).unwrap();
+        assert_eq!(cpu.get_wait_state(0).await.unwrap(), 2);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 2);
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRL, 0x55).unwrap();
+        assert_eq!(cpu.get_wait_state(0).await.unwrap(), 1);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 1);
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRL, 0).unwrap();
+        assert_eq!(cpu.get_wait_state(0).await.unwrap(), 0);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 0);
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_wait_state_wcrh() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(WCRH, 0xff).unwrap();
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 3);
+        assert_eq!(cpu.get_wait_state(7).await.unwrap(), 3);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRH, 0xaa).unwrap();
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 2);
+        assert_eq!(cpu.get_wait_state(7).await.unwrap(), 2);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRH, 0x55).unwrap();
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 1);
+        assert_eq!(cpu.get_wait_state(7).await.unwrap(), 1);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 0);
+
+        cpu.bus.lock().await.write(WCRH, 0).unwrap();
+        assert_eq!(cpu.get_wait_state(4).await.unwrap(), 0);
+        assert_eq!(cpu.get_wait_state(7).await.unwrap(), 0);
+        assert_eq!(cpu.get_wait_state(3).await.unwrap(), 0);
+    }
+}
