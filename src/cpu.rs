@@ -434,8 +434,8 @@ impl Cpu {
             0x16 => return self.and_b_rn(opcode),
             0x66 => return self.and_w_rn(opcode),
 
-            0x90..=0x9f => return self.addx_imm(opcode),
-            0x0e => return self.addx_rn(opcode),
+            0x90..=0x9f => return self.addx_imm(opcode).await,
+            0x0e => return self.addx_rn(opcode).await,
 
             0x59 | 0x5a | 0x5b => return self.jmp(opcode).await,
             0x5d | 0x5e | 0x5f => return self.jsr(opcode).await,
