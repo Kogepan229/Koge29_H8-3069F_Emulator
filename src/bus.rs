@@ -93,7 +93,6 @@ impl Bus {
         match addr {
             0x00..=0xff => return Ok(self.exception_handling_vector[addr as usize]),
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
-                println!("{:x}", addr);
                 return Ok(self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize]);
             }
             AREA2_START_ADDR..=AREA2_END_ADDR => {

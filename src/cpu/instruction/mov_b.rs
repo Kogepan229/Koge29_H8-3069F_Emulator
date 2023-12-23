@@ -182,7 +182,6 @@ impl Cpu {
         let access_addr = self.get_addr_abs16(abs_addr);
         if opcode & 0xfff0 == 0x6a00 {
             let value = self.read_abs16_b(abs_addr).await?;
-            println!("{:x}", value);
             self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
             self.mov_b_proc_pcc(value);
         } else {
