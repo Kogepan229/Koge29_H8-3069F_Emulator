@@ -21,8 +21,7 @@ impl Cpu {
         }
     }
 
-    pub(in super::super) fn get_addr_abs8(&self, mut addr: u8) -> u32 {
-        addr &= !1u8;
+    pub(in super::super) fn get_addr_abs8(&self, addr: u8) -> u32 {
         0xffff00 | addr as u32
     }
 
