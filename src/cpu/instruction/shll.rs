@@ -1,8 +1,8 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) fn shll_b(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn shll_b(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let src = self.read_rn_b(register)?;
         if src & 0x40 == 0x40 {
@@ -19,10 +19,10 @@ impl Cpu {
         self.write_ccr(CCR::C, src >> 7);
         self.write_rn_b(register, src << 1)?;
 
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) fn shll_w(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn shll_w(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let src = self.read_rn_w(register)?;
         if src & 0x4000 == 0x4000 {
@@ -39,10 +39,10 @@ impl Cpu {
         self.write_ccr(CCR::C, (src >> 15) as u8);
         self.write_rn_w(register, src << 1)?;
 
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) fn shll_l(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn shll_l(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let src = self.read_rn_l(register)?;
         if src & 0x40000000 == 0x40000000 {
@@ -59,7 +59,7 @@ impl Cpu {
         self.write_ccr(CCR::C, (src >> 31) as u8);
         self.write_rn_l(register, src << 1)?;
 
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 }
 
