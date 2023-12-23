@@ -39,7 +39,7 @@ impl Cpu {
             self.mov_w_proc_pcc(value);
             Ok(())
         };
-        f().with_context(|| format!("opcode [{:x}]", opcode));
+        f().with_context(|| format!("opcode [{:x}]", opcode))?;
         Ok(self.calc_state(StateType::I, 1).await?)
     }
 
@@ -50,7 +50,7 @@ impl Cpu {
             self.mov_w_proc_pcc(imm);
             return Ok(());
         };
-        f().with_context(|| format!("opcode [{:x}] imm(opcode2) [{:x}]", opcode, imm));
+        f().with_context(|| format!("opcode [{:x}] imm(opcode2) [{:x}]", opcode, imm))?;
         Ok(self.calc_state(StateType::I, 2).await?)
     }
 

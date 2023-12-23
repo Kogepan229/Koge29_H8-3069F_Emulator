@@ -54,7 +54,7 @@ impl Cpu {
             self.write_rn_w(register, result)?;
             Ok(())
         };
-        f().with_context(|| format!("imm(opcode2) [{:x}]", imm));
+        f().with_context(|| format!("imm(opcode2) [{:x}]", imm))?;
         Ok(self.calc_state(StateType::I, 2).await?)
     }
 

@@ -36,7 +36,7 @@ impl Cpu {
             self.mov_b_proc_pcc(value);
             return Ok(());
         };
-        f().with_context(|| format!("opcode [{:x}]", opcode));
+        f().with_context(|| format!("opcode [{:x}]", opcode))?;
         Ok(self.calc_state(StateType::I, 1).await?)
     }
 
@@ -46,7 +46,7 @@ impl Cpu {
             self.mov_b_proc_pcc(opcode as u8);
             return Ok(());
         };
-        f().with_context(|| format!("opcode [{:x}]", opcode));
+        f().with_context(|| format!("opcode [{:x}]", opcode))?;
         Ok(self.calc_state(StateType::I, 1).await?)
     }
 

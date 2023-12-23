@@ -59,7 +59,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
             return Ok(());
         };
-        f().with_context(|| format!("opcode2(imm) [{:x}]", opcode2));
+        f().with_context(|| format!("opcode2(imm) [{:x}]", opcode2))?;
         Ok(self.calc_state(StateType::I, 2).await?)
     }
 
@@ -102,7 +102,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
             return Ok(());
         };
-        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm));
+        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))?;
         Ok(self.calc_state(StateType::I, 3).await?)
     }
 
@@ -125,7 +125,7 @@ impl Cpu {
             self.write_ccr(CCR::V, 0);
             return Ok(());
         };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2));
+        f().with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         Ok(self.calc_state(StateType::I, 2).await?)
     }
 }
