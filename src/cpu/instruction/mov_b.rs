@@ -59,7 +59,7 @@ impl Cpu {
             self.mov_b_proc_pcc(value);
             Ok(self.calc_state(StateType::I, 1).await?
                 + self
-                    .calc_state_with_addr(StateType::L, 2, access_addr)
+                    .calc_state_with_addr(StateType::L, 1, access_addr)
                     .await?)
         } else {
             let value = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)?;
@@ -69,7 +69,7 @@ impl Cpu {
             self.mov_b_proc_pcc(value);
             Ok(self.calc_state(StateType::I, 1).await?
                 + self
-                    .calc_state_with_addr(StateType::L, 2, access_addr)
+                    .calc_state_with_addr(StateType::L, 1, access_addr)
                     .await?)
         }
     }

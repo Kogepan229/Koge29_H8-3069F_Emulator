@@ -22,7 +22,7 @@ impl Cpu {
         self.pc = (self.pc as i32 + disp) as u32;
         Ok(self.calc_state(StateType::I, 2).await?
             + self
-                .calc_state_with_addr(StateType::K, 1, access_addr)
+                .calc_state_with_addr(StateType::K, 2, access_addr)
                 .await?
             + self.calc_state(StateType::N, 2).await?)
     }
