@@ -1,28 +1,36 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) fn bixor_rn(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bixor_rn(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 4)?;
         let value = self.read_rn_b(register)?;
         let imm = Cpu::get_nibble_opcode(opcode, 3)? & 7;
         self.write_ccr(CCR::C, (!(value >> imm) & 1) ^ self.read_ccr(CCR::C));
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) async fn bixor_ern(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bixor_ern(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 3)?;
+        let access_addr = self.get_addr_ern(register)?;
         let value = self.read_ern_b(register).await?;
         let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
         self.write_ccr(CCR::C, (!(value >> imm) & 1) ^ self.read_ccr(CCR::C));
-        return Ok(6);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::L, 1, access_addr)
+                .await?)
     }
 
-    pub(in super::super) async fn bixor_abs(&mut self, opcode: u16, opcode2: u16) -> Result<usize> {
+    pub(in super::super) async fn bixor_abs(&mut self, opcode: u16, opcode2: u16) -> Result<u8> {
         let imm = Cpu::get_nibble_opcode(opcode2, 3)? & 7;
         let value = self.read_abs8_b(opcode as u8).await?;
         self.write_ccr(CCR::C, (!(value >> imm) & 1) ^ self.read_ccr(CCR::C));
-        return Ok(6);
+        let access_addr = self.get_addr_abs8(opcode as u8);
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::L, 1, access_addr)
+                .await?)
     }
 }
 

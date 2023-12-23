@@ -1,8 +1,8 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) fn xor_b_imm(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn xor_b_imm(&mut self, opcode: u16) -> Result<u8> {
         let register = Cpu::get_nibble_opcode(opcode, 2)?;
         let result = self.read_rn_b(register)? ^ opcode as u8;
         self.write_rn_b(register, result)?;
@@ -17,10 +17,10 @@ impl Cpu {
             self.write_ccr(CCR::Z, 0);
         }
         self.write_ccr(CCR::V, 0);
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) fn xor_b_rn(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn xor_b_rn(&mut self, opcode: u16) -> Result<u8> {
         let register_src = Cpu::get_nibble_opcode(opcode, 3)?;
         let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
         let result = self.read_rn_b(register_src)? ^ self.read_rn_b(register_dest)?;
@@ -36,13 +36,13 @@ impl Cpu {
             self.write_ccr(CCR::Z, 0);
         }
         self.write_ccr(CCR::V, 0);
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) async fn xor_w_imm(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn xor_w_imm(&mut self, opcode: u16) -> Result<u8> {
         let opcode2 = self.fetch().await;
 
-        let mut f = || -> Result<usize> {
+        let mut f = || -> Result<()> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let result = self.read_rn_w(register)? ^ opcode2;
             self.write_rn_w(register, result)?;
@@ -57,12 +57,13 @@ impl Cpu {
                 self.write_ccr(CCR::Z, 0);
             }
             self.write_ccr(CCR::V, 0);
-            return Ok(4);
+            return Ok(());
         };
-        f().with_context(|| format!("opcode2(imm) [{:x}]", opcode2))
+        f().with_context(|| format!("opcode2(imm) [{:x}]", opcode2))?;
+        Ok(self.calc_state(StateType::I, 2).await?)
     }
 
-    pub(in super::super) fn xor_w_rn(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn xor_w_rn(&mut self, opcode: u16) -> Result<u8> {
         let register_src = Cpu::get_nibble_opcode(opcode, 3)?;
         let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
         let result = self.read_rn_w(register_src)? ^ self.read_rn_w(register_dest)?;
@@ -78,13 +79,13 @@ impl Cpu {
             self.write_ccr(CCR::Z, 0);
         }
         self.write_ccr(CCR::V, 0);
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    pub(in super::super) async fn xor_l_imm(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn xor_l_imm(&mut self, opcode: u16) -> Result<u8> {
         let imm = ((self.fetch().await as u32) << 16) | self.fetch().await as u32;
 
-        let mut f = || -> Result<usize> {
+        let mut f = || -> Result<()> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let result = self.read_rn_l(register)? ^ imm;
             self.write_rn_l(register, result)?;
@@ -99,13 +100,14 @@ impl Cpu {
                 self.write_ccr(CCR::Z, 0);
             }
             self.write_ccr(CCR::V, 0);
-            return Ok(6);
+            return Ok(());
         };
-        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))
+        f().with_context(|| format!("imm(opcode2, 3) [{:x}]", imm))?;
+        Ok(self.calc_state(StateType::I, 3).await?)
     }
 
-    pub(in super::super) fn xor_l_rn(&mut self, _opcode: u16, opcode2: u16) -> Result<usize> {
-        let mut f = || -> Result<usize> {
+    pub(in super::super) async fn xor_l_rn(&mut self, _opcode: u16, opcode2: u16) -> Result<u8> {
+        let mut f = || -> Result<()> {
             let register_src = Cpu::get_nibble_opcode(opcode2, 3)?;
             let register_dest = Cpu::get_nibble_opcode(opcode2, 4)?;
             let result = self.read_rn_l(register_src)? ^ self.read_rn_l(register_dest)?;
@@ -121,9 +123,10 @@ impl Cpu {
                 self.write_ccr(CCR::Z, 0);
             }
             self.write_ccr(CCR::V, 0);
-            return Ok(4);
+            return Ok(());
         };
-        f().with_context(|| format!("opcode2 [{:x}]", opcode2))
+        f().with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+        Ok(self.calc_state(StateType::I, 2).await?)
     }
 }
 

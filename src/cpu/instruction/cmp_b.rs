@@ -1,11 +1,11 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Result};
 
 impl Cpu {
-    pub(in super::super) fn cmp_b(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn cmp_b(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
-            0xa0..=0xaf => return self.cmp_b_imm(opcode),
-            0x1c => return self.cmp_b_rn(opcode),
+            0xa0..=0xaf => return self.cmp_b_imm(opcode).await,
+            0x1c => return self.cmp_b_rn(opcode).await,
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
     }
@@ -45,16 +45,16 @@ impl Cpu {
         value as u8
     }
 
-    fn cmp_b_imm(&mut self, opcode: u16) -> Result<usize> {
+    async fn cmp_b_imm(&mut self, opcode: u16) -> Result<u8> {
         let dest = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)?;
         self.cmp_b_proc(dest, opcode as u8);
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    fn cmp_b_rn(&mut self, opcode: u16) -> Result<usize> {
+    async fn cmp_b_rn(&mut self, opcode: u16) -> Result<u8> {
         let src = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 3)? & 0x7)?;
         let dest = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)?;
         self.cmp_b_proc(dest, src);
-        Ok(2)
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 }

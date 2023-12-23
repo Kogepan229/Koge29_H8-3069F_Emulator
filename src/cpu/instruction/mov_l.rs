@@ -1,10 +1,10 @@
-use crate::cpu::{Cpu, CCR};
+use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) async fn mov_l(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn mov_l(&mut self, opcode: u16) -> Result<u8> {
         if opcode & 0xff80 == 0x0f80 {
-            return self.mov_l_rn(opcode);
+            return self.mov_l_rn(opcode).await;
         }
         if opcode & 0xfff8 == 0x7a00 {
             return self.mov_l_imm(opcode).await;
@@ -38,93 +38,132 @@ impl Cpu {
         self.write_ccr(CCR::V, 0);
     }
 
-    fn mov_l_rn(&mut self, opcode: u16) -> Result<usize> {
-        let mut f = || -> Result<usize> {
+    async fn mov_l_rn(&mut self, opcode: u16) -> Result<u8> {
+        let mut f = || -> Result<()> {
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 3)? & 0x07)?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
             self.mov_l_proc_pcc(value);
-            return Ok(2);
+            return Ok(());
         };
-        f().with_context(|| format!("opcode [{:x}]", opcode))
+        f().with_context(|| format!("opcode [{:x}]", opcode))?;
+        Ok(self.calc_state(StateType::I, 1).await?)
     }
 
-    async fn mov_l_imm(&mut self, opcode: u16) -> Result<usize> {
+    async fn mov_l_imm(&mut self, opcode: u16) -> Result<u8> {
         let imm = (self.fetch().await as u32) << 16 | self.fetch().await as u32;
-        let mut f = || -> Result<usize> {
+        let mut f = || -> Result<()> {
             self.write_rn_l((opcode & 0x000f) as u8, imm)?;
             self.mov_l_proc_pcc(imm);
-            return Ok(6);
+            Ok(())
         };
-        f().with_context(|| format!("opcode [{:x}]", opcode))
+        f().with_context(|| format!("opcode [{:x}]", opcode))?;
+        Ok(self.calc_state(StateType::I, 3).await?)
     }
 
-    async fn mov_l_ern(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_ern(&mut self, opcode2: u16) -> Result<u8> {
         if opcode2 & 0x0080 == 0 {
-            let value = self.read_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?).await?;
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)?;
+            let access_addr = self.get_addr_ern(register_ern)?;
+            let value = self.read_ern_l(register_ern).await?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 2).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         } else {
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)? & 0x07;
+            let access_addr = self.get_addr_ern(register_ern)?;
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-            self.write_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)
-                .await?;
+            self.write_ern_l(register_ern, value).await?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 2).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         }
-        return Ok(8);
     }
 
-    async fn mov_l_disp16(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_disp16(&mut self, opcode2: u16) -> Result<u8> {
         let disp = self.fetch().await;
         if opcode2 & 0x0080 == 0 {
-            let value = self
-                .read_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)
-                .await?;
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)?;
+            let access_addr = self.get_addr_disp16(register_ern, disp)?;
+            let value = self.read_disp16_ern_l(register_ern, disp).await?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 3).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         } else {
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)? & 0x07;
+            let access_addr = self.get_addr_disp16(register_ern, disp)?;
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-            self.write_disp16_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)
-                .await?;
+            self.write_disp16_ern_l(register_ern, disp, value).await?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 3).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         }
-        return Ok(10);
     }
 
-    async fn mov_l_disp24(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_disp24(&mut self, opcode2: u16) -> Result<u8> {
         let opcode3 = self.fetch().await;
         let disp = ((self.fetch().await as u32) << 16) | self.fetch().await as u32;
         if opcode2 & 0x0080 == 0 {
-            let value = self
-                .read_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?, disp)
-                .await?;
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)?;
+            let access_addr = self.get_addr_disp24(register_ern, disp)?;
+            let value = self.read_disp24_ern_l(register_ern, disp).await?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?, value)?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 5).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         } else {
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)? & 0x07;
+            let access_addr = self.get_addr_disp24(register_ern, disp)?;
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode3, 4)?)?;
-            self.write_disp24_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, disp, value)
-                .await?;
+            self.write_disp24_ern_l(register_ern, disp, value).await?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 5).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?)
         }
-        return Ok(14);
     }
 
-    async fn mov_l_inc_or_dec(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_inc_or_dec(&mut self, opcode2: u16) -> Result<u8> {
         if opcode2 & 0x0080 == 0 {
-            let value = self
-                .read_inc_ern_l(Cpu::get_nibble_opcode(opcode2, 3)?)
-                .await?;
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)?;
+            let access_addr = self.read_rn_l(register_ern)? & 0x00ffffff;
+            let value = self.read_inc_ern_l(register_ern).await?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 2).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?
+                + self.calc_state(StateType::N, 2).await?)
         } else {
+            let register_ern = Cpu::get_nibble_opcode(opcode2, 3)? & 0x07;
+            let access_addr = self.read_rn_l(register_ern)? & 0x00ffffff;
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-            self.write_dec_ern_l(Cpu::get_nibble_opcode(opcode2, 3)? & 0x07, value)
-                .await?;
+            self.write_dec_ern_l(register_ern, value).await?;
             self.mov_l_proc_pcc(value);
+            Ok(self.calc_state(StateType::I, 2).await?
+                + self
+                    .calc_state_with_addr(StateType::M, 2, access_addr)
+                    .await?
+                + self.calc_state(StateType::N, 2).await?)
         }
-        return Ok(10);
     }
 
-    async fn mov_l_abs16(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_abs16(&mut self, opcode2: u16) -> Result<u8> {
         let abs_addr = self.fetch().await;
+        let access_addr = self.get_addr_abs16(abs_addr);
         if opcode2 & 0xfff0 == 0x6b00 {
             let value = self.read_abs16_l(abs_addr).await?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
@@ -134,10 +173,13 @@ impl Cpu {
             self.write_abs16_l(abs_addr, value).await?;
             self.mov_l_proc_pcc(value);
         }
-        return Ok(10);
+        Ok(self.calc_state(StateType::I, 3).await?
+            + self
+                .calc_state_with_addr(StateType::M, 2, access_addr)
+                .await?)
     }
 
-    async fn mov_l_abs24(&mut self, opcode2: u16) -> Result<usize> {
+    async fn mov_l_abs24(&mut self, opcode2: u16) -> Result<u8> {
         let abs_addr = ((self.fetch().await as u32) << 16) | self.fetch().await as u32;
         if opcode2 & 0xfff0 == 0x6b20 {
             let value = self.read_abs24_l(abs_addr).await?;
@@ -148,7 +190,8 @@ impl Cpu {
             self.write_abs24_l(abs_addr, value).await?;
             self.mov_l_proc_pcc(value);
         }
-        return Ok(12);
+        Ok(self.calc_state(StateType::I, 4).await?
+            + self.calc_state_with_addr(StateType::M, 2, abs_addr).await?)
     }
 }
 

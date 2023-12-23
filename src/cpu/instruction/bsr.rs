@@ -1,20 +1,30 @@
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, StateType};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) async fn bsr_disp16(&mut self, opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bsr_disp16(&mut self, opcode: u16) -> Result<u8> {
+        let access_addr = (self.read_rn_l(7)? - 4) & 0x00ffffff;
         self.write_dec_ern_l(7, self.pc).await?;
         let disp = ((opcode as u8) as i8) as i32;
         self.pc = (self.pc as i32 + disp) as u32;
-        Ok(8)
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::K, 1, access_addr)
+                .await?
+            + self.calc_state(StateType::N, 2).await?)
     }
 
-    pub(in super::super) async fn bsr_disp24(&mut self, _opcode: u16) -> Result<usize> {
+    pub(in super::super) async fn bsr_disp24(&mut self, _opcode: u16) -> Result<u8> {
+        let access_addr = (self.read_rn_l(7)? - 4) & 0x00ffffff;
         let opcode2 = self.fetch().await;
         self.write_dec_ern_l(7, self.pc).await?;
         let disp = (opcode2 as i16) as i32;
         self.pc = (self.pc as i32 + disp) as u32;
-        Ok(10)
+        Ok(self.calc_state(StateType::I, 2).await?
+            + self
+                .calc_state_with_addr(StateType::K, 2, access_addr)
+                .await?
+            + self.calc_state(StateType::N, 2).await?)
     }
 }
 
