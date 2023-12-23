@@ -614,6 +614,22 @@ mod tests {
     }
 
     #[tokio::test]
+    #[should_panic]
+    async fn test_calc_state_type_l() {
+        let cpu = Cpu::new();
+        const STATE: u8 = 2;
+        cpu.calc_state(StateType::L, STATE).await.unwrap();
+    }
+
+    #[tokio::test]
+    #[should_panic]
+    async fn test_calc_state_type_m() {
+        let cpu = Cpu::new();
+        const STATE: u8 = 2;
+        cpu.calc_state(StateType::M, STATE).await.unwrap();
+    }
+
+    #[tokio::test]
     async fn test_calc_state_memory() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = MEMORY_START_ADDR;
@@ -628,14 +644,6 @@ mod tests {
         );
         assert_eq!(
             cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::L, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::M, STATE).await.unwrap(),
             2 * STATE
         );
         assert_eq!(
@@ -661,14 +669,6 @@ mod tests {
         );
         assert_eq!(
             cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            4 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::L, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::M, STATE).await.unwrap(),
             4 * STATE
         );
         assert_eq!(
@@ -699,14 +699,6 @@ mod tests {
             (6 + 2 * WAIT_STATE) * STATE
         );
         assert_eq!(
-            cpu.calc_state(StateType::L, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::M, STATE).await.unwrap(),
-            (6 + 2 * WAIT_STATE) * STATE
-        );
-        assert_eq!(
             cpu.calc_state(StateType::N, STATE).await.unwrap(),
             1 * STATE
         );
@@ -729,14 +721,6 @@ mod tests {
         );
         assert_eq!(
             cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::L, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::M, STATE).await.unwrap(),
             2 * STATE
         );
         assert_eq!(
@@ -767,16 +751,110 @@ mod tests {
             (3 + WAIT_STATE) * STATE
         );
         assert_eq!(
-            cpu.calc_state(StateType::L, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::M, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
             cpu.calc_state(StateType::N, STATE).await.unwrap(),
             1 * STATE
+        );
+    }
+
+    #[tokio::test]
+    async fn test_calc_state_with_addr_memory() {
+        let cpu = Cpu::new();
+        const STATE: u8 = 2;
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::L, STATE, MEMORY_START_ADDR)
+                .await
+                .unwrap(),
+            2 * STATE
+        );
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::M, STATE, MEMORY_START_ADDR)
+                .await
+                .unwrap(),
+            2 * STATE
+        );
+    }
+
+    #[tokio::test]
+    async fn test_calc_state_with_addr_external_8bit_2state() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(ABWCR, 0x01).unwrap();
+        cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
+        const STATE: u8 = 2;
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            2 * STATE
+        );
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            4 * STATE
+        );
+    }
+
+    #[tokio::test]
+    async fn test_calc_state_with_addr_external_8bit_3state() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(ABWCR, 0x01).unwrap();
+        cpu.bus.lock().await.write(ASTCR, 0x01).unwrap();
+        cpu.bus.lock().await.write(WCRL, 0x03).unwrap();
+        const STATE: u8 = 2;
+        const WAIT_STATE: u8 = 3;
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            (3 + WAIT_STATE) * STATE
+        );
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            (6 + 2 * WAIT_STATE) * STATE
+        );
+    }
+
+    #[tokio::test]
+    async fn test_calc_state_with_addr_external_16bit_2state() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(ABWCR, 0xfe).unwrap();
+        cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
+        const STATE: u8 = 2;
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            2 * STATE
+        );
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            2 * STATE
+        );
+    }
+
+    #[tokio::test]
+    async fn test_calc_state_with_addr_external_16bit_3state() {
+        let cpu = Cpu::new();
+        cpu.bus.lock().await.write(ABWCR, 0xfe).unwrap();
+        cpu.bus.lock().await.write(ASTCR, 0x01).unwrap();
+        cpu.bus.lock().await.write(WCRL, 0x03).unwrap();
+        const STATE: u8 = 2;
+        const WAIT_STATE: u8 = 3;
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            (3 + WAIT_STATE) * STATE
+        );
+        assert_eq!(
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
+                .await
+                .unwrap(),
+            (3 + WAIT_STATE) * STATE
         );
     }
 }
