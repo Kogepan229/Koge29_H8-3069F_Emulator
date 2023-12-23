@@ -79,22 +79,13 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
 
             // Add start address of program to Global Offset
             for i in 0..(s.header.size / 4) {
-                let mut global_off = ((bus_lock.dram
-                    [program_dram_offset + (s.header.addr + 4 * i) as usize]
-                    as u32)
-                    << 24)
-                    | ((bus_lock.dram[program_dram_offset + (s.header.addr + 4 * i + 1) as usize]
-                        as u32)
-                        << 16)
-                    | ((bus_lock.dram[program_dram_offset + (s.header.addr + 4 * i + 2) as usize]
-                        as u32)
-                        << 8)
-                    | (bus_lock.dram[program_dram_offset + (s.header.addr + 4 * i + 3) as usize]
-                        as u32);
+                let got_addr = program_dram_offset + (s.header.addr + 4 * i) as usize;
+                let mut global_off = ((bus_lock.dram[got_addr] as u32) << 24)
+                    | ((bus_lock.dram[got_addr + 1] as u32) << 16)
+                    | ((bus_lock.dram[got_addr + 2] as u32) << 8)
+                    | (bus_lock.dram[got_addr + 3] as u32);
                 global_off += PROGRAM_START_ADDR as u32;
-                bus_lock.dram[program_dram_offset + ((s.header.addr + 4 * i) as usize)
-                    ..program_dram_offset + ((s.header.addr + 4 * i + 4) as usize)]
-                    .copy_from_slice(&global_off.to_be_bytes());
+                bus_lock.dram[got_addr..=got_addr + 3].copy_from_slice(&global_off.to_be_bytes());
             }
         } else if s.name == ".symtab" {
             let (_, symtabs) =
@@ -102,7 +93,6 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
                     &elf_binary[s.header.offset as usize..],
                 )
                 .unwrap();
-            // println!("{:#?}", symtabs);
 
             let raw_symbol_names_offset = sht[s.header.link as usize].offset;
             let raw_symbol_names = &elf_binary[raw_symbol_names_offset as usize..];
@@ -120,7 +110,6 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
                     }
                 })
                 .collect::<Vec<symtab::SymbolTableWithName32>>();
-            // println!("{:#?}", symtabs_with_name);
 
             for symtab in symtabs_with_name {
                 if symtab.name == "___exit" {
