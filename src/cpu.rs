@@ -193,8 +193,8 @@ impl Cpu {
                 0xf0 => {
                     let opcode2 = self.fetch().await;
                     match (opcode2 >> 8) as u8 {
-                        0x64 => return self.or_l_rn(opcode, opcode2),
-                        0x65 => return self.xor_l_rn(opcode, opcode2),
+                        0x64 => return self.or_l_rn(opcode, opcode2).await,
+                        0x65 => return self.xor_l_rn(opcode, opcode2).await,
                         0x66 => return self.and_l_rn(opcode, opcode2).await,
                         _ => unimpl!(opcode, self.pc),
                     }
@@ -205,43 +205,43 @@ impl Cpu {
             0x55 => return self.bsr_disp16(opcode).await,
             0x5c => return self.bsr_disp24(opcode).await,
 
-            0x60 => return self.bset_rn_from_rn(opcode),
-            0x61 => return self.bnot_rn_from_rn(opcode),
-            0x62 => return self.bclr_rn_from_rn(opcode),
-            0x63 => return self.btst_rn_from_rn(opcode),
+            0x60 => return self.bset_rn_from_rn(opcode).await,
+            0x61 => return self.bnot_rn_from_rn(opcode).await,
+            0x62 => return self.bclr_rn_from_rn(opcode).await,
+            0x63 => return self.btst_rn_from_rn(opcode).await,
 
             0x67 => match opcode & 0x80 {
-                0x00 => return self.bst_rn(opcode),
-                0x80 => return self.bist_rn(opcode),
+                0x00 => return self.bst_rn(opcode).await,
+                0x80 => return self.bist_rn(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
-            0x70 => return self.bset_rn_from_imm(opcode),
-            0x71 => return self.bnot_rn_from_imm(opcode),
-            0x72 => return self.bclr_rn_from_imm(opcode),
-            0x73 => return self.btst_rn_from_imm(opcode),
+            0x70 => return self.bset_rn_from_imm(opcode).await,
+            0x71 => return self.bnot_rn_from_imm(opcode).await,
+            0x72 => return self.bclr_rn_from_imm(opcode).await,
+            0x73 => return self.btst_rn_from_imm(opcode).await,
 
             0x74 => match opcode & 0x80 {
-                0x00 => return self.bor_rn(opcode),
-                0x80 => return self.bior_rn(opcode),
+                0x00 => return self.bor_rn(opcode).await,
+                0x80 => return self.bior_rn(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x75 => match opcode & 0x80 {
-                0x00 => return self.bxor_rn(opcode),
-                0x80 => return self.bixor_rn(opcode),
+                0x00 => return self.bxor_rn(opcode).await,
+                0x80 => return self.bixor_rn(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x76 => match opcode & 0x80 {
-                0x00 => return self.band_rn(opcode),
-                0x80 => return self.biand_rn(opcode),
+                0x00 => return self.band_rn(opcode).await,
+                0x80 => return self.biand_rn(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x77 => match opcode & 0x80 {
-                0x00 => return self.bld_rn(opcode),
-                0x080 => return self.bild_rn(opcode),
+                0x00 => return self.bld_rn(opcode).await,
+                0x080 => return self.bild_rn(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -333,16 +333,16 @@ impl Cpu {
             }
 
             0x0a => match opcode as u8 {
-                0x00..=0x0f => return self.inc_b(opcode),
+                0x00..=0x0f => return self.inc_b(opcode).await,
                 0x80..=0xf7 => return self.add_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x0b => match opcode as u8 {
-                0x50..=0x5f => return self.inc_w_1(opcode),
-                0xd0..=0xdf => return self.inc_w_2(opcode),
-                0x70..=0x77 => return self.inc_l_1(opcode),
-                0xf0..=0xf7 => return self.inc_l_2(opcode),
+                0x50..=0x5f => return self.inc_w_1(opcode).await,
+                0xd0..=0xdf => return self.inc_w_2(opcode).await,
+                0x70..=0x77 => return self.inc_l_1(opcode).await,
+                0xf0..=0xf7 => return self.inc_l_2(opcode).await,
                 0x00..=0x07 => return self.adds1(opcode).await,
                 0x80..=0x87 => return self.adds2(opcode).await,
                 0x90..=0x97 => return self.adds4(opcode).await,
@@ -350,85 +350,85 @@ impl Cpu {
             },
 
             0x10 => match opcode as u8 {
-                0x00..=0x0f => return self.shll_b(opcode),
-                0x10..=0x1f => return self.shll_w(opcode),
-                0x30..=0x37 => return self.shll_l(opcode),
-                0x80..=0x8f => return self.shal_b(opcode),
-                0x90..=0x9f => return self.shal_w(opcode),
-                0xb0..=0xb7 => return self.shal_l(opcode),
+                0x00..=0x0f => return self.shll_b(opcode).await,
+                0x10..=0x1f => return self.shll_w(opcode).await,
+                0x30..=0x37 => return self.shll_l(opcode).await,
+                0x80..=0x8f => return self.shal_b(opcode).await,
+                0x90..=0x9f => return self.shal_w(opcode).await,
+                0xb0..=0xb7 => return self.shal_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x11 => match opcode as u8 {
-                0x00..=0x0f => return self.shlr_b(opcode),
-                0x10..=0x1f => return self.shlr_w(opcode),
-                0x30..=0x3f => return self.shlr_l(opcode),
-                0x80..=0x8f => return self.shar_b(opcode),
-                0x90..=0x9f => return self.shar_w(opcode),
-                0xb0..=0xb7 => return self.shar_l(opcode),
+                0x00..=0x0f => return self.shlr_b(opcode).await,
+                0x10..=0x1f => return self.shlr_w(opcode).await,
+                0x30..=0x3f => return self.shlr_l(opcode).await,
+                0x80..=0x8f => return self.shar_b(opcode).await,
+                0x90..=0x9f => return self.shar_w(opcode).await,
+                0xb0..=0xb7 => return self.shar_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x12 => match opcode as u8 {
-                0x00..=0x0f => return self.rotxl_b(opcode),
-                0x10..=0x1f => return self.rotxl_w(opcode),
-                0x30..=0x37 => return self.rotxl_l(opcode),
-                0x80..=0x8f => return self.rotl_b(opcode),
-                0x90..=0x9f => return self.rotl_w(opcode),
-                0xb0..=0xb7 => return self.rotl_l(opcode),
+                0x00..=0x0f => return self.rotxl_b(opcode).await,
+                0x10..=0x1f => return self.rotxl_w(opcode).await,
+                0x30..=0x37 => return self.rotxl_l(opcode).await,
+                0x80..=0x8f => return self.rotl_b(opcode).await,
+                0x90..=0x9f => return self.rotl_w(opcode).await,
+                0xb0..=0xb7 => return self.rotl_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x13 => match opcode as u8 {
-                0x00..=0x0f => return self.rotxr_b(opcode),
-                0x10..=0x1f => return self.rotxr_w(opcode),
-                0x30..=0x37 => return self.rotxr_l(opcode),
-                0x80..=0x8f => return self.rotr_b(opcode),
-                0x90..=0x9f => return self.rotr_w(opcode),
-                0xb0..=0xb7 => return self.rotr_l(opcode),
+                0x00..=0x0f => return self.rotxr_b(opcode).await,
+                0x10..=0x1f => return self.rotxr_w(opcode).await,
+                0x30..=0x37 => return self.rotxr_l(opcode).await,
+                0x80..=0x8f => return self.rotr_b(opcode).await,
+                0x90..=0x9f => return self.rotr_w(opcode).await,
+                0xb0..=0xb7 => return self.rotr_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x17 => match opcode as u8 {
-                0x50..=0x5f => return self.extu_w(opcode),
-                0x70..=0x77 => return self.extu_l(opcode),
+                0x50..=0x5f => return self.extu_w(opcode).await,
+                0x70..=0x77 => return self.extu_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x1a => match opcode as u8 {
-                0x00..=0x0f => return self.dec_b(opcode),
+                0x00..=0x0f => return self.dec_b(opcode).await,
                 0x80..=0xf7 => return self.sub_l(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x1b => match opcode as u8 {
-                0x50..=0x5f => return self.dec_w_1(opcode),
-                0xd0..=0xdf => return self.dec_w_2(opcode),
-                0x70..=0x77 => return self.dec_l_1(opcode),
-                0xf0..=0xf7 => return self.dec_l_2(opcode),
-                0x00..=0x07 => return self.subs1(opcode),
-                0x80..=0x87 => return self.subs2(opcode),
-                0x90..=0x97 => return self.subs4(opcode),
+                0x50..=0x5f => return self.dec_w_1(opcode).await,
+                0xd0..=0xdf => return self.dec_w_2(opcode).await,
+                0x70..=0x77 => return self.dec_l_1(opcode).await,
+                0xf0..=0xf7 => return self.dec_l_2(opcode).await,
+                0x00..=0x07 => return self.subs1(opcode).await,
+                0x80..=0x87 => return self.subs2(opcode).await,
+                0x90..=0x97 => return self.subs4(opcode).await,
                 _ => unimpl!(opcode, self.pc),
             },
 
             0x80..=0x8f | 0x08 => return self.add_b(opcode).await,
             0x09 => return self.add_w(opcode).await,
 
-            0x18 => return self.sub_b(opcode),
+            0x18 => return self.sub_b(opcode).await,
             0x19 => return self.sub_w(opcode).await,
 
-            0x1c | 0xa0..=0xaf => return self.cmp_b(opcode),
+            0x1c | 0xa0..=0xaf => return self.cmp_b(opcode).await,
             0x1d => return self.cmp_w(opcode).await,
             0x1f => return self.cmp_l(opcode).await,
 
-            0xc0..=0xcf => return self.or_b_imm(opcode),
-            0x14 => return self.or_b_rn(opcode),
-            0x64 => return self.or_w_rn(opcode),
+            0xc0..=0xcf => return self.or_b_imm(opcode).await,
+            0x14 => return self.or_b_rn(opcode).await,
+            0x64 => return self.or_w_rn(opcode).await,
 
-            0xd0..=0xdf => return self.xor_b_imm(opcode),
-            0x15 => return self.xor_b_rn(opcode),
-            0x65 => return self.xor_w_rn(opcode),
+            0xd0..=0xdf => return self.xor_b_imm(opcode).await,
+            0x15 => return self.xor_b_rn(opcode).await,
+            0x65 => return self.xor_w_rn(opcode).await,
 
             0xe0..=0xef => return self.and_b_imm(opcode).await,
             0x16 => return self.and_b_rn(opcode).await,
