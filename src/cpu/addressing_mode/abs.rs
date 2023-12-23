@@ -289,36 +289,36 @@ mod tests {
     async fn test_write_abs16_b() {
         let mut cpu = Cpu::new();
         cpu.write_abs16_b(0xff10, 0xff).await.unwrap();
-        cpu.write_abs16_b(0xff1f, 0xff).await.unwrap();
+        cpu.write_abs16_b(0xff1e, 0xff).await.unwrap();
         assert_eq!(cpu.bus.lock().await.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(cpu.bus.lock().await.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.bus.lock().await.read(0xffff1e).unwrap(), 0xff);
     }
 
     #[tokio::test]
     async fn test_read_abs16_b() {
         let cpu = Cpu::new();
         cpu.bus.lock().await.write(0xffff10, 0xff).unwrap();
-        cpu.bus.lock().await.write(0xffff1f, 0xff).unwrap();
+        cpu.bus.lock().await.write(0xffff1e, 0xff).unwrap();
         assert_eq!(cpu.read_abs16_b(0xff10).await.unwrap(), 0xff);
-        assert_eq!(cpu.read_abs16_b(0xff1f).await.unwrap(), 0xff);
+        assert_eq!(cpu.read_abs16_b(0xff1e).await.unwrap(), 0xff);
     }
 
     #[tokio::test]
     async fn test_write_abs24_b() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_b(0xffff10, 0xff).await.unwrap();
-        cpu.write_abs24_b(0xffff1f, 0xff).await.unwrap();
+        cpu.write_abs24_b(0xffff1e, 0xff).await.unwrap();
         assert_eq!(cpu.bus.lock().await.read(0xffff10).unwrap(), 0xff);
-        assert_eq!(cpu.bus.lock().await.read(0xffff1f).unwrap(), 0xff);
+        assert_eq!(cpu.bus.lock().await.read(0xffff1e).unwrap(), 0xff);
     }
 
     #[tokio::test]
     async fn test_read_abs24_b() {
         let cpu = Cpu::new();
         cpu.bus.lock().await.write(0xffff10, 0xff).unwrap();
-        cpu.bus.lock().await.write(0xffff1f, 0xff).unwrap();
+        cpu.bus.lock().await.write(0xffff1e, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).await.unwrap(), 0xff);
-        assert_eq!(cpu.read_abs24_b(0xffff1f).await.unwrap(), 0xff);
+        assert_eq!(cpu.read_abs24_b(0xffff1e).await.unwrap(), 0xff);
     }
 
     #[tokio::test]
@@ -338,8 +338,8 @@ mod tests {
         {
             let bus_lock = cpu.bus.lock().await;
             assert_eq!(
-                (bus_lock.read(0xffff00).unwrap() as u16) << 8
-                    | bus_lock.read(0xffff01).unwrap() as u16,
+                (bus_lock.read(0xffff01).unwrap() as u16) << 8
+                    | bus_lock.read(0xffff02).unwrap() as u16,
                 0x0fff
             );
         }
