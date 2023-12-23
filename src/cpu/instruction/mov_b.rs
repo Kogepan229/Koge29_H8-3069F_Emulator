@@ -135,7 +135,7 @@ impl Cpu {
             self.mov_b_proc_pcc(value);
             Ok(self.calc_state(StateType::I, 1).await?
                 + self
-                    .calc_state_with_addr(StateType::J, 1, access_addr)
+                    .calc_state_with_addr(StateType::L, 1, access_addr)
                     .await?
                 + self.calc_state(StateType::N, 2).await?)
         } else {
@@ -146,7 +146,7 @@ impl Cpu {
             self.mov_b_proc_pcc(value);
             Ok(self.calc_state(StateType::I, 1).await?
                 + self
-                    .calc_state_with_addr(StateType::J, 1, access_addr)
+                    .calc_state_with_addr(StateType::L, 1, access_addr)
                     .await?
                 + self.calc_state(StateType::N, 2).await?)
         }
