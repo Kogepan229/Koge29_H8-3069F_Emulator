@@ -78,6 +78,9 @@ impl Cpu {
 
         let mut is_paused = false;
 
+        // Set program counter
+        self.pc = self.er[2];
+
         // set stack pointer
         self.er[7] = MEMORY_END_ADDR - 0xf;
 
@@ -161,14 +164,9 @@ impl Cpu {
 
         self.operating_pc = _pc;
 
-        if _pc < MEMORY_START_ADDR || _pc > MEMORY_END_ADDR {
-            panic!("fetch error [pc: {:0>8x}]", self.pc)
-        }
-
         let opcode = {
-            let bl = self.bus.lock().await;
-            (bl.memory[(_pc - MEMORY_START_ADDR) as usize] as u16) << 8
-                | (bl.memory[(_pc - MEMORY_START_ADDR + 1) as usize] as u16)
+            let bus_lock = self.bus.lock().await;
+            ((bus_lock.read(_pc).unwrap() as u16) << 8) | (bus_lock.read(_pc + 1).unwrap() as u16)
         };
 
         if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {

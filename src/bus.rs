@@ -53,7 +53,7 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize =
 pub struct Bus {
     pub memory: Memory,
     pub exception_handling_vector: Vec<u8>,
-    dram: Vec<u8>,
+    pub dram: Vec<u8>,
     io_registrs1: Vec<u8>,
     io_registrs2: Vec<u8>,
 }
