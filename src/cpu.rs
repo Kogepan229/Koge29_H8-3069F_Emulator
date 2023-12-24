@@ -1,5 +1,6 @@
 use crate::{
     bus::{Bus, AREA0_START_ADDR, AREA7_END_ADDR},
+    elf::PROGRAM_START_ADDR,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     registers::{ABWCR, ASTCR, WCRH, WCRL},
     setting, socket,
@@ -51,7 +52,7 @@ macro_rules! unimpl {
             "unimplemented instruction:[{:>04x}] pc:[{:x}({:x})]",
             $op,
             $pc - 2,
-            $pc - 2 - MEMORY_START_ADDR
+            $pc - 2 - PROGRAM_START_ADDR as u32
         )
     };
 }
@@ -60,7 +61,7 @@ impl Cpu {
     pub fn new() -> Self {
         Cpu {
             bus: Arc::new(Mutex::new(Bus::new())),
-            pc: MEMORY_START_ADDR,
+            pc: 0,
             operating_pc: 0,
             ccr: 0,
             er: [0; 8],
@@ -80,9 +81,6 @@ impl Cpu {
 
         // Set program counter
         self.pc = self.er[2];
-
-        // set stack pointer
-        self.er[7] = MEMORY_END_ADDR - 0xf;
 
         self.init_registers().await?;
 
@@ -111,7 +109,10 @@ impl Cpu {
             }
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
-                print!(" {:4x}:   ", self.pc.wrapping_sub(MEMORY_START_ADDR));
+                print!(
+                    " {:4x}:   ",
+                    self.pc.wrapping_sub(PROGRAM_START_ADDR as u32)
+                );
             }
 
             let opcode = self.fetch().await;
@@ -119,7 +120,7 @@ impl Cpu {
                 format!(
                     "[pc: {:0>8x}({:0>8x})] opcode1 [{:0>4x}]",
                     self.pc - 2,
-                    self.pc - 2 - MEMORY_START_ADDR,
+                    self.pc - 2 - PROGRAM_START_ADDR as u32,
                     opcode
                 )
             })?;

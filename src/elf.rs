@@ -14,7 +14,7 @@ mod section;
 mod string_table;
 mod symtab;
 
-const PROGRAM_START_ADDR: usize = 0x416900;
+pub const PROGRAM_START_ADDR: usize = 0x416900;
 
 fn read_elf(path: String) -> Vec<u8> {
     let mut file = std::fs::File::open(path).expect("failed open elf");
@@ -61,7 +61,7 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
 
     // load to memory
     let program_dram_offset = PROGRAM_START_ADDR - AREA2_START_ADDR as usize;
-    for ph in pht {
+    for ph in &pht {
         if ph.ty == SegmentType::Load {
             bus_lock.dram[program_dram_offset + ph.virtual_addr as usize
                 ..program_dram_offset + (ph.virtual_addr + ph.size_in_file) as usize]
@@ -87,6 +87,14 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
                 global_off += PROGRAM_START_ADDR as u32;
                 bus_lock.dram[got_addr..=got_addr + 3].copy_from_slice(&global_off.to_be_bytes());
             }
+        } else if s.name == ".stack" {
+            let program_size = pht[pht.len() - 1].size_in_mem + pht[pht.len() - 1].physical_addr;
+            let stack_size = s.header.addr;
+            let mut a = PROGRAM_START_ADDR + program_size as usize + stack_size as usize + 3;
+            a >>= 2;
+            a <<= 2;
+            cpu.er[7] = a as u32 - 12;
+            println!("Set er7(stack pointer) [0x{:x}]", cpu.er[7]);
         } else if s.name == ".symtab" {
             let (_, symtabs) =
                 parse_symbol_table32((s.header.size / s.header.entry_size) as usize)(
