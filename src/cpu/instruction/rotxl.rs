@@ -65,12 +65,13 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_rotxl_b() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x00]);
@@ -83,6 +84,7 @@ mod tests {
 
         // check register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x0f]);
@@ -95,6 +97,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001010;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x00]);
@@ -107,6 +110,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x00]);
@@ -122,6 +126,7 @@ mod tests {
     async fn test_rotxl_w() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x10]);
@@ -134,6 +139,7 @@ mod tests {
 
         // check register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x1f]);
@@ -146,6 +152,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001010;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x10]);
@@ -158,6 +165,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x10]);
@@ -173,6 +181,7 @@ mod tests {
     async fn test_rotxl_l() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x30]);
@@ -189,6 +198,7 @@ mod tests {
 
         // check register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x37]);
@@ -205,6 +215,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001010;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x30]);
@@ -217,6 +228,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x12, 0x30]);

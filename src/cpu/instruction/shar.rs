@@ -65,11 +65,12 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_shar_b() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x80]);
@@ -81,6 +82,7 @@ mod tests {
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0b0010_1101);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x8f]);
@@ -93,6 +95,7 @@ mod tests {
 
         // check CCR N
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x80]);
@@ -105,6 +108,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x80]);
@@ -117,6 +121,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001011;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x80]);
@@ -131,6 +136,7 @@ mod tests {
     #[tokio::test]
     async fn test_shar_w() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x90]);
@@ -142,6 +148,7 @@ mod tests {
         assert_eq!(cpu.read_rn_w(0).unwrap(), 0b0010_1010_1010_1101);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x9f]);
@@ -154,6 +161,7 @@ mod tests {
 
         // check CCR N
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x90]);
@@ -166,6 +174,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x90]);
@@ -178,6 +187,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001011;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0x90]);
@@ -192,6 +202,7 @@ mod tests {
     #[tokio::test]
     async fn test_shar_l() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
@@ -207,6 +218,7 @@ mod tests {
         );
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0xb7]);
@@ -223,6 +235,7 @@ mod tests {
 
         // check CCR N
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00000111;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
@@ -239,6 +252,7 @@ mod tests {
 
         // check CCR C
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0xb0]);
@@ -255,6 +269,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001011;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x11, 0xb0]);

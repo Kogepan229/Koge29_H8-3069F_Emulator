@@ -26,11 +26,12 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_subs1() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
         cpu.write_rn_l(0, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -41,6 +42,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x07]);
         cpu.write_rn_l(7, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -51,6 +53,7 @@ mod tests {
 
         // overflow
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
         cpu.write_rn_l(0, std::i32::MIN as u32).unwrap();
         let opcode = cpu.fetch().await;
@@ -61,6 +64,7 @@ mod tests {
 
         // overflow2
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
         cpu.write_rn_l(0, std::u32::MIN).unwrap();
         let opcode = cpu.fetch().await;
@@ -71,6 +75,7 @@ mod tests {
 
         // u32 MAX - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
         cpu.write_rn_l(0, std::u32::MAX).unwrap();
         let opcode = cpu.fetch().await;
@@ -81,6 +86,7 @@ mod tests {
 
         // 0 - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x00]);
         cpu.write_rn_l(0, 0).unwrap();
         let opcode = cpu.fetch().await;
@@ -93,6 +99,7 @@ mod tests {
     #[tokio::test]
     async fn test_subs2() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x80]);
         cpu.write_rn_l(0, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -103,6 +110,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x87]);
         cpu.write_rn_l(7, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -113,6 +121,7 @@ mod tests {
 
         // overflow
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x80]);
         cpu.write_rn_l(0, std::i32::MIN as u32).unwrap();
         let opcode = cpu.fetch().await;
@@ -123,6 +132,7 @@ mod tests {
 
         // u32 MAX - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x80]);
         cpu.write_rn_l(0, std::u32::MAX).unwrap();
         let opcode = cpu.fetch().await;
@@ -133,6 +143,7 @@ mod tests {
 
         // 0 - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x80]);
         cpu.write_rn_l(0, 0).unwrap();
         let opcode = cpu.fetch().await;
@@ -145,6 +156,7 @@ mod tests {
     #[tokio::test]
     async fn test_subs4() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x90]);
         cpu.write_rn_l(0, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -155,6 +167,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x97]);
         cpu.write_rn_l(7, 10).unwrap();
         let opcode = cpu.fetch().await;
@@ -165,6 +178,7 @@ mod tests {
 
         // overflow
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x90]);
         cpu.write_rn_l(0, std::i32::MIN as u32).unwrap();
         let opcode = cpu.fetch().await;
@@ -175,6 +189,7 @@ mod tests {
 
         // u32 MAX - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x90]);
         cpu.write_rn_l(0, std::u32::MAX).unwrap();
         let opcode = cpu.fetch().await;
@@ -185,6 +200,7 @@ mod tests {
 
         // 0 - 1
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x1b, 0x90]);
         cpu.write_rn_l(0, 0).unwrap();
         let opcode = cpu.fetch().await;

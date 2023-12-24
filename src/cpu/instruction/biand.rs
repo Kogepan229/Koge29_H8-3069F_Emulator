@@ -36,11 +36,12 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_biand_rn() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_rn_b(0, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x76, 0x80]);
@@ -51,6 +52,7 @@ mod tests {
 
         // bit7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_rn_b(0, 0x7f).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x76, 0xf0]);
@@ -61,6 +63,7 @@ mod tests {
 
         // register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_rn_b(0xf, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x76, 0x8f]);
@@ -70,6 +73,7 @@ mod tests {
         assert_eq!(cpu.ccr, 1);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_rn_b(0, 0x01).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x76, 0x80]);
@@ -79,6 +83,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0;
         cpu.write_rn_b(0, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x76, 0x80]);
@@ -91,6 +96,7 @@ mod tests {
     #[tokio::test]
     async fn test_biand_ern() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0xfe).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -102,6 +108,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0x7f).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -113,6 +120,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0xfe).await.unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -123,6 +131,7 @@ mod tests {
         assert_eq!(cpu.ccr, 1);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffcf20, 0x01).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -133,6 +142,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffcf20, 0xfe).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -146,6 +156,7 @@ mod tests {
     #[tokio::test]
     async fn test_biand_abs() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0xfe).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7e, 0x12, 0x76, 0x80]);
@@ -156,6 +167,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0x7f).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7e, 0x12, 0x76, 0xf0]);
@@ -165,6 +177,7 @@ mod tests {
         assert_eq!(cpu.ccr, 1);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 1;
         cpu.write_abs24_b(0xffff12, 0x01).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7e, 0x12, 0x76, 0x80]);
@@ -174,6 +187,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0;
         cpu.write_abs24_b(0xffff12, 0xfe).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7e, 0x12, 0x76, 0x80]);

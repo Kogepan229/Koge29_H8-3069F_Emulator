@@ -137,6 +137,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_b_imm() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0xe0, 0x80]);
         cpu.write_rn_b(0, 0xaf).unwrap();
@@ -167,6 +168,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_b_rn() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x16, 0x0f]);
         cpu.write_rn_b(0, 0xaf).unwrap();
@@ -206,6 +208,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_w_imm() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x79, 0x60, 0x80, 0x80]);
         cpu.write_rn_w(0, 0xafaf).unwrap();
@@ -236,6 +239,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_w_rn() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x66, 0x0f]);
         cpu.write_rn_w(0, 0xafaf).unwrap();
@@ -277,6 +281,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_l_imm() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x7a, 0x60, 0x80, 0x80, 0x80, 0x80]);
         cpu.write_rn_l(0, 0xafafafaf).unwrap();
@@ -307,6 +312,7 @@ mod tests {
     #[tokio::test]
     async fn test_and_l_rn() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
 
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0xf0, 0x66, 0x07]);
         cpu.write_rn_l(0, 0xafafafaf).unwrap();

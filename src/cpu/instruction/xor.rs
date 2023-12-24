@@ -138,6 +138,7 @@ mod tests {
     async fn test_xor_b_imm() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0xd0, 0x7a]);
         cpu.write_rn_b(0, 0xaf).unwrap();
         let opcode = cpu.fetch().await;
@@ -173,6 +174,7 @@ mod tests {
     async fn test_xor_b_rn() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x15, 0x0f]);
         cpu.write_rn_b(0, 0xaf).unwrap();
         cpu.write_rn_b(0xf, 0x7a).unwrap();
@@ -217,6 +219,7 @@ mod tests {
     async fn test_xor_w_imm() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x79, 0x50, 0x7a, 0x69]);
         cpu.write_rn_w(0, 0xaf9e).unwrap();
         let opcode = cpu.fetch().await;
@@ -252,6 +255,7 @@ mod tests {
     async fn test_xor_w_rn() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x65, 0x0f]);
         cpu.write_rn_w(0, 0x7a69).unwrap();
         cpu.write_rn_w(0xf, 0xaf9e).unwrap();
@@ -296,6 +300,7 @@ mod tests {
     async fn test_xor_l_imm() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x7a, 0x50, 0x7a, 0x69, 0x58, 0x47]);
         cpu.write_rn_l(0, 0xaf9e8d7c).unwrap();
         let opcode = cpu.fetch().await;
@@ -331,6 +336,7 @@ mod tests {
     async fn test_xor_l_rn() {
         let mut cpu = Cpu::new();
         cpu.ccr = 0b00000111;
+        cpu.pc = MEMORY_START_ADDR;
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x01, 0xf0, 0x65, 0x07]);
         cpu.write_rn_l(0, 0x7a695847).unwrap();
         cpu.write_rn_l(7, 0xaf9e8d7c).unwrap();

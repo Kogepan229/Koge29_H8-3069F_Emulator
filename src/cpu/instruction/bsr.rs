@@ -38,6 +38,7 @@ mod tests {
     #[tokio::test]
     async fn test_bsr_disp16() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x55, 0x15]);
         let opcode = cpu.fetch().await;
@@ -48,6 +49,7 @@ mod tests {
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 2 + 0x15);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.pc = MEMORY_START_ADDR + 100;
         cpu.bus.lock().await.memory[100..102].copy_from_slice(&[0x55, 0xf6]);
@@ -62,6 +64,7 @@ mod tests {
     #[tokio::test]
     async fn test_bsr_disp24() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x5c, 0x00, 0x00, 0x15]);
         let opcode = cpu.fetch().await;
@@ -72,6 +75,7 @@ mod tests {
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 4 + 0x15);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.er[7] = MEMORY_END_ADDR - 0xf;
         cpu.pc = MEMORY_START_ADDR + 100;
         cpu.bus.lock().await.memory[100..104].copy_from_slice(&[0x5c, 0x00, 0xff, 0xf6]);

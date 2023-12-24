@@ -67,12 +67,13 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_bset_rn_from_imm() {
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x70, 0x00]);
         let opcode = cpu.fetch().await;
@@ -82,6 +83,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0, 0x7f).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x70, 0x70]);
         let opcode = cpu.fetch().await;
@@ -91,6 +93,7 @@ mod tests {
 
         // register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0xf, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x70, 0x0f]);
         let opcode = cpu.fetch().await;
@@ -103,6 +106,7 @@ mod tests {
     async fn test_bset_rn_from_rn() {
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0, 0).unwrap();
         cpu.write_rn_b(0xf, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x60, 0x0f]);
@@ -113,6 +117,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0, 7).unwrap();
         cpu.write_rn_b(0xf, 0x7f).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x60, 0x0f]);
@@ -123,6 +128,7 @@ mod tests {
 
         // register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_rn_b(0xf, 0).unwrap();
         cpu.write_rn_b(0, 0xfe).unwrap();
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x60, 0xf0]);
@@ -139,6 +145,7 @@ mod tests {
 
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0xfe).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x70, 0x00]);
@@ -149,6 +156,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0x7f).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x00, 0x70, 0x70]);
@@ -159,6 +167,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0x7f).await.unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7d, 0x70, 0x70, 0x70]);
@@ -172,6 +181,7 @@ mod tests {
 
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0xfe).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_rn_b(0xf, 0).unwrap();
@@ -183,6 +193,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0x7f).await.unwrap();
         cpu.write_rn_l(0, 0xffcf20).unwrap();
         cpu.write_rn_b(0xf, 7).unwrap();
@@ -194,6 +205,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffcf20, 0x7f).await.unwrap();
         cpu.write_rn_l(7, 0xffcf20).unwrap();
         cpu.write_rn_b(0, 7).unwrap();
@@ -211,6 +223,7 @@ mod tests {
 
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffff12, 0xfe).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x70, 0x00]);
         let opcode = cpu.fetch().await;
@@ -220,6 +233,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffff12, 0x7f).await.unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x70, 0x70]);
         let opcode = cpu.fetch().await;
@@ -232,6 +246,7 @@ mod tests {
 
         // bit 0
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffff12, 0xfe).await.unwrap();
         cpu.write_rn_b(0, 0).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x60, 0x00]);
@@ -242,6 +257,7 @@ mod tests {
 
         // bit 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffff12, 0x7f).await.unwrap();
         cpu.write_rn_b(0, 7).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x60, 0x00]);
@@ -252,6 +268,7 @@ mod tests {
 
         // register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.write_abs24_b(0xffff12, 0x7f).await.unwrap();
         cpu.write_rn_b(0xf, 7).unwrap();
         cpu.bus.lock().await.memory[0..4].copy_from_slice(&[0x7f, 0x12, 0x60, 0xf0]);

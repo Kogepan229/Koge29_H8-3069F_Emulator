@@ -197,11 +197,12 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_mov_l_rn() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x0f, 0x87]);
@@ -212,7 +213,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x0f, 0xf0]);
@@ -223,7 +225,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x0f, 0x87]);
@@ -238,6 +241,7 @@ mod tests {
     #[tokio::test]
     async fn test_mov_l_imm() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x7a, 0x00, 0xd8, 0xc7, 0xb6, 0xa5]);
@@ -247,7 +251,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x7a, 0x07, 0xd8, 0xc7, 0xb6, 0xa5]);
@@ -257,7 +262,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.bus.lock().await.memory[0..6].copy_from_slice(&[0x7a, 0x00, 0x00, 0x00, 0x00, 0x00]);
@@ -274,6 +280,7 @@ mod tests {
         // EAs to Rd
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -285,7 +292,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -297,7 +305,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -312,7 +321,8 @@ mod tests {
         ////////
         // Rs to ERs
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -324,7 +334,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -336,7 +347,8 @@ mod tests {
         assert_eq!(cpu.ccr & 0b00001110, 0b00001000);
         assert_eq!(cpu.read_abs24_l(0xffcf20).await.unwrap(), 0xd8c7b6a5);
 
-        cpu = Cpu::new();
+        let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0).unwrap();
@@ -355,6 +367,7 @@ mod tests {
         // EAs to Rd
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -367,6 +380,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -379,6 +393,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -394,6 +409,7 @@ mod tests {
         // Rs to ERs
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -406,6 +422,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffde0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -418,6 +435,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffde0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(7, 0).unwrap();
@@ -436,6 +454,7 @@ mod tests {
         // EAs to Rd
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -449,6 +468,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -462,6 +482,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -478,6 +499,7 @@ mod tests {
         // Rs to ERs
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -491,6 +513,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffce0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -504,6 +527,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffce0e).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(7, 0).unwrap();
@@ -523,6 +547,7 @@ mod tests {
         // increment
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -536,6 +561,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xffcf24);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xffcf20).unwrap();
@@ -549,6 +575,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xffcf24);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0xffcf20).unwrap();
@@ -565,6 +592,7 @@ mod tests {
         // decrement
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -578,6 +606,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xffcf20);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -591,6 +620,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xffcf20);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(7, 0).unwrap();
@@ -610,6 +640,7 @@ mod tests {
         // EAs to Rd
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
@@ -621,6 +652,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
@@ -632,6 +664,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_abs24_l(0xffff02, 0).await.unwrap();
@@ -646,6 +679,7 @@ mod tests {
         // Rs to ERs
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -657,6 +691,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -668,6 +703,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0).unwrap();
@@ -680,11 +716,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_mov_w_abs24() {
+    async fn test_mov_l_abs24() {
         ////////
         // EAs to Rd
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
@@ -697,6 +734,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_abs24_l(0xffff02, 0xd8c7b6a5).await.unwrap();
@@ -709,6 +747,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_abs24_l(0xffff02, 0).await.unwrap();
@@ -724,6 +763,7 @@ mod tests {
         // Rs to ERs
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -736,6 +776,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x04;
 
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -748,6 +789,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff02).await.unwrap(), 0xd8c7b6a5);
 
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0x0a;
 
         cpu.write_rn_l(0, 0).unwrap();

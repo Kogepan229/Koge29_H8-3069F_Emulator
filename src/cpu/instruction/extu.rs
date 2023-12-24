@@ -37,11 +37,12 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu::Cpu;
+    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
     #[tokio::test]
     async fn test_extu_w() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x50]);
         cpu.write_rn_w(0, 0xb6a5).unwrap();
@@ -53,6 +54,7 @@ mod tests {
 
         // register 0xf
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x5f]);
         cpu.write_rn_w(0xf, 0xb6a5).unwrap();
@@ -64,6 +66,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x50]);
         cpu.write_rn_w(0, 0xb600).unwrap();
@@ -75,6 +78,7 @@ mod tests {
 
         // check CCR expected unchanged
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b11111111;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x50]);
         cpu.write_rn_w(0, 0xb6a5).unwrap();
@@ -88,6 +92,7 @@ mod tests {
     #[tokio::test]
     async fn test_extu_l() {
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x70]);
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
@@ -99,6 +104,7 @@ mod tests {
 
         // register 7
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x77]);
         cpu.write_rn_l(7, 0xd8c7b6a5).unwrap();
@@ -110,6 +116,7 @@ mod tests {
 
         // check CCR Z
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b00001110;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x70]);
         cpu.write_rn_l(0, 0xd8c70000).unwrap();
@@ -121,6 +128,7 @@ mod tests {
 
         // check CCR expected unchanged
         let mut cpu = Cpu::new();
+        cpu.pc = MEMORY_START_ADDR;
         cpu.ccr = 0b11111111;
         cpu.bus.lock().await.memory[0..2].copy_from_slice(&[0x17, 0x70]);
         cpu.write_rn_l(0, 0xd8c7b6a5).unwrap();
