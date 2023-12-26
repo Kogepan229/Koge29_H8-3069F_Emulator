@@ -2,7 +2,7 @@ use crate::{
     bus::{Bus, AREA0_START_ADDR, AREA7_END_ADDR},
     elf::PROGRAM_START_ADDR,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
-    registers::{ABWCR, ASTCR, WCRH, WCRL},
+    registers::{ABWCR, ASTCR, DRCRA, WCRH, WCRL},
     setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
@@ -498,6 +498,23 @@ impl Cpu {
                 let area_index = Bus::get_area_index(target_addr)?;
                 if (self.bus.lock().await.read(ABWCR)? >> area_index) & 1 == 1 {
                     // 8 bit
+
+                    // dram
+                    if self.bus.lock().await.check_dram_area(area_index)? {
+                        // as 4state
+                        match state_type {
+                            StateType::I | StateType::J | StateType::K | StateType::M => {
+                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                return Ok(state * (8 + 2 * wait_state));
+                            }
+                            StateType::L => {
+                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                return Ok(state * (4 + wait_state));
+                            }
+                            StateType::N => return Ok(state * 1),
+                        }
+                    }
+
                     if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
                         // 2 state
                         match state_type {
@@ -523,6 +540,13 @@ impl Cpu {
                     }
                 } else {
                     // 16 bit
+
+                    // dram
+                    if self.bus.lock().await.check_dram_area(area_index)? {
+                        let wait_state: u8 = self.get_wait_state(area_index).await?;
+                        return Ok(state * (4 + wait_state));
+                    }
+
                     if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
                         // 2 state
                         return Ok(state * 2);
@@ -543,6 +567,7 @@ impl Cpu {
         bus.write(ASTCR, 0xfb)?;
         bus.write(WCRH, 0xff)?;
         bus.write(WCRL, 0xcf)?;
+        bus.write(DRCRA, 0xe0)?;
 
         return Ok(());
     }

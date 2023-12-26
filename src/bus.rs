@@ -1,4 +1,7 @@
-use crate::memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR};
+use crate::{
+    memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
+    registers::DRCRA,
+};
 use anyhow::{bail, Result};
 
 const EXCEPTION_HANDLING_VENCTOR_SIZE: usize = 0xff;
@@ -136,6 +139,35 @@ impl Bus {
             }
             _ => bail!("Invalid Addr [{}].", target_addr),
         }
+    }
+
+    pub fn check_dram_area(&self, area_index: u8) -> Result<bool> {
+        let register = self.read(DRCRA)? >> 5;
+
+        match area_index {
+            2 => {
+                if register >= 1 {
+                    return Ok(true);
+                }
+            }
+            3 => {
+                if register >= 2 {
+                    return Ok(true);
+                }
+            }
+            4 => {
+                if register >= 4 {
+                    return Ok(true);
+                }
+            }
+            5 => {
+                if register >= 5 {
+                    return Ok(true);
+                }
+            }
+            _ => return Ok(false),
+        }
+        return Ok(false);
     }
 }
 
