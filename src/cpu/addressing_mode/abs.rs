@@ -5,19 +5,19 @@ use anyhow::{Context as _, Result};
 impl Cpu {
     async fn send_port_value8(&mut self, addr: u32, value: u8) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u8(addr, value);
+            send_addr_value_u8(addr, value).await;
         }
     }
 
     async fn send_port_value16(&mut self, addr: u32, value: u16) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u16(addr, value);
+            send_addr_value_u16(addr, value).await;
         }
     }
 
     async fn send_port_value32(&mut self, addr: u32, value: u32) {
         if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u32(addr, value);
+            send_addr_value_u32(addr, value).await;
         }
     }
 

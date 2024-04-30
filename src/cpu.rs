@@ -154,7 +154,7 @@ impl Cpu {
             }
 
             if one_sec_count >= CPU_CLOCK {
-                socket::send_one_sec_message();
+                socket::send_one_sec_message().await;
                 one_sec_count -= CPU_CLOCK;
             }
         }
