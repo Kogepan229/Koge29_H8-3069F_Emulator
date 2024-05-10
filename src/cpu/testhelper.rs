@@ -5,15 +5,19 @@ use crate::{
     memory::MEMORY_START_ADDR,
 };
 
-pub struct TestHelper {
-    src_addressing_mode: Box<dyn AddressingMode>,
-    target_addressing_mode: Box<dyn AddressingMode>,
+pub struct TestHelper<ST, TT> {
+    src_addressing_mode: Box<dyn AddressingMode<ST>>,
+    target_addressing_mode: Box<dyn AddressingMode<TT>>,
 }
-impl TestHelper {
+impl<ST, TT> TestHelper<ST, TT>
+where
+    ST: Copy,
+    TT: Copy,
+{
     pub fn build(
-        src_addressing_mode: Box<dyn AddressingMode>,
-        target_addressing_mode: Box<dyn AddressingMode>,
-    ) -> TestHelper {
+        src_addressing_mode: Box<dyn AddressingMode<ST>>,
+        target_addressing_mode: Box<dyn AddressingMode<TT>>,
+    ) -> TestHelper<ST, TT> {
         TestHelper {
             src_addressing_mode,
             target_addressing_mode,
@@ -21,7 +25,7 @@ impl TestHelper {
     }
 
     // callback: (src_index, target_index, should_success)
-    pub async fn run<Fut>(&mut self, f: impl Fn(TestOperator, usize, usize) -> Fut)
+    pub async fn run<Fut>(&mut self, f: impl Fn(TestOperator, ST, TT) -> Fut)
     where
         Fut: Future,
     {
@@ -201,14 +205,14 @@ impl TestOperator {
     }
 }
 
-pub trait AddressingMode {
-    fn get_valid_index(&mut self) -> Vec<usize>;
-    fn get_invalid_index(&mut self) -> Vec<usize>;
+pub trait AddressingMode<T> {
+    fn get_valid_index(&mut self) -> Vec<T>;
+    fn get_invalid_index(&mut self) -> Vec<T>;
 }
 
 pub struct RnMode {
-    valid_index_list: Vec<usize>,
-    invalid_index_list: Vec<usize>,
+    valid_index_list: Vec<u8>,
+    invalid_index_list: Vec<u8>,
 }
 impl RnMode {
     pub fn new_byteword() -> Box<RnMode> {
@@ -224,12 +228,12 @@ impl RnMode {
         })
     }
 }
-impl AddressingMode for RnMode {
-    fn get_valid_index(&mut self) -> Vec<usize> {
+impl AddressingMode<u8> for RnMode {
+    fn get_valid_index(&mut self) -> Vec<u8> {
         self.valid_index_list.clone()
     }
 
-    fn get_invalid_index(&mut self) -> Vec<usize> {
+    fn get_invalid_index(&mut self) -> Vec<u8> {
         self.invalid_index_list.clone()
     }
 }
