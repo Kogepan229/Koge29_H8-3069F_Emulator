@@ -65,7 +65,7 @@ struct TestCCR {
 }
 
 pub struct TestOperator {
-    opcode: Vec<u8>,
+    cpu: cpu::Cpu,
     should_success: bool,
     initial_ccr: [u8; 2],
     expect_ccr: [u8; 2],
@@ -75,7 +75,7 @@ pub struct TestOperator {
 impl TestOperator {
     fn new(should_success: bool) -> TestOperator {
         TestOperator {
-            opcode: Vec::new(),
+            cpu: cpu::Cpu::new(),
             should_success,
             initial_ccr: [0, 0xff], // Invariant values are 0 and 1
             expect_ccr: [0, 0xff],
@@ -85,8 +85,7 @@ impl TestOperator {
 
     pub async fn exec(self, f: impl Fn(cpu::Cpu) -> bool) {
         for i in 0..=1 {
-            let mut cpu = cpu::Cpu::new();
-            cpu.bus.lock().await.memory[0..self.opcode.len()].copy_from_slice(&self.opcode[..]);
+            let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
             cpu.ccr = self.initial_ccr[i];
             let opcode = cpu.fetch().await;
@@ -106,8 +105,13 @@ impl TestOperator {
         }
     }
 
+    pub fn access_cpu(mut self, f: impl Fn(&mut cpu::Cpu)) -> TestOperator {
+        f(&mut self.cpu);
+        self
+    }
+
     pub async fn set_opcode(mut self, opcode: &[u8]) -> TestOperator {
-        self.opcode.copy_from_slice(opcode);
+        self.cpu.bus.lock().await.memory[0..opcode.len()].copy_from_slice(opcode);
         self
     }
 

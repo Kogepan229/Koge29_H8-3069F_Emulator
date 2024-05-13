@@ -213,7 +213,33 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
+    use crate::{
+        cpu::{
+            testhelper::{RnMode, TestHelper},
+            Cpu,
+        },
+        memory::MEMORY_START_ADDR,
+    };
+
+    #[tokio::test]
+    async fn test_mov_b_rn_helper() {
+        TestHelper::build(RnMode::new_byteword(), RnMode::new_byteword())
+            .run(|operator, src_i, target_i| async move {
+                operator
+                    .set_opcode(&[0x0c, (src_i << 4) | target_i])
+                    .await
+                    .access_cpu(|cpu| {
+                        cpu.write_rn_b(src_i, 0xa5).unwrap();
+                    })
+                    .should_state(2)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| cpu.read_rn_b(target_i).unwrap() == 0xa5)
+                    .await;
+            })
+            .await;
+    }
 
     #[tokio::test]
     async fn test_mov_b_rn() {

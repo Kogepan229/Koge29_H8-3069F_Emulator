@@ -17,6 +17,7 @@ mod testhelper;
 
 const CPU_CLOCK: usize = 20_000_000;
 
+#[derive(Clone)]
 pub struct Cpu {
     pub bus: Arc<Mutex<Bus>>,
     pc: u32,
