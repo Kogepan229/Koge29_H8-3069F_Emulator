@@ -215,7 +215,7 @@ impl Cpu {
 mod tests {
     use crate::{
         cpu::{
-            testhelper::{RnMode, TestHelper},
+            testhelper::{ErnMode, ImmMode, RnMode, TestHelper},
             Cpu,
         },
         memory::MEMORY_START_ADDR,
@@ -223,19 +223,39 @@ mod tests {
 
     #[tokio::test]
     async fn test_mov_b_rn_helper() {
-        TestHelper::build(RnMode::new_byteword(), RnMode::new_byteword())
+        TestHelper::build(RnMode::new(), RnMode::new())
             .run(|operator, src_i, target_i| async move {
-                operator
+                operator // negative value
+                    .clone()
                     .set_opcode(&[0x0c, (src_i << 4) | target_i])
                     .await
                     .access_cpu(|cpu| {
-                        cpu.write_rn_b(src_i, 0xa5).unwrap();
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0xa5).unwrap();
+                        })
                     })
+                    .await
                     .should_state(2)
                     .should_ccr_v(false)
                     .should_ccr_z(false)
                     .should_ccr_n(true)
-                    .exec(|cpu| cpu.read_rn_b(target_i).unwrap() == 0xa5)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0xa5 })
+                    .await;
+                operator // zero value
+                    .clone()
+                    .set_opcode(&[0x0c, (src_i << 4) | target_i])
+                    .await
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(2)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0 })
                     .await;
             })
             .await;
@@ -281,6 +301,38 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_mov_b_imm_helper() {
+        TestHelper::build(ImmMode::new(0xa5), RnMode::new())
+            .run(|operator, imm, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0xf0 | target_i, imm])
+                    .await
+                    .should_state(2)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0xa5 })
+                    .await;
+            })
+            .await;
+        TestHelper::build(ImmMode::new(0x00), RnMode::new())
+            .run(|operator, imm, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0xf0 | target_i, imm])
+                    .await
+                    .should_state(2)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0x00 })
+                    .await;
+            })
+            .await;
+    }
+
+    #[tokio::test]
     async fn test_mov_b_imm() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -314,6 +366,91 @@ mod tests {
         assert_eq!(state, 2);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_mov_b_ern_to_rn_helper() {
+        TestHelper::build(ErnMode::new(), RnMode::new())
+            .run(|operator, src_i, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0x68, (src_i << 4) | target_i])
+                    .await
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_l(src_i, 0xffcf20).unwrap();
+                            cpu.write_abs24_b(0xffcf20, 0xa5).await.unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(4)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0xa5 })
+                    .await;
+                operator // zero value
+                    .clone()
+                    .set_opcode(&[0x68, (src_i << 4) | target_i])
+                    .await
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(4)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0 })
+                    .await;
+            })
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_mov_b_rn_to_ern_helper() {
+        TestHelper::build(RnMode::new(), ErnMode::new())
+            .run(|operator, src_i, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0x68, (target_i << 4) | src_i | 0x80])
+                    .await
+                    .should_success(src_i % 8 != target_i) // Avoid conflict
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0xa5).unwrap();
+                            cpu.write_rn_l(target_i, 0xffcf20).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(4)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| async move { cpu.read_abs24_b(0xffcf20).await.unwrap() == 0xa5 })
+                    .await;
+                operator // zero value
+                    .clone()
+                    .set_opcode(&[0x68, (target_i << 4) | src_i | 0x80])
+                    .await
+                    .should_success(src_i % 8 != target_i) // Avoid conflict
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0x00).unwrap();
+                            cpu.write_rn_l(target_i, 0xffcf20).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(4)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_abs24_b(0xffcf20).await.unwrap() == 0x00 })
+                    .await;
+            })
+            .await;
     }
 
     #[tokio::test]
@@ -401,6 +538,92 @@ mod tests {
         assert_eq!(state, 4);
         assert_eq!(cpu.ccr & 0b00001110, 0b00000100);
         assert_eq!(cpu.read_abs24_b(0xffcf20).await.unwrap(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_mov_b_disp16_to_rn_helper() {
+        TestHelper::build(ErnMode::new(), RnMode::new())
+            .run(|operator, src_i, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0x6e, (src_i << 4) | target_i, 0x0e, 0xee])
+                    .await
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_l(src_i, 0xffcf20).unwrap();
+                            cpu.write_abs24_b(0xffde0e, 0xa5).await.unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(6)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0xa5 })
+                    .await;
+                operator // zero value
+                    .clone()
+                    .set_opcode(&[0x6e, (src_i << 4) | target_i, 0x0e, 0xee])
+                    .await
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_l(src_i, 0xffcf20).unwrap();
+                            cpu.write_abs24_b(0xffde0e, 0x00).await.unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(6)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_rn_b(target_i).unwrap() == 0x00 })
+                    .await;
+            })
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_mov_b_rn_to_disp16_helper() {
+        TestHelper::build(RnMode::new(), ErnMode::new())
+            .run(|operator, src_i, target_i| async move {
+                operator // negative value
+                    .clone()
+                    .set_opcode(&[0x6e, (target_i << 4) | src_i | 0x80, 0x0e, 0xee])
+                    .await
+                    .should_success(src_i % 8 != target_i) // Avoid conflict
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0xa5).unwrap();
+                            cpu.write_rn_l(target_i, 0xffcf20).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(6)
+                    .should_ccr_v(false)
+                    .should_ccr_z(false)
+                    .should_ccr_n(true)
+                    .exec(|cpu| async move { cpu.read_abs24_b(0xffde0e).await.unwrap() == 0xa5 })
+                    .await;
+                operator // zero value
+                    .clone()
+                    .set_opcode(&[0x6e, (target_i << 4) | src_i | 0x80, 0x0e, 0xee])
+                    .await
+                    .should_success(src_i % 8 != target_i) // Avoid conflict
+                    .access_cpu(|cpu| {
+                        Box::pin(async move {
+                            cpu.write_rn_b(src_i, 0x00).unwrap();
+                            cpu.write_rn_l(target_i, 0xffcf20).unwrap();
+                        })
+                    })
+                    .await
+                    .should_state(6)
+                    .should_ccr_v(false)
+                    .should_ccr_z(true)
+                    .should_ccr_n(false)
+                    .exec(|cpu| async move { cpu.read_abs24_b(0xffde0e).await.unwrap() == 0x00 })
+                    .await;
+            })
+            .await;
     }
 
     #[tokio::test]
