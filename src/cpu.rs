@@ -13,6 +13,8 @@ use tokio::sync::Mutex;
 
 mod addressing_mode;
 mod instruction;
+
+#[cfg(test)]
 mod testhelper;
 
 const CPU_CLOCK: usize = 20_000_000;

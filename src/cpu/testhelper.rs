@@ -1,7 +1,7 @@
-use std::{future::Future, ops::Add};
+use std::{future::Future, pin::Pin};
 
 use crate::{
-    cpu::{self, Cpu},
+    cpu::{self},
     memory::MEMORY_START_ADDR,
 };
 
@@ -24,7 +24,7 @@ where
         }
     }
 
-    // callback: (src_index, target_index, should_success)
+    // callback: (operator, src_index, target_index)
     pub async fn run<Fut>(&mut self, f: impl Fn(TestOperator, ST, TT) -> Fut)
     where
         Fut: Future,
@@ -53,17 +53,7 @@ where
     }
 }
 
-struct TestCCR {
-    c: bool,
-    v: bool,
-    z: bool,
-    n: bool,
-    u: bool,
-    h: bool,
-    ui: bool,
-    i: bool,
-}
-
+#[derive(Clone)]
 pub struct TestOperator {
     cpu: cpu::Cpu,
     should_success: bool,
@@ -83,7 +73,10 @@ impl TestOperator {
         }
     }
 
-    pub async fn exec(self, f: impl Fn(cpu::Cpu) -> bool) {
+    pub async fn exec<Fut>(self, f: impl Fn(cpu::Cpu) -> Fut)
+    where
+        Fut: Future<Output = bool>,
+    {
         for i in 0..=1 {
             let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
@@ -91,27 +84,36 @@ impl TestOperator {
             let opcode = cpu.fetch().await;
             let result = cpu.exec(opcode).await;
             if self.should_success {
-                assert!(result.is_ok_and(|state| state == self.expect_state));
+                assert!(result.is_ok());
+                assert_eq!(result.unwrap(), self.expect_state);
                 assert_eq!(cpu.ccr, self.expect_ccr[i]);
-                assert!(f(cpu));
+                assert!(f(cpu).await);
             } else {
                 assert!(
                     result.is_err()
                         || result.is_ok_and(|state| state != self.expect_state)
                         || cpu.ccr != self.expect_ccr[1]
-                        || !f(cpu)
+                        || !f(cpu).await
                 );
             }
         }
     }
 
-    pub fn access_cpu(mut self, f: impl Fn(&mut cpu::Cpu)) -> TestOperator {
-        f(&mut self.cpu);
+    pub async fn access_cpu<F>(mut self, f: F) -> TestOperator
+    where
+        F: for<'a> Fn(&'a mut cpu::Cpu) -> Pin<Box<dyn Future<Output = ()> + 'a>>,
+    {
+        f(&mut self.cpu).await;
         self
     }
 
     pub async fn set_opcode(mut self, opcode: &[u8]) -> TestOperator {
         self.cpu.bus.lock().await.memory[0..opcode.len()].copy_from_slice(opcode);
+        self
+    }
+
+    pub fn should_success(mut self, success: bool) -> TestOperator {
+        self.should_success = success;
         self
     }
 
@@ -219,16 +221,11 @@ pub struct RnMode {
     invalid_index_list: Vec<u8>,
 }
 impl RnMode {
-    pub fn new_byteword() -> Box<RnMode> {
-        Box::new(RnMode {
-            valid_index_list: vec![0, 1, 2, 3, 4, 5, 6, 7],
-            invalid_index_list: vec![8],
-        })
-    }
-    pub fn new_long() -> Box<RnMode> {
+    pub fn new() -> Box<RnMode> {
         Box::new(RnMode {
             valid_index_list: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            invalid_index_list: vec![16],
+
+            invalid_index_list: vec![],
         })
     }
 }
@@ -242,19 +239,38 @@ impl AddressingMode<u8> for RnMode {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{AddressingMode, RnMode};
+pub struct ImmMode {
+    values: Vec<u8>,
+}
+impl ImmMode {
+    pub fn new(value: u8) -> Box<ImmMode> {
+        Box::new(ImmMode {
+            values: [value].to_vec(),
+        })
+    }
+}
+impl AddressingMode<u8> for ImmMode {
+    fn get_valid_index(&mut self) -> Vec<u8> {
+        self.values.clone()
+    }
 
-    #[tokio::test]
-    async fn test_rn() {
-        let mut rn = RnMode::new_long();
-        for value in rn.get_valid_index() {
-            println!("vv: {value}");
-        }
+    fn get_invalid_index(&mut self) -> Vec<u8> {
+        Vec::new()
+    }
+}
 
-        for value in rn.get_invalid_index() {
-            println!("vvi: {value}");
-        }
+pub struct ErnMode {}
+impl ErnMode {
+    pub fn new() -> Box<ErnMode> {
+        Box::new(ErnMode {})
+    }
+}
+impl AddressingMode<u8> for ErnMode {
+    fn get_valid_index(&mut self) -> Vec<u8> {
+        vec![0, 1, 2, 3, 4, 5, 6, 7]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<u8> {
+        Vec::new()
     }
 }
