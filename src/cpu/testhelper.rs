@@ -244,9 +244,7 @@ pub struct ImmMode {
 }
 impl ImmMode {
     pub fn new(value: u8) -> Box<ImmMode> {
-        Box::new(ImmMode {
-            values: [value].to_vec(),
-        })
+        Box::new(ImmMode { values: [value].to_vec() })
     }
 }
 impl AddressingMode<u8> for ImmMode {
@@ -271,6 +269,54 @@ impl AddressingMode<u8> for ErnMode {
     }
 
     fn get_invalid_index(&mut self) -> Vec<u8> {
+        Vec::new()
+    }
+}
+
+pub struct Abs8Mode {}
+impl Abs8Mode {
+    pub fn new() -> Box<Abs8Mode> {
+        Box::new(Abs8Mode {})
+    }
+}
+impl AddressingMode<u8> for Abs8Mode {
+    fn get_valid_index(&mut self) -> Vec<u8> {
+        vec![0x02]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<u8> {
+        Vec::new()
+    }
+}
+
+pub struct Abs16Mode {}
+impl Abs16Mode {
+    pub fn new() -> Box<Abs16Mode> {
+        Box::new(Abs16Mode {})
+    }
+}
+impl AddressingMode<u16> for Abs16Mode {
+    fn get_valid_index(&mut self) -> Vec<u16> {
+        vec![0xff02]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<u16> {
+        Vec::new()
+    }
+}
+
+pub struct Abs24Mode {}
+impl Abs24Mode {
+    pub fn new() -> Box<Abs24Mode> {
+        Box::new(Abs24Mode {})
+    }
+}
+impl AddressingMode<u32> for Abs24Mode {
+    fn get_valid_index(&mut self) -> Vec<u32> {
+        vec![0x00ffff02]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<u32> {
         Vec::new()
     }
 }
