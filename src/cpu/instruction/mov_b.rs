@@ -184,13 +184,7 @@ impl Cpu {
 mod tests {
     use nom::AsBytes;
 
-    use crate::{
-        cpu::{
-            testhelper::{Abs16Mode, Abs24Mode, Abs8Mode, ErnMode, ImmMode, RnMode, TestHelper},
-            Cpu,
-        },
-        memory::MEMORY_START_ADDR,
-    };
+    use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Abs8Mode, ErnMode, ImmMode, RnMode, TestHelper};
 
     #[tokio::test]
     async fn test_mov_b_rn_helper() {
