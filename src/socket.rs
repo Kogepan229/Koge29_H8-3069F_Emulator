@@ -87,26 +87,27 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
+pub async fn send_message(str: &str) {
+    if let Some(v) = MESSAGE_SENDER.get() {
+        v.send(str.to_string()).await.unwrap();
+    }
+}
+
 pub async fn send_one_sec_message() {
-    MESSAGE_SENDER
-        .get()
-        .unwrap()
-        .send("1sec".to_owned())
-        .await
-        .unwrap();
+    send_message("1sec").await;
 }
 
 pub async fn send_addr_value_u8(addr: u32, value: u8) {
     let str = format!("u8:{}:{}", addr, value);
-    MESSAGE_SENDER.get().unwrap().send(str).await.unwrap();
+    send_message(&str).await;
 }
 
 pub async fn send_addr_value_u16(addr: u32, value: u16) {
     let str = format!("u16:{}:{}", addr, value);
-    MESSAGE_SENDER.get().unwrap().send(str).await.unwrap();
+    send_message(&str).await;
 }
 
 pub async fn send_addr_value_u32(addr: u32, value: u32) {
     let str = format!("u32:{}:{}", addr, value);
-    MESSAGE_SENDER.get().unwrap().send(str).await.unwrap();
+    send_message(&str).await;
 }
