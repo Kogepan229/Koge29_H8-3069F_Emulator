@@ -9,6 +9,8 @@ use tokio::{
     sync::mpsc::{self, Receiver, Sender},
 };
 
+use crate::setting;
+
 static READ_BUF: OnceLock<Mutex<Vec<String>>> = OnceLock::new();
 static MESSAGE_SENDER: OnceLock<Sender<String>> = OnceLock::new();
 
@@ -90,6 +92,9 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
 pub async fn send_message(str: &str) {
     if let Some(v) = MESSAGE_SENDER.get() {
         v.send(str.to_string()).await.unwrap();
+    }
+    if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
+        println!("msg: {}", str);
     }
 }
 

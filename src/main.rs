@@ -19,7 +19,10 @@ struct Args {
 
     /// Print executed opcode
     #[arg(long)]
-    debug_instruction: Option<bool>,
+    print_instruction: bool,
+
+    #[arg(long)]
+    print_messages: bool,
 
     #[arg(short, long)]
     disable_socket: bool,
@@ -31,16 +34,14 @@ struct Args {
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    if let Some(v) = args.debug_instruction {
-        *setting::ENABLE_PRINT_OPCODE.write().unwrap() = v;
-    }
+    *setting::ENABLE_PRINT_OPCODE.write().unwrap() = args.print_instruction;
+
+    *setting::ENABLE_PRINT_MESSAGES.write().unwrap() = args.print_messages;
 
     let mut cpu = Cpu::new();
 
     if !args.disable_socket {
-        socket::listen(format!("127.0.0.1:{}", args.port))
-            .await
-            .unwrap();
+        socket::listen(format!("127.0.0.1:{}", args.port)).await.unwrap();
     }
 
     /* // test code
