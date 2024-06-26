@@ -113,10 +113,7 @@ impl Cpu {
             }
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
-                print!(
-                    " {:4x}:   ",
-                    self.pc.wrapping_sub(PROGRAM_START_ADDR as u32)
-                );
+                print!(" {:4x}:   ", self.pc.wrapping_sub(PROGRAM_START_ADDR as u32));
             }
 
             let opcode = self.fetch().await;
@@ -127,7 +124,7 @@ impl Cpu {
                     self.pc - 2 - PROGRAM_START_ADDR as u32,
                     opcode
                 )
-            })?;
+            })? * 3; // Temporary speed adjustment
             state_sum += state as usize;
             loop_count += state as usize;
             one_sec_count += state as usize;
@@ -138,22 +135,15 @@ impl Cpu {
 
             if self.pc == self.exit_addr {
                 self.print_er();
-                println!(
-                    "state: {}, time: {}sec",
-                    state_sum,
-                    exec_time.elapsed().as_secs_f64()
-                );
+                println!("state: {}, time: {}sec", state_sum, exec_time.elapsed().as_secs_f64());
                 return Ok(());
             }
 
             // sleep every 1msec (Windows timer max precision)
             if loop_count >= 20000 {
-                spin_sleep_tokio::sleep(
-                    Duration::from_secs_f64(loop_count as f64 * 1.0 / CPU_CLOCK as f64)
-                        .saturating_sub(loop_time.elapsed()),
-                )
-                .await;
-                loop_count -= loop_count;
+                spin_sleep_tokio::sleep(Duration::from_secs_f64(loop_count as f64 / CPU_CLOCK as f64).saturating_sub(loop_time.elapsed()))
+                    .await;
+                loop_count = 0;
                 loop_time = time::Instant::now();
             }
 
@@ -184,9 +174,7 @@ impl Cpu {
 
     async fn exec(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
-            0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x2f | 0x30..=0x3f | 0x6a => {
-                return self.mov_b(opcode).await
-            }
+            0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x2f | 0x30..=0x3f | 0x6a => return self.mov_b(opcode).await,
             0x0d => return self.mov_w(opcode).await,
             0x69 | 0x6f | 0x6d | 0x6b => return self.mov_w(opcode).await,
             0x0f => return self.mov_l(opcode).await,
@@ -468,9 +456,7 @@ impl Cpu {
     async fn get_wait_state(&self, area_index: u8) -> Result<u8> {
         match area_index {
             0..=3 => return Ok((self.bus.lock().await.read(WCRL)? >> (area_index * 2)) & 0x3),
-            4..=7 => {
-                return Ok((self.bus.lock().await.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3)
-            }
+            4..=7 => return Ok((self.bus.lock().await.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3),
             _ => bail!("Invalid area_index [{}]", area_index),
         }
     }
@@ -479,17 +465,11 @@ impl Cpu {
         if state_type == StateType::L || state_type == StateType::M {
             bail!("StateType L or M must be specified address. Use calc_state_with_addr.")
         }
-        self.calc_state_with_addr(state_type, state, self.operating_pc)
-            .await
+        self.calc_state_with_addr(state_type, state, self.operating_pc).await
     }
 
     // todo 内蔵周辺モジュール
-    pub async fn calc_state_with_addr(
-        &self,
-        state_type: StateType,
-        state: u8,
-        target_addr: u32,
-    ) -> Result<u8> {
+    pub async fn calc_state_with_addr(&self, state_type: StateType, state: u8, target_addr: u32) -> Result<u8> {
         if state_type == StateType::N {
             return Ok(state * 1);
         }
@@ -522,9 +502,7 @@ impl Cpu {
                     if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
                         // 2 state
                         match state_type {
-                            StateType::I | StateType::J | StateType::K | StateType::M => {
-                                return Ok(state * 4)
-                            }
+                            StateType::I | StateType::J | StateType::K | StateType::M => return Ok(state * 4),
                             StateType::L => return Ok(state * 2),
                             StateType::N => return Ok(state * 1),
                         }
@@ -662,22 +640,10 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.operating_pc = MEMORY_START_ADDR;
         const STATE: u8 = 2;
-        assert_eq!(
-            cpu.calc_state(StateType::I, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::J, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::N, STATE).await.unwrap(),
-            1 * STATE
-        );
+        assert_eq!(cpu.calc_state(StateType::I, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::J, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::K, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::N, STATE).await.unwrap(), 1 * STATE);
     }
 
     #[tokio::test]
@@ -687,22 +653,10 @@ mod tests {
         cpu.bus.lock().await.write(ABWCR, 0x01).unwrap();
         cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
         const STATE: u8 = 2;
-        assert_eq!(
-            cpu.calc_state(StateType::I, STATE).await.unwrap(),
-            4 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::J, STATE).await.unwrap(),
-            4 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            4 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::N, STATE).await.unwrap(),
-            1 * STATE
-        );
+        assert_eq!(cpu.calc_state(StateType::I, STATE).await.unwrap(), 4 * STATE);
+        assert_eq!(cpu.calc_state(StateType::J, STATE).await.unwrap(), 4 * STATE);
+        assert_eq!(cpu.calc_state(StateType::K, STATE).await.unwrap(), 4 * STATE);
+        assert_eq!(cpu.calc_state(StateType::N, STATE).await.unwrap(), 1 * STATE);
     }
 
     #[tokio::test]
@@ -714,22 +668,10 @@ mod tests {
         cpu.bus.lock().await.write(WCRL, 0x03).unwrap();
         const STATE: u8 = 2;
         const WAIT_STATE: u8 = 3;
-        assert_eq!(
-            cpu.calc_state(StateType::I, STATE).await.unwrap(),
-            (6 + 2 * WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::J, STATE).await.unwrap(),
-            (6 + 2 * WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            (6 + 2 * WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::N, STATE).await.unwrap(),
-            1 * STATE
-        );
+        assert_eq!(cpu.calc_state(StateType::I, STATE).await.unwrap(), (6 + 2 * WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::J, STATE).await.unwrap(), (6 + 2 * WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::K, STATE).await.unwrap(), (6 + 2 * WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::N, STATE).await.unwrap(), 1 * STATE);
     }
 
     #[tokio::test]
@@ -739,22 +681,10 @@ mod tests {
         cpu.bus.lock().await.write(ABWCR, 0xfe).unwrap();
         cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
         const STATE: u8 = 2;
-        assert_eq!(
-            cpu.calc_state(StateType::I, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::J, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            2 * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::N, STATE).await.unwrap(),
-            1 * STATE
-        );
+        assert_eq!(cpu.calc_state(StateType::I, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::J, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::K, STATE).await.unwrap(), 2 * STATE);
+        assert_eq!(cpu.calc_state(StateType::N, STATE).await.unwrap(), 1 * STATE);
     }
 
     #[tokio::test]
@@ -766,22 +696,10 @@ mod tests {
         cpu.bus.lock().await.write(WCRL, 0x03).unwrap();
         const STATE: u8 = 2;
         const WAIT_STATE: u8 = 3;
-        assert_eq!(
-            cpu.calc_state(StateType::I, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::J, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::K, STATE).await.unwrap(),
-            (3 + WAIT_STATE) * STATE
-        );
-        assert_eq!(
-            cpu.calc_state(StateType::N, STATE).await.unwrap(),
-            1 * STATE
-        );
+        assert_eq!(cpu.calc_state(StateType::I, STATE).await.unwrap(), (3 + WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::J, STATE).await.unwrap(), (3 + WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::K, STATE).await.unwrap(), (3 + WAIT_STATE) * STATE);
+        assert_eq!(cpu.calc_state(StateType::N, STATE).await.unwrap(), 1 * STATE);
     }
 
     #[tokio::test]
@@ -789,15 +707,11 @@ mod tests {
         let cpu = Cpu::new();
         const STATE: u8 = 2;
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::L, STATE, MEMORY_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::L, STATE, MEMORY_START_ADDR).await.unwrap(),
             2 * STATE
         );
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::M, STATE, MEMORY_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::M, STATE, MEMORY_START_ADDR).await.unwrap(),
             2 * STATE
         );
     }
@@ -809,15 +723,11 @@ mod tests {
         cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
         const STATE: u8 = 2;
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR).await.unwrap(),
             2 * STATE
         );
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).await.unwrap(),
             4 * STATE
         );
     }
@@ -831,15 +741,11 @@ mod tests {
         const STATE: u8 = 2;
         const WAIT_STATE: u8 = 3;
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR).await.unwrap(),
             (3 + WAIT_STATE) * STATE
         );
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).await.unwrap(),
             (6 + 2 * WAIT_STATE) * STATE
         );
     }
@@ -851,15 +757,11 @@ mod tests {
         cpu.bus.lock().await.write(ASTCR, 0xfe).unwrap();
         const STATE: u8 = 2;
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR).await.unwrap(),
             2 * STATE
         );
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).await.unwrap(),
             2 * STATE
         );
     }
@@ -873,15 +775,11 @@ mod tests {
         const STATE: u8 = 2;
         const WAIT_STATE: u8 = 3;
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::L, STATE, AREA0_START_ADDR).await.unwrap(),
             (3 + WAIT_STATE) * STATE
         );
         assert_eq!(
-            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR)
-                .await
-                .unwrap(),
+            cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).await.unwrap(),
             (3 + WAIT_STATE) * STATE
         );
     }
