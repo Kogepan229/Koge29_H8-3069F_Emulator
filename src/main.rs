@@ -27,6 +27,9 @@ struct Args {
     #[arg(short, long)]
     disable_socket: bool,
 
+    #[arg(short = 'r', long)]
+    print_ready: bool,
+
     #[arg(short, long, default_value = "12345")]
     port: u16,
 }
@@ -37,6 +40,8 @@ async fn main() {
     *setting::ENABLE_PRINT_OPCODE.write().unwrap() = args.print_instruction;
 
     *setting::ENABLE_PRINT_MESSAGES.write().unwrap() = args.print_messages;
+
+    *setting::ENABLE_PRINT_READY.write().unwrap() = args.print_ready;
 
     let mut cpu = Cpu::new();
 

@@ -5,3 +5,5 @@ pub static ENABLE_PRINT_OPCODE: RwLock<bool> = RwLock::new(true);
 pub static ENABLE_PRINT_OPCODE: RwLock<bool> = RwLock::new(false);
 
 pub static ENABLE_PRINT_MESSAGES: RwLock<bool> = RwLock::new(false);
+
+pub static ENABLE_PRINT_READY: RwLock<bool> = RwLock::new(false);

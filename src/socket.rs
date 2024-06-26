@@ -16,6 +16,10 @@ static MESSAGE_SENDER: OnceLock<Sender<String>> = OnceLock::new();
 
 pub async fn listen(addr: String) -> Result<()> {
     let listener = TcpListener::bind(addr).await.unwrap();
+
+    if *setting::ENABLE_PRINT_READY.read().unwrap() {
+        println!("ready");
+    }
     let (stream, _) = listener.accept().await.unwrap();
     let (socket_reader, socket_writer) = stream.into_split();
 
