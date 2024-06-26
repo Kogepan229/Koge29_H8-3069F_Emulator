@@ -98,16 +98,16 @@ pub async fn send_one_sec_message() {
 }
 
 pub async fn send_addr_value_u8(addr: u32, value: u8) {
-    let str = format!("u8:{}:{}", addr, value);
+    let str = format!("u8:0x{:x}:0x{:x}", addr, value);
     send_message(&str).await;
 }
 
 pub async fn send_addr_value_u16(addr: u32, value: u16) {
-    let str = format!("u16:{}:{}", addr, value);
+    let str = format!("u16:0x{:x}:0x{:x}", addr, value);
     send_message(&str).await;
 }
 
 pub async fn send_addr_value_u32(addr: u32, value: u32) {
-    let str = format!("u32:{}:{}", addr, value);
+    let str = format!("u32:0x{:x}:0x{:x}", addr, value);
     send_message(&str).await;
 }
