@@ -63,6 +63,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_btst_rn_from_imm() {
         // bit 0, 1 -> 0
         let mut cpu = Cpu::new();
@@ -109,6 +110,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
     }
 
+    #[test]
     fn test_btst_rn_from_rn() {
         // bit 0, 0 -> 1
         let mut cpu = Cpu::new();
@@ -159,6 +161,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
     }
 
+    #[test]
     fn test_btst_ern() {
         ////////
         // imm
@@ -267,6 +270,7 @@ mod tests {
         assert_eq!(cpu.ccr, 0);
     }
 
+    #[test]
     fn test_btst_abs() {
         ////////
         // imm

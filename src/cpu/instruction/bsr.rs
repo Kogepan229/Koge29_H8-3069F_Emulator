@@ -31,6 +31,7 @@ mod tests {
         memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     };
 
+    #[test]
     fn test_bsr_disp16() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -56,6 +57,7 @@ mod tests {
         assert_eq!(cpu.pc, MEMORY_START_ADDR + 102 - 10);
     }
 
+    #[test]
     fn test_bsr_disp24() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;

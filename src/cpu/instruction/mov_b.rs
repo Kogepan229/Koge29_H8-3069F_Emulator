@@ -186,6 +186,7 @@ mod tests {
 
     use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Abs8Mode, ErnMode, ImmMode, RnMode, TestHelper};
 
+    #[test]
     fn test_mov_b_rn_helper() {
         TestHelper::build(RnMode::new(), RnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -213,6 +214,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_imm_helper() {
         TestHelper::build(ImmMode::new(0xa5), RnMode::new()).run(|operator, imm, target_i| {
             operator // negative value
@@ -236,6 +238,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_ern_to_rn_helper() {
         TestHelper::build(ErnMode::new(), RnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -264,6 +267,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_ern_helper() {
         TestHelper::build(RnMode::new(), ErnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -295,6 +299,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_disp16_to_rn_helper() {
         TestHelper::build(ErnMode::new(), RnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -324,6 +329,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_disp16_helper() {
         TestHelper::build(RnMode::new(), ErnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -355,6 +361,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_disp24_to_rn_helper() {
         TestHelper::build(ErnMode::new(), RnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -384,6 +391,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_disp24_helper() {
         TestHelper::build(RnMode::new(), ErnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -415,6 +423,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_inc_helper() {
         TestHelper::build(ErnMode::new(), RnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -446,6 +455,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_dec_helper() {
         TestHelper::build(RnMode::new(), ErnMode::new()).run(|operator, src_i, target_i| {
             operator // negative value
@@ -477,6 +487,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_abs8_to_rn_helper() {
         TestHelper::build(Abs8Mode::new(), RnMode::new()).run(|operator, abs, target_i| {
             operator // negative value
@@ -504,6 +515,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_abs8_helper() {
         TestHelper::build(RnMode::new(), Abs8Mode::new()).run(|operator, src_i, abs| {
             operator // negative value
@@ -531,6 +543,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_abs16_to_rn_helper() {
         TestHelper::build(Abs16Mode::new(), RnMode::new()).run(|operator, abs, target_i| {
             operator // negative value
@@ -558,6 +571,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_abs16_helper() {
         TestHelper::build(RnMode::new(), Abs16Mode::new()).run(|operator, src_i, abs| {
             operator // negative value
@@ -585,6 +599,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_abs24_to_rn_helper() {
         TestHelper::build(Abs24Mode::new(), RnMode::new()).run(|operator, abs, target_i| {
             operator // negative value
@@ -612,6 +627,7 @@ mod tests {
         });
     }
 
+    #[test]
     fn test_mov_b_rn_to_abs24_helper() {
         TestHelper::build(RnMode::new(), Abs24Mode::new()).run(|operator, src_i, abs| {
             operator // negative value

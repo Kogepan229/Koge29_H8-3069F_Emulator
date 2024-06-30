@@ -39,6 +39,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_extu_w() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -88,6 +89,7 @@ mod tests {
         assert_eq!(cpu.read_rn_w(0).unwrap(), 0xa5);
     }
 
+    #[test]
     fn test_extu_l() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;

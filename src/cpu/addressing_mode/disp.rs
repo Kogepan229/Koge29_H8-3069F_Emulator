@@ -84,6 +84,7 @@ impl Cpu {
 mod tests {
     use crate::cpu::Cpu;
 
+    #[test]
     fn test_write_disp16_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -95,6 +96,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_b(0xfffe00).unwrap(), 0xff);
     }
 
+    #[test]
     fn test_read_disp16_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -106,6 +108,7 @@ mod tests {
         assert_eq!(cpu.read_disp16_ern_b(1, 0xfff6).unwrap(), 0xff);
     }
 
+    #[test]
     fn test_write_disp16_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -117,6 +120,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_w(0xfffe00).unwrap(), 0x0fff);
     }
 
+    #[test]
     fn test_read_disp16_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -128,6 +132,7 @@ mod tests {
         assert_eq!(cpu.read_disp16_ern_w(1, 0xfff6).unwrap(), 0x0fff);
     }
 
+    #[test]
     fn test_write_disp16_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -139,6 +144,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xfffe00).unwrap(), 0x0f0fff0f);
     }
 
+    #[test]
     fn test_read_disp16_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -150,6 +156,7 @@ mod tests {
         assert_eq!(cpu.read_disp16_ern_l(1, 0xfff6).unwrap(), 0x0f0fff0f);
     }
 
+    #[test]
     fn test_write_disp24_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -161,6 +168,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_b(0xfffe00).unwrap(), 0xff);
     }
 
+    #[test]
     fn test_read_disp24_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -172,6 +180,7 @@ mod tests {
         assert_eq!(cpu.read_disp24_ern_b(1, 0xfffff6).unwrap(), 0xff);
     }
 
+    #[test]
     fn test_write_disp24_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -183,6 +192,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_w(0xfffe00).unwrap(), 0x0fff);
     }
 
+    #[test]
     fn test_read_disp24_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -194,6 +204,7 @@ mod tests {
         assert_eq!(cpu.read_disp24_ern_w(1, 0xfffff6).unwrap(), 0x0fff);
     }
 
+    #[test]
     fn test_write_disp24_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;
@@ -205,6 +216,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xfffe00).unwrap(), 0x0f0fff0f);
     }
 
+    #[test]
     fn test_read_disp24_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xfff000;

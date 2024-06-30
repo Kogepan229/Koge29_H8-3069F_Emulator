@@ -63,6 +63,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_bnot_rn_from_imm() {
         // bit 0, 1 -> 0
         let mut cpu = Cpu::new();
@@ -105,6 +106,7 @@ mod tests {
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0xfe);
     }
 
+    #[test]
     fn test_bnot_rn_from_rn() {
         // bit 0, 0 -> 1
         let mut cpu = Cpu::new();
@@ -151,6 +153,7 @@ mod tests {
         assert_eq!(cpu.read_rn_b(0xf).unwrap(), 0xfe);
     }
 
+    #[test]
     fn test_bnot_ern() {
         ////////
         // imm
@@ -251,6 +254,7 @@ mod tests {
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xfe);
     }
 
+    #[test]
     fn test_bnot_abs() {
         ////////
         // imm

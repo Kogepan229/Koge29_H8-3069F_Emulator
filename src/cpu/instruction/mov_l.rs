@@ -173,6 +173,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_mov_l_rn() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -211,6 +212,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(7).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_imm() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -246,6 +248,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_ern() {
         ////////
         // EAs to Rd
@@ -332,6 +335,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffcf20).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_disp16() {
         ////////
         // EAs to Rd
@@ -418,6 +422,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffde0e).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_disp24() {
         ////////
         // EAs to Rd
@@ -504,6 +509,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffce0e).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_inc_or_dec() {
         ////////
         // increment
@@ -596,6 +602,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), 0xffcf20);
     }
 
+    #[test]
     fn test_mov_l_abs16() {
         ////////
         // EAs to Rd
@@ -676,6 +683,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff02).unwrap(), 0);
     }
 
+    #[test]
     fn test_mov_l_abs24() {
         ////////
         // EAs to Rd

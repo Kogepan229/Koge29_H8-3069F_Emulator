@@ -50,6 +50,7 @@ impl Cpu {
 mod tests {
     use crate::cpu::Cpu;
 
+    #[test]
     fn test_write_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
@@ -58,6 +59,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff)
     }
 
+    #[test]
     fn test_read_ern_b() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
@@ -65,6 +67,7 @@ mod tests {
         assert_eq!(cpu.read_ern_b(0).unwrap(), 0xff)
     }
 
+    #[test]
     fn test_write_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
@@ -73,6 +76,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff)
     }
 
+    #[test]
     fn test_read_ern_w() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
@@ -80,6 +84,7 @@ mod tests {
         assert_eq!(cpu.read_ern_w(0).unwrap(), 0x0fff)
     }
 
+    #[test]
     fn test_write_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;
@@ -88,6 +93,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_l(0xffff10).unwrap(), 0x0f0fff0f)
     }
 
+    #[test]
     fn test_read_ern_l() {
         let mut cpu = Cpu::new();
         cpu.er[0] = 0xffff10;

@@ -67,6 +67,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_rotxl_b() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();
@@ -121,6 +122,7 @@ mod tests {
         assert_eq!(cpu.read_rn_b(0).unwrap(), 0b0010_1000);
     }
 
+    #[test]
     fn test_rotxl_w() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();
@@ -175,6 +177,7 @@ mod tests {
         assert_eq!(cpu.read_rn_w(0).unwrap(), 0b0010_1010_1010_1000);
     }
 
+    #[test]
     fn test_rotxl_l() {
         // check CCR N, V, value
         let mut cpu = Cpu::new();

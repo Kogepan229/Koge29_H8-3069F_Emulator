@@ -28,6 +28,7 @@ impl Cpu {
 mod tests {
     use crate::{cpu::Cpu, memory::MEMORY_START_ADDR};
 
+    #[test]
     fn test_subs1() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -95,6 +96,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), -1i32 as u32);
     }
 
+    #[test]
     fn test_subs2() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
@@ -151,6 +153,7 @@ mod tests {
         assert_eq!(cpu.read_rn_l(0).unwrap(), -2i32 as u32);
     }
 
+    #[test]
     fn test_subs4() {
         let mut cpu = Cpu::new();
         cpu.pc = MEMORY_START_ADDR;
