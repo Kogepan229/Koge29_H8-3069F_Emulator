@@ -1,5 +1,3 @@
-use std::{future::Future, pin::Pin};
-
 use crate::{
     cpu::{self},
     memory::MEMORY_START_ADDR,
@@ -25,10 +23,7 @@ where
     }
 
     // callback: (operator, src_index, target_index)
-    pub async fn run<Fut>(&mut self, f: impl Fn(TestOperator, ST, TT) -> Fut)
-    where
-        Fut: Future,
-    {
+    pub fn run(&mut self, f: impl Fn(TestOperator, ST, TT)) {
         let src_valid_index_list = self.src_addressing_mode.get_valid_index();
         let src_invalid_index_list = self.src_addressing_mode.get_invalid_index();
         let target_valid_index_list = self.target_addressing_mode.get_valid_index();
@@ -36,18 +31,18 @@ where
 
         for src_i in src_valid_index_list.iter() {
             for target_i in target_valid_index_list.iter() {
-                f(TestOperator::new(true), *src_i, *target_i).await;
+                f(TestOperator::new(true), *src_i, *target_i);
             }
             for target_i in target_invalid_index_list.iter() {
-                f(TestOperator::new(false), *src_i, *target_i).await;
+                f(TestOperator::new(false), *src_i, *target_i);
             }
         }
         for src_i in src_invalid_index_list.iter() {
             for target_i in target_valid_index_list.iter() {
-                f(TestOperator::new(false), *src_i, *target_i).await;
+                f(TestOperator::new(false), *src_i, *target_i);
             }
             for target_i in target_invalid_index_list.iter() {
-                f(TestOperator::new(false), *src_i, *target_i).await;
+                f(TestOperator::new(false), *src_i, *target_i);
             }
         }
     }
@@ -73,42 +68,33 @@ impl TestOperator {
         }
     }
 
-    pub async fn exec<Fut>(self, f: impl Fn(cpu::Cpu) -> Fut)
-    where
-        Fut: Future<Output = bool>,
-    {
+    pub fn exec(self, f: impl Fn(cpu::Cpu) -> bool) {
         for i in 0..=1 {
             let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
             cpu.ccr = self.initial_ccr[i];
-            let opcode = cpu.fetch().await;
-            let result = cpu.exec(opcode).await;
+            let opcode = cpu.fetch();
+            let result = cpu.exec(opcode);
             if self.should_success {
                 assert!(result.is_ok());
                 assert_eq!(result.unwrap(), self.expect_state);
                 assert_eq!(cpu.ccr, self.expect_ccr[i]);
-                assert!(f(cpu).await);
+                assert!(f(cpu));
             } else {
                 assert!(
-                    result.is_err()
-                        || result.is_ok_and(|state| state != self.expect_state)
-                        || cpu.ccr != self.expect_ccr[1]
-                        || !f(cpu).await
+                    result.is_err() || result.is_ok_and(|state| state != self.expect_state) || cpu.ccr != self.expect_ccr[1] || !f(cpu)
                 );
             }
         }
     }
 
-    pub async fn access_cpu<F>(mut self, f: F) -> TestOperator
-    where
-        F: for<'a> Fn(&'a mut cpu::Cpu) -> Pin<Box<dyn Future<Output = ()> + 'a>>,
-    {
-        f(&mut self.cpu).await;
+    pub fn access_cpu(mut self, f: impl Fn(&mut cpu::Cpu)) -> TestOperator {
+        f(&mut self.cpu);
         self
     }
 
-    pub async fn set_opcode(mut self, opcode: &[u8]) -> TestOperator {
-        self.cpu.bus.lock().await.memory[0..opcode.len()].copy_from_slice(opcode);
+    pub fn set_opcode(mut self, opcode: &[u8]) -> TestOperator {
+        self.cpu.bus.memory[0..opcode.len()].copy_from_slice(opcode);
         self
     }
 

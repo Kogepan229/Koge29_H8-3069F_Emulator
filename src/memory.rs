@@ -8,6 +8,7 @@ pub fn create_memory() -> Memory {
     Box::new([0; MEMORY_SIZE])
 }
 
+#[allow(dead_code)]
 pub fn print_memory(memory: &Memory) {
     for i in 0..MEMORY_SIZE {
         if (i + 1) % 32 == 0 {

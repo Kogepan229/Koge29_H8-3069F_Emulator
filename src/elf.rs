@@ -23,38 +23,28 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub async fn load(elf_path: String, cpu: &mut Cpu) {
+pub fn load(elf_path: String, cpu: &mut Cpu) {
     let elf_binary = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&elf_binary).unwrap();
     // println!("{:?}", hd);
 
-    let (_, sht) = parse_section::parse_section_header_table32(hd.shnum as usize)(
-        &elf_binary[hd.shoff as usize..],
-    )
-    .unwrap();
+    let (_, sht) = parse_section::parse_section_header_table32(hd.shnum as usize)(&elf_binary[hd.shoff as usize..]).unwrap();
 
     let raw_section_names_offset = sht[hd.shstrndx as usize].offset;
     let raw_section_names = &elf_binary[raw_section_names_offset as usize..];
     let sections = sht
         .iter()
         .map(|header| section::Section32 {
-            name: string_table::parse_string_table_entry(
-                &raw_section_names[header.name_idx as usize..],
-            )
-            .unwrap()
-            .1,
+            name: string_table::parse_string_table_entry(&raw_section_names[header.name_idx as usize..])
+                .unwrap()
+                .1,
             header,
         })
         .collect::<Vec<section::Section32>>();
     // println!("{:#?}", sections);
 
-    let (_, pht) = parse_program_header::parse_program_header_table32(hd.phnum as usize)(
-        &elf_binary[hd.phoff as usize..],
-    )
-    .unwrap();
+    let (_, pht) = parse_program_header::parse_program_header_table32(hd.phnum as usize)(&elf_binary[hd.phoff as usize..]).unwrap();
     // println!("{:#?}", pht);
-
-    let mut bus_lock = cpu.bus.lock().await;
 
     cpu.er[2] = PROGRAM_START_ADDR as u32;
     println!("Set er2 [0x{:x}]", cpu.er[2]);
@@ -63,11 +53,9 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
     let program_dram_offset = PROGRAM_START_ADDR - AREA2_START_ADDR as usize;
     for ph in &pht {
         if ph.ty == SegmentType::Load {
-            bus_lock.dram[program_dram_offset + ph.virtual_addr as usize
-                ..program_dram_offset + (ph.virtual_addr + ph.size_in_file) as usize]
-                .copy_from_slice(
-                    &elf_binary[ph.offset as usize..(ph.offset + ph.size_in_file) as usize],
-                );
+            cpu.bus.dram
+                [program_dram_offset + ph.virtual_addr as usize..program_dram_offset + (ph.virtual_addr + ph.size_in_file) as usize]
+                .copy_from_slice(&elf_binary[ph.offset as usize..(ph.offset + ph.size_in_file) as usize]);
         }
     }
 
@@ -80,12 +68,12 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
             // Add start address of program to Global Offset
             for i in 0..(s.header.size / 4) {
                 let got_addr = program_dram_offset + (s.header.addr + 4 * i) as usize;
-                let mut global_off = ((bus_lock.dram[got_addr] as u32) << 24)
-                    | ((bus_lock.dram[got_addr + 1] as u32) << 16)
-                    | ((bus_lock.dram[got_addr + 2] as u32) << 8)
-                    | (bus_lock.dram[got_addr + 3] as u32);
+                let mut global_off = ((cpu.bus.dram[got_addr] as u32) << 24)
+                    | ((cpu.bus.dram[got_addr + 1] as u32) << 16)
+                    | ((cpu.bus.dram[got_addr + 2] as u32) << 8)
+                    | (cpu.bus.dram[got_addr + 3] as u32);
                 global_off += PROGRAM_START_ADDR as u32;
-                bus_lock.dram[got_addr..=got_addr + 3].copy_from_slice(&global_off.to_be_bytes());
+                cpu.bus.dram[got_addr..=got_addr + 3].copy_from_slice(&global_off.to_be_bytes());
             }
         } else if s.name == ".stack" {
             let program_size = pht[pht.len() - 1].size_in_mem + pht[pht.len() - 1].physical_addr;
@@ -97,10 +85,7 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
             println!("Set er7(stack pointer) [0x{:x}]", cpu.er[7]);
         } else if s.name == ".symtab" {
             let (_, symtabs) =
-                parse_symbol_table32((s.header.size / s.header.entry_size) as usize)(
-                    &elf_binary[s.header.offset as usize..],
-                )
-                .unwrap();
+                parse_symbol_table32((s.header.size / s.header.entry_size) as usize)(&elf_binary[s.header.offset as usize..]).unwrap();
 
             let raw_symbol_names_offset = sht[s.header.link as usize].offset;
             let raw_symbol_names = &elf_binary[raw_symbol_names_offset as usize..];
@@ -109,11 +94,9 @@ pub async fn load(elf_path: String, cpu: &mut Cpu) {
                 .map(|symtab| -> symtab::SymbolTableWithName32 {
                     // nameの中にスペースがあるとエラー？
                     symtab::SymbolTableWithName32 {
-                        name: string_table::parse_string_table_entry(
-                            &raw_symbol_names[symtab.name_idx as usize..],
-                        )
-                        .unwrap_or_else(|_| (&raw_symbol_names, "Error".to_string()))
-                        .1,
+                        name: string_table::parse_string_table_entry(&raw_symbol_names[symtab.name_idx as usize..])
+                            .unwrap_or_else(|_| (&raw_symbol_names, "Error".to_string()))
+                            .1,
                         symtab,
                     }
                 })
