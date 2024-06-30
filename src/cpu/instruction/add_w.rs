@@ -2,10 +2,10 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super) async fn add_w(&mut self, opcode: u16) -> Result<u8> {
+    pub(in super::super) fn add_w(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
-            0x79 => return self.add_w_imm(opcode).await,
-            0x09 => return self.add_w_rn(opcode).await,
+            0x79 => return self.add_w_imm(opcode),
+            0x09 => return self.add_w_rn(opcode),
             _ => bail!("invalid opcode [{:>04x}]", opcode),
         }
     }
@@ -45,8 +45,8 @@ impl Cpu {
         value as u16
     }
 
-    async fn add_w_imm(&mut self, opcode: u16) -> Result<u8> {
-        let imm = self.fetch().await;
+    fn add_w_imm(&mut self, opcode: u16) -> Result<u8> {
+        let imm = self.fetch();
         let mut f = || -> Result<()> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let dest = self.read_rn_w(register)?;
@@ -55,16 +55,16 @@ impl Cpu {
             Ok(())
         };
         f().with_context(|| format!("imm(opcode2) [{:x}]", imm))?;
-        Ok(self.calc_state(StateType::I, 2).await?)
+        Ok(self.calc_state(StateType::I, 2)?)
     }
 
-    async fn add_w_rn(&mut self, opcode: u16) -> Result<u8> {
+    fn add_w_rn(&mut self, opcode: u16) -> Result<u8> {
         let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
         let dest = self.read_rn_w(register_dest)?;
         let register_src = Cpu::get_nibble_opcode(opcode, 3)? & 0x7;
         let src = self.read_rn_w(register_src)?;
         let result = self.add_w_proc(dest, src);
         self.write_rn_w(register_dest, result)?;
-        Ok(self.calc_state(StateType::I, 1).await?)
+        Ok(self.calc_state(StateType::I, 1)?)
     }
 }

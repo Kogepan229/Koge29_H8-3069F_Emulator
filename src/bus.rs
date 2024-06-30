@@ -41,18 +41,17 @@ pub const AREA7_SIZE: usize = (AREA7_END_ADDR - AREA7_START_ADDR + 1) as usize;
 
 pub const IO_REGISTERS1_START_ADDR: u32 = 0xfee000;
 pub const IO_REGISTERS1_END_ADDR: u32 = 0xfee0bf;
-pub const IO_REGISTERS1_SIZE: usize =
-    (IO_REGISTERS1_END_ADDR - IO_REGISTERS1_START_ADDR + 1) as usize;
+pub const IO_REGISTERS1_SIZE: usize = (IO_REGISTERS1_END_ADDR - IO_REGISTERS1_START_ADDR + 1) as usize;
 
 pub const IO_REGISTERS2_EMC1_START_ADDR: u32 = 0xffff20;
 pub const IO_REGISTERS2_EMC1_END_ADDR: u32 = 0xffffe9;
-pub const IO_REGISTERS2_EMC1_SIZE: usize =
-    (IO_REGISTERS2_EMC1_END_ADDR - IO_REGISTERS2_EMC1_START_ADDR + 1) as usize;
+pub const IO_REGISTERS2_EMC1_SIZE: usize = (IO_REGISTERS2_EMC1_END_ADDR - IO_REGISTERS2_EMC1_START_ADDR + 1) as usize;
 
 // pub const IO_REGISTERIES2_EMC0_STRAT_ADDR: u32 = 0xfffe80;
 // pub const IO_REGISTERIES2_EMC0_END_ADDR: u32 = 0xffffff;
 // pub const IO_REGISTERIES2_EMC0_SIZE: usize = (MEMORY_END_ADDR - MEMORY_START_ADDR + 1) as usize;
 
+#[derive(Clone)]
 pub struct Bus {
     pub memory: Memory,
     pub exception_handling_vector: Vec<u8>,
@@ -75,15 +74,9 @@ impl Bus {
     pub fn write(&mut self, addr: u32, value: u8) -> Result<()> {
         match addr {
             0x00..=0xff => self.exception_handling_vector[addr as usize] = value,
-            IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
-                self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value
-            }
-            AREA2_START_ADDR..=AREA2_END_ADDR => {
-                self.dram[(addr - AREA2_START_ADDR) as usize] = value
-            }
-            MEMORY_START_ADDR..=MEMORY_END_ADDR => {
-                self.memory[(addr - MEMORY_START_ADDR) as usize] = value
-            }
+            IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value,
+            AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
+            MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
                 self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
@@ -98,12 +91,8 @@ impl Bus {
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
                 return Ok(self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize]);
             }
-            AREA2_START_ADDR..=AREA2_END_ADDR => {
-                return Ok(self.dram[(addr - AREA2_START_ADDR) as usize])
-            }
-            MEMORY_START_ADDR..=MEMORY_END_ADDR => {
-                return Ok(self.memory[(addr - MEMORY_START_ADDR) as usize])
-            }
+            AREA2_START_ADDR..=AREA2_END_ADDR => return Ok(self.dram[(addr - AREA2_START_ADDR) as usize]),
+            MEMORY_START_ADDR..=MEMORY_END_ADDR => return Ok(self.memory[(addr - MEMORY_START_ADDR) as usize]),
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
                 return Ok(self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize])
             }
@@ -175,8 +164,8 @@ impl Bus {
 mod tests {
     use crate::{
         bus::{
-            IO_REGISTERS1_END_ADDR, IO_REGISTERS1_SIZE, IO_REGISTERS1_START_ADDR,
-            IO_REGISTERS2_EMC1_END_ADDR, IO_REGISTERS2_EMC1_SIZE, IO_REGISTERS2_EMC1_START_ADDR,
+            IO_REGISTERS1_END_ADDR, IO_REGISTERS1_SIZE, IO_REGISTERS1_START_ADDR, IO_REGISTERS2_EMC1_END_ADDR, IO_REGISTERS2_EMC1_SIZE,
+            IO_REGISTERS2_EMC1_START_ADDR,
         },
         memory::{MEMORY_END_ADDR, MEMORY_SIZE, MEMORY_START_ADDR},
     };

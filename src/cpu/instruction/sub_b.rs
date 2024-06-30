@@ -2,14 +2,14 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::Result;
 
 impl Cpu {
-    pub(in super::super) async fn sub_b(&mut self, opcode: u16) -> Result<u8> {
+    pub(in super::super)  fn sub_b(&mut self, opcode: u16) -> Result<u8> {
         let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
         let dest = self.read_rn_b(register_dest)?;
         let register_src = Cpu::get_nibble_opcode(opcode, 3)? & 0x7;
         let src = self.read_rn_b(register_src)?;
         let result = self.sub_b_proc(dest, src);
         self.write_rn_b(register_dest, result)?;
-        Ok(self.calc_state(StateType::I, 1).await?)
+        Ok(self.calc_state(StateType::I, 1)?)
     }
 
     fn sub_b_proc(&mut self, dest: u8, src: u8) -> u8 {
