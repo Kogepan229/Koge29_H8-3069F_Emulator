@@ -58,7 +58,7 @@ async fn main() {
     });
      */
 
-    elf::load(args.elf, &mut cpu).await;
+    elf::load(args.elf, &mut cpu);
     // print_memory(&cpu.bus.memory);
 
     cpu.run().await.unwrap();

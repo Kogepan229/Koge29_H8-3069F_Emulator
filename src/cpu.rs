@@ -6,10 +6,8 @@ use crate::{
     setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
-use std::sync::Arc;
 use std::time;
 use std::time::Duration;
-use tokio::sync::Mutex;
 
 mod addressing_mode;
 mod instruction;
@@ -21,7 +19,7 @@ const CPU_CLOCK: usize = 20_000_000;
 
 #[derive(Clone)]
 pub struct Cpu {
-    pub bus: Arc<Mutex<Bus>>,
+    pub bus: Bus,
     pc: u32,
     operating_pc: u32,
     ccr: u8,
@@ -64,7 +62,7 @@ macro_rules! unimpl {
 impl Cpu {
     pub fn new() -> Self {
         Cpu {
-            bus: Arc::new(Mutex::new(Bus::new())),
+            bus: Bus::new(),
             pc: 0,
             operating_pc: 0,
             ccr: 0,
@@ -86,7 +84,7 @@ impl Cpu {
         // Set program counter
         self.pc = self.er[2];
 
-        self.init_registers().await?;
+        self.init_registers()?;
 
         loop {
             // Print received messages
@@ -159,10 +157,7 @@ impl Cpu {
 
         self.operating_pc = _pc;
 
-        let opcode = {
-            let bus_lock = self.bus.lock().await;
-            ((bus_lock.read(_pc).unwrap() as u16) << 8) | (bus_lock.read(_pc + 1).unwrap() as u16)
-        };
+        let opcode = { ((self.bus.read(_pc).unwrap() as u16) << 8) | (self.bus.read(_pc + 1).unwrap() as u16) };
 
         if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
             print!("{:0>2x} {:0>2x} ", (opcode >> 8) as u8, opcode as u8);
@@ -453,10 +448,10 @@ impl Cpu {
         self.pc
     }
 
-    async fn get_wait_state(&self, area_index: u8) -> Result<u8> {
+    fn get_wait_state(&self, area_index: u8) -> Result<u8> {
         match area_index {
-            0..=3 => return Ok((self.bus.lock().await.read(WCRL)? >> (area_index * 2)) & 0x3),
-            4..=7 => return Ok((self.bus.lock().await.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3),
+            0..=3 => return Ok((self.bus.read(WCRL)? >> (area_index * 2)) & 0x3),
+            4..=7 => return Ok((self.bus.read(WCRH)? >> ((area_index - 4) * 2)) & 0x3),
             _ => bail!("Invalid area_index [{}]", area_index),
         }
     }
@@ -480,26 +475,26 @@ impl Cpu {
             },
             AREA0_START_ADDR..=AREA7_END_ADDR => {
                 let area_index = Bus::get_area_index(target_addr)?;
-                if (self.bus.lock().await.read(ABWCR)? >> area_index) & 1 == 1 {
+                if (self.bus.read(ABWCR)? >> area_index) & 1 == 1 {
                     // 8 bit
 
                     // dram
-                    if self.bus.lock().await.check_dram_area(area_index)? {
+                    if self.bus.check_dram_area(area_index)? {
                         // as 4state
                         match state_type {
                             StateType::I | StateType::J | StateType::K | StateType::M => {
-                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index)?;
                                 return Ok(state * (8 + 2 * wait_state));
                             }
                             StateType::L => {
-                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index)?;
                                 return Ok(state * (4 + wait_state));
                             }
                             StateType::N => return Ok(state * 1),
                         }
                     }
 
-                    if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
+                    if (self.bus.read(ASTCR)? >> area_index) & 1 == 0 {
                         // 2 state
                         match state_type {
                             StateType::I | StateType::J | StateType::K | StateType::M => return Ok(state * 4),
@@ -510,11 +505,11 @@ impl Cpu {
                         // 3 state
                         match state_type {
                             StateType::I | StateType::J | StateType::K | StateType::M => {
-                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index)?;
                                 return Ok(state * (6 + 2 * wait_state));
                             }
                             StateType::L => {
-                                let wait_state: u8 = self.get_wait_state(area_index).await?;
+                                let wait_state: u8 = self.get_wait_state(area_index)?;
                                 return Ok(state * (3 + wait_state));
                             }
                             StateType::N => return Ok(state * 1),
@@ -524,17 +519,17 @@ impl Cpu {
                     // 16 bit
 
                     // dram
-                    if self.bus.lock().await.check_dram_area(area_index)? {
-                        let wait_state: u8 = self.get_wait_state(area_index).await?;
+                    if self.bus.check_dram_area(area_index)? {
+                        let wait_state: u8 = self.get_wait_state(area_index)?;
                         return Ok(state * (4 + wait_state));
                     }
 
-                    if (self.bus.lock().await.read(ASTCR)? >> area_index) & 1 == 0 {
+                    if (self.bus.read(ASTCR)? >> area_index) & 1 == 0 {
                         // 2 state
                         return Ok(state * 2);
                     } else {
                         // 3 state
-                        let wait_state: u8 = self.get_wait_state(area_index).await?;
+                        let wait_state: u8 = self.get_wait_state(area_index)?;
                         return Ok(state * (3 + wait_state));
                     }
                 }
@@ -543,13 +538,12 @@ impl Cpu {
         }
     }
 
-    async fn init_registers(&self) -> Result<()> {
-        let mut bus = self.bus.lock().await;
-        bus.write(ABWCR, 0xff)?;
-        bus.write(ASTCR, 0xfb)?;
-        bus.write(WCRH, 0xff)?;
-        bus.write(WCRL, 0xcf)?;
-        bus.write(DRCRA, 0xe0)?;
+    fn init_registers(&mut self) -> Result<()> {
+        self.bus.write(ABWCR, 0xff)?;
+        self.bus.write(ASTCR, 0xfb)?;
+        self.bus.write(WCRH, 0xff)?;
+        self.bus.write(WCRL, 0xcf)?;
+        self.bus.write(DRCRA, 0xe0)?;
 
         return Ok(());
     }
