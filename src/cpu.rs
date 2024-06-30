@@ -27,6 +27,7 @@ pub struct Cpu {
     pub exit_addr: u32, // address of ___exit
 }
 
+#[allow(dead_code)]
 pub enum CCR {
     C,
     V,
@@ -616,7 +617,7 @@ mod tests {
     #[tokio::test]
     #[should_panic]
     async fn test_calc_state_type_l() {
-        let mut cpu = Cpu::new();
+        let cpu = Cpu::new();
         const STATE: u8 = 2;
         cpu.calc_state(StateType::L, STATE).unwrap();
     }
@@ -624,7 +625,7 @@ mod tests {
     #[tokio::test]
     #[should_panic]
     async fn test_calc_state_type_m() {
-        let mut cpu = Cpu::new();
+        let cpu = Cpu::new();
         const STATE: u8 = 2;
         cpu.calc_state(StateType::M, STATE).unwrap();
     }
@@ -698,7 +699,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_calc_state_with_addr_memory() {
-        let mut cpu = Cpu::new();
+        let cpu = Cpu::new();
         const STATE: u8 = 2;
         assert_eq!(cpu.calc_state_with_addr(StateType::L, STATE, MEMORY_START_ADDR).unwrap(), 2 * STATE);
         assert_eq!(cpu.calc_state_with_addr(StateType::M, STATE, MEMORY_START_ADDR).unwrap(), 2 * STATE);
