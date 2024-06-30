@@ -114,7 +114,7 @@ impl Cpu {
                 print!(" {:4x}:   ", self.pc.wrapping_sub(PROGRAM_START_ADDR as u32));
             }
 
-            let opcode = self.fetch().await;
+            let opcode = self.fetch();
             let state = self.exec(opcode).await.with_context(|| {
                 format!(
                     "[pc: {:0>8x}({:0>8x})] opcode1 [{:0>4x}]",
@@ -152,7 +152,7 @@ impl Cpu {
         }
     }
 
-    pub async fn fetch(&mut self) -> u16 {
+    pub fn fetch(&mut self) -> u16 {
         let _pc = self.pc & !1;
 
         self.operating_pc = _pc;
@@ -167,7 +167,7 @@ impl Cpu {
         opcode
     }
 
-    async fn exec(&mut self, opcode: u16) -> Result<u8> {
+    fn exec(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
             0x0c | 0xf0..=0xff | 0x68 | 0x6e | 0x6c | 0x20..=0x2f | 0x30..=0x3f | 0x6a => return self.mov_b(opcode).await,
             0x0d => return self.mov_w(opcode).await,
@@ -177,7 +177,7 @@ impl Cpu {
             0x01 => match opcode as u8 {
                 0x00 => return self.mov_l(opcode).await,
                 0xf0 => {
-                    let opcode2 = self.fetch().await;
+                    let opcode2 = self.fetch();
                     match (opcode2 >> 8) as u8 {
                         0x64 => return self.or_l_rn(opcode, opcode2).await,
                         0x65 => return self.xor_l_rn(opcode, opcode2).await,
@@ -232,7 +232,7 @@ impl Cpu {
             },
 
             0x78 => {
-                let opcode2 = self.fetch().await;
+                let opcode2 = self.fetch();
                 match (opcode2 >> 8) as u8 {
                     0x6a => return self.mov_b_disp24(opcode, opcode2).await,
                     0x6b => return self.mov_w_disp24(opcode, opcode2).await,
@@ -263,7 +263,7 @@ impl Cpu {
             },
 
             0x7c => {
-                let opcode2 = self.fetch().await;
+                let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
                     0x6300 | 0x6380 | 0x7300 => return self.btst_ern(opcode, opcode2).await,
                     0x7400 => return self.bor_ern(opcode, opcode2).await,
@@ -279,7 +279,7 @@ impl Cpu {
             }
 
             0x7d => {
-                let opcode2 = self.fetch().await;
+                let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
                     0x6000 | 0x6080 | 0x7000 => return self.bset_ern(opcode, opcode2).await,
                     0x6100 | 0x6180 | 0x7100 => return self.bnot_ern(opcode, opcode2).await,
@@ -291,7 +291,7 @@ impl Cpu {
             }
 
             0x7e => {
-                let opcode2 = self.fetch().await;
+                let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
                     0x6300 | 0x6380 | 0x7300 => return self.btst_abs(opcode, opcode2).await,
                     0x7400 => return self.bor_abs(opcode, opcode2).await,
@@ -307,7 +307,7 @@ impl Cpu {
             }
 
             0x7f => {
-                let opcode2 = self.fetch().await;
+                let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
                     0x6000 | 0x6080 | 0x7000 => return self.bset_abs(opcode, opcode2).await,
                     0x6100 | 0x6180 | 0x7100 => return self.bnot_abs(opcode, opcode2).await,
@@ -456,15 +456,15 @@ impl Cpu {
         }
     }
 
-    pub async fn calc_state(&self, state_type: StateType, state: u8) -> Result<u8> {
+    pub fn calc_state(&self, state_type: StateType, state: u8) -> Result<u8> {
         if state_type == StateType::L || state_type == StateType::M {
             bail!("StateType L or M must be specified address. Use calc_state_with_addr.")
         }
-        self.calc_state_with_addr(state_type, state, self.operating_pc).await
+        self.calc_state_with_addr(state_type, state, self.operating_pc)
     }
 
     // todo 内蔵周辺モジュール
-    pub async fn calc_state_with_addr(&self, state_type: StateType, state: u8, target_addr: u32) -> Result<u8> {
+    pub fn calc_state_with_addr(&self, state_type: StateType, state: u8, target_addr: u32) -> Result<u8> {
         if state_type == StateType::N {
             return Ok(state * 1);
         }
