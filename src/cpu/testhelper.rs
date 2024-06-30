@@ -1,5 +1,3 @@
-use std::{future::Future, pin::Pin};
-
 use crate::{
     cpu::{self},
     memory::MEMORY_START_ADDR,
@@ -25,7 +23,7 @@ where
     }
 
     // callback: (operator, src_index, target_index)
-    pub async fn run(&mut self, f: impl Fn(TestOperator, ST, TT)) {
+    pub fn run(&mut self, f: impl Fn(TestOperator, ST, TT)) {
         let src_valid_index_list = self.src_addressing_mode.get_valid_index();
         let src_invalid_index_list = self.src_addressing_mode.get_invalid_index();
         let target_valid_index_list = self.target_addressing_mode.get_valid_index();

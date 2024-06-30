@@ -258,19 +258,18 @@ mod tests {
 
     #[test]
     fn test_write_abs8_w() {
-        let mut cpu = Cpu::new();
-        cpu.write_abs8_w(0x10, 0x0fff).unwrap();
         {
             let mut cpu = Cpu::new();
+            cpu.write_abs8_w(0x10, 0x0fff).unwrap();
             assert_eq!(
                 (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
                 0x0fff
             );
         }
 
-        cpu.write_abs8_w(0x01, 0x0fff).unwrap();
         {
             let mut cpu = Cpu::new();
+            cpu.write_abs8_w(0x01, 0x0fff).unwrap();
             assert_eq!(
                 (cpu.bus.read(0xffff01).unwrap() as u16) << 8 | cpu.bus.read(0xffff02).unwrap() as u16,
                 0x0fff
@@ -291,7 +290,6 @@ mod tests {
     fn test_write_abs16_w() {
         let mut cpu = Cpu::new();
         cpu.write_abs16_w(0xff10, 0x0fff).unwrap();
-        let mut cpu = Cpu::new();
         assert_eq!(
             (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
@@ -315,7 +313,6 @@ mod tests {
     fn test_write_abs24_w() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
-        let mut cpu = Cpu::new();
         assert_eq!(
             (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
