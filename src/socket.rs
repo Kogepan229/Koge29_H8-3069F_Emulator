@@ -93,30 +93,33 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
-pub async fn send_message(str: &str) {
+pub fn send_message(str: &str) {
     if let Some(v) = MESSAGE_SENDER.get() {
-        v.send(str.to_string()).await.unwrap();
+        let _str = str.to_string();
+        tokio::spawn(async move {
+            v.send(_str).await.unwrap();
+        });
     }
     if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
         println!("msg: {}", str);
     }
 }
 
-pub async fn send_one_sec_message() {
-    send_message("1sec").await;
+pub fn send_one_sec_message() {
+    send_message("1sec");
 }
 
-pub async fn send_addr_value_u8(addr: u32, value: u8) {
+pub fn send_addr_value_u8(addr: u32, value: u8) {
     let str = format!("u8:0x{:x}:0x{:x}", addr, value);
-    send_message(&str).await;
+    send_message(&str);
 }
 
-pub async fn send_addr_value_u16(addr: u32, value: u16) {
+pub fn send_addr_value_u16(addr: u32, value: u16) {
     let str = format!("u16:0x{:x}:0x{:x}", addr, value);
-    send_message(&str).await;
+    send_message(&str);
 }
 
-pub async fn send_addr_value_u32(addr: u32, value: u32) {
+pub fn send_addr_value_u32(addr: u32, value: u32) {
     let str = format!("u32:0x{:x}:0x{:x}", addr, value);
-    send_message(&str).await;
+    send_message(&str);
 }
