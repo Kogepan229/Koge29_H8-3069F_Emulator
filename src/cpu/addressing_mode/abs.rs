@@ -202,8 +202,7 @@ impl Cpu {
 mod tests {
     use crate::cpu::Cpu;
 
-    #[tokio::test]
-    async fn test_write_abs8_b() {
+    fn test_write_abs8_b() {
         let mut cpu = Cpu::new();
         cpu.write_abs8_b(0x10, 0xff).unwrap();
         cpu.write_abs8_b(0x1f, 0xff).unwrap();
@@ -211,17 +210,15 @@ mod tests {
         assert_eq!(cpu.bus.read(0xffff1f).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_read_abs8_b() {
-        let cpu = Cpu::new();
+    fn test_read_abs8_b() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff10, 0xff).unwrap();
         cpu.bus.write(0xffff1f, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_b(0x10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs8_b(0x1f).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_write_abs16_b() {
+    fn test_write_abs16_b() {
         let mut cpu = Cpu::new();
         cpu.write_abs16_b(0xff10, 0xff).unwrap();
         cpu.write_abs16_b(0xff1e, 0xff).unwrap();
@@ -229,17 +226,15 @@ mod tests {
         assert_eq!(cpu.bus.read(0xffff1e).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_read_abs16_b() {
-        let cpu = Cpu::new();
+    fn test_read_abs16_b() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff10, 0xff).unwrap();
         cpu.bus.write(0xffff1e, 0xff).unwrap();
         assert_eq!(cpu.read_abs16_b(0xff10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs16_b(0xff1e).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_write_abs24_b() {
+    fn test_write_abs24_b() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_b(0xffff10, 0xff).unwrap();
         cpu.write_abs24_b(0xffff1e, 0xff).unwrap();
@@ -247,61 +242,58 @@ mod tests {
         assert_eq!(cpu.bus.read(0xffff1e).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_read_abs24_b() {
-        let cpu = Cpu::new();
+    fn test_read_abs24_b() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff10, 0xff).unwrap();
         cpu.bus.write(0xffff1e, 0xff).unwrap();
         assert_eq!(cpu.read_abs24_b(0xffff10).unwrap(), 0xff);
         assert_eq!(cpu.read_abs24_b(0xffff1e).unwrap(), 0xff);
     }
 
-    #[tokio::test]
-    async fn test_write_abs8_w() {
+    fn test_write_abs8_w() {
         let mut cpu = Cpu::new();
         cpu.write_abs8_w(0x10, 0x0fff).unwrap();
         {
-            let bus_lock = cpu.bus;
+            let mut cpu = Cpu::new();
             assert_eq!(
-                (bus_lock.read(0xffff10).unwrap() as u16) << 8 | bus_lock.read(0xffff11).unwrap() as u16,
+                (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
                 0x0fff
             );
         }
 
         cpu.write_abs8_w(0x01, 0x0fff).unwrap();
         {
-            let bus_lock = cpu.bus;
+            let mut cpu = Cpu::new();
             assert_eq!(
-                (bus_lock.read(0xffff01).unwrap() as u16) << 8 | bus_lock.read(0xffff02).unwrap() as u16,
+                (cpu.bus.read(0xffff01).unwrap() as u16) << 8 | cpu.bus.read(0xffff02).unwrap() as u16,
                 0x0fff
             );
         }
     }
 
-    #[tokio::test]
-    async fn test_read_abs8_w() {
-        let cpu = Cpu::new();
+    fn test_read_abs8_w() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff10, 0x0f).unwrap();
         cpu.bus.write(0xffff11, 0xff).unwrap();
         assert_eq!(cpu.read_abs8_w(0x10).unwrap(), 0x0fff);
     }
 
     // アドレスの最上位ビットが1のときのみ
-    #[tokio::test]
-    async fn test_write_abs16_w() {
+
+    fn test_write_abs16_w() {
         let mut cpu = Cpu::new();
         cpu.write_abs16_w(0xff10, 0x0fff).unwrap();
-        let bus_lock = cpu.bus;
+        let mut cpu = Cpu::new();
         assert_eq!(
-            (bus_lock.read(0xffff10).unwrap() as u16) << 8 | bus_lock.read(0xffff11).unwrap() as u16,
+            (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
         );
     }
 
     // アドレスの最上位ビットが1のときのみ
-    #[tokio::test]
-    async fn test_read_abs16_w() {
-        let cpu = Cpu::new();
+
+    fn test_read_abs16_w() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff00, 0x0f).unwrap();
         cpu.bus.write(0xffff01, 0x0f).unwrap();
         assert_eq!(cpu.read_abs16_w(0xff00).unwrap(), 0x0f0f);
@@ -311,20 +303,18 @@ mod tests {
         assert_eq!(cpu.read_abs16_w(0xff10).unwrap(), 0x0fff);
     }
 
-    #[tokio::test]
-    async fn test_write_abs24_w() {
+    fn test_write_abs24_w() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff10, 0x0fff).unwrap();
-        let bus_lock = cpu.bus;
+        let mut cpu = Cpu::new();
         assert_eq!(
-            (bus_lock.read(0xffff10).unwrap() as u16) << 8 | bus_lock.read(0xffff11).unwrap() as u16,
+            (cpu.bus.read(0xffff10).unwrap() as u16) << 8 | cpu.bus.read(0xffff11).unwrap() as u16,
             0x0fff
         );
     }
 
-    #[tokio::test]
-    async fn test_read_abs24_w() {
-        let cpu = Cpu::new();
+    fn test_read_abs24_w() {
+        let mut cpu = Cpu::new();
         cpu.bus.write(0xffff00, 0x0f).unwrap();
         cpu.bus.write(0xffff01, 0x0f).unwrap();
         assert_eq!(cpu.read_abs24_w(0xffff00).unwrap(), 0x0f0f);
@@ -334,8 +324,7 @@ mod tests {
         assert_eq!(cpu.read_abs24_w(0xffff10).unwrap(), 0x0fff);
     }
 
-    #[tokio::test]
-    async fn test_write_abs8_l() {
+    fn test_write_abs8_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs8_l(0x10, 0x0f0fff0f).unwrap();
         assert_eq!(
@@ -344,8 +333,7 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_read_abs8_l() {
+    fn test_read_abs8_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff10, 0x0f0f).unwrap();
         cpu.write_abs24_w(0xffff12, 0xff0f).unwrap();
@@ -353,8 +341,8 @@ mod tests {
     }
 
     // アドレスの最上位ビットが1のときのみ
-    #[tokio::test]
-    async fn test_write_abs16_l() {
+
+    fn test_write_abs16_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs16_l(0xff10, 0x0f0fff0f).unwrap();
         assert_eq!(
@@ -364,16 +352,15 @@ mod tests {
     }
 
     // アドレスの最上位ビットが1のときのみ
-    #[tokio::test]
-    async fn test_read_abs16_l() {
+
+    fn test_read_abs16_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff00, 0x0f0f).unwrap();
         cpu.write_abs24_w(0xffff02, 0xff0f).unwrap();
         assert_eq!(cpu.read_abs16_l(0xff00).unwrap(), 0x0f0fff0f);
     }
 
-    #[tokio::test]
-    async fn test_write_abs24_l() {
+    fn test_write_abs24_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_l(0xffff10, 0x0f0fff0f).unwrap();
         assert_eq!(
@@ -382,8 +369,7 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_read_abs24_l() {
+    fn test_read_abs24_l() {
         let mut cpu = Cpu::new();
         cpu.write_abs24_w(0xffff00, 0x0f0f).unwrap();
         cpu.write_abs24_w(0xffff02, 0xff0f).unwrap();
