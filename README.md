@@ -60,7 +60,7 @@
 | JSR         | <ul><li>[x] </ul>                      |
 | RTS         | <ul><li>[x] </ul>                      |
 | TRAPA       | <ul><li>[ ] </ul>                      |
-| RTE         | <ul><li>[ ] </ul>                      |
+| RTE         | <ul><li>[x] </ul>                      |
 | SLEEP       | <ul><li>[ ] </ul>                      |
 | LDC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
 | STC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |

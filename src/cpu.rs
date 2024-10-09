@@ -428,6 +428,7 @@ impl Cpu {
             0x5d | 0x5e | 0x5f => return self.jsr(opcode),
             0x40..=0x4f | 0x58 => return self.bcc(opcode),
             0x54 => return self.rts(),
+            0x56 => return self.rte(),
             0x57 => Ok(14), // Ignore TRAPA
             _ => unimpl!(opcode, self.pc),
         }
