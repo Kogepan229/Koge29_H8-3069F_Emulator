@@ -46,6 +46,7 @@ mod sub_b;
 mod sub_l;
 mod sub_w;
 mod subs;
+mod trapa;
 mod xor;
 
 use crate::cpu::Cpu;

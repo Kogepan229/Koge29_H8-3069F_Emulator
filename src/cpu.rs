@@ -16,6 +16,7 @@ mod instruction;
 mod testhelper;
 
 const CPU_CLOCK: usize = 20_000_000;
+pub const ADDRESS_MASK: u32 = 0x00ffffff;
 
 #[derive(Clone)]
 pub struct Cpu {
@@ -429,7 +430,7 @@ impl Cpu {
             0x40..=0x4f | 0x58 => return self.bcc(opcode),
             0x54 => return self.rts(),
             0x56 => return self.rte(),
-            0x57 => Ok(14), // Ignore TRAPA
+            0x57 => return self.trapa(opcode),
             _ => unimpl!(opcode, self.pc),
         }
     }
