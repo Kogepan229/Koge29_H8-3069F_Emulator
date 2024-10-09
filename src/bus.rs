@@ -56,20 +56,20 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize = (IO_REGISTERS2_EMC1_END_ADDR - IO_REG
 #[derive(Clone)]
 pub struct Bus {
     pub memory: Memory,
-    pub exception_handling_vector: Vec<u8>,
-    pub dram: Vec<u8>,
-    io_registrs1: Vec<u8>,
-    io_registrs2: Vec<u8>,
+    pub exception_handling_vector: Box<[u8]>,
+    pub dram: Box<[u8]>,
+    io_registrs1: Box<[u8]>,
+    io_registrs2: Box<[u8]>,
 }
 
 impl Bus {
     pub fn new() -> Self {
         Bus {
             memory: create_memory(),
-            exception_handling_vector: vec![0; VENCTOR_SIZE],
-            dram: vec![0; AREA2_SIZE],
-            io_registrs1: vec![0; IO_REGISTERS1_SIZE],
-            io_registrs2: vec![0; IO_REGISTERS2_EMC1_SIZE],
+            exception_handling_vector: vec![0; VENCTOR_SIZE].into_boxed_slice(),
+            dram: vec![0; AREA2_SIZE].into_boxed_slice(),
+            io_registrs1: vec![0; IO_REGISTERS1_SIZE].into_boxed_slice(),
+            io_registrs2: vec![0; IO_REGISTERS2_EMC1_SIZE].into_boxed_slice(),
         }
     }
 
