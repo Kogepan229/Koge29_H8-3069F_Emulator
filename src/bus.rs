@@ -4,7 +4,9 @@ use crate::{
 };
 use anyhow::{bail, Result};
 
-const EXCEPTION_HANDLING_VENCTOR_SIZE: usize = 0xff;
+pub const VENCTOR_START_ADDR: u32 = 0;
+pub const VENCTOR_END_ADDR: u32 = 0xff;
+pub const VENCTOR_SIZE: usize = (VENCTOR_END_ADDR - VENCTOR_START_ADDR + 1) as usize;
 
 pub const AREA0_START_ADDR: u32 = 0;
 pub const AREA0_END_ADDR: u32 = 0x1fffff;
@@ -64,7 +66,7 @@ impl Bus {
     pub fn new() -> Self {
         Bus {
             memory: create_memory(),
-            exception_handling_vector: vec![0; EXCEPTION_HANDLING_VENCTOR_SIZE],
+            exception_handling_vector: vec![0; VENCTOR_SIZE],
             dram: vec![0; AREA2_SIZE],
             io_registrs1: vec![0; IO_REGISTERS1_SIZE],
             io_registrs2: vec![0; IO_REGISTERS2_EMC1_SIZE],
@@ -73,7 +75,7 @@ impl Bus {
 
     pub fn write(&mut self, addr: u32, value: u8) -> Result<()> {
         match addr {
-            0x00..=0xff => self.exception_handling_vector[addr as usize] = value,
+            VENCTOR_START_ADDR..=VENCTOR_END_ADDR => self.exception_handling_vector[addr as usize] = value,
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value,
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
@@ -87,7 +89,7 @@ impl Bus {
 
     pub fn read(&self, addr: u32) -> Result<u8> {
         match addr {
-            0x00..=0xff => return Ok(self.exception_handling_vector[addr as usize]),
+            VENCTOR_START_ADDR..=VENCTOR_END_ADDR => return Ok(self.exception_handling_vector[addr as usize]),
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
                 return Ok(self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize]);
             }
