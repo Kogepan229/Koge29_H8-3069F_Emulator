@@ -1,9 +1,9 @@
-use crate::cpu::{Cpu, StateType};
+use crate::cpu::{Cpu, StateType, ADDRESS_MASK};
 use anyhow::Result;
 
 impl Cpu {
     pub(in super::super) fn bsr_disp16(&mut self, opcode: u16) -> Result<u8> {
-        let access_addr = (self.read_rn_l(7)? - 4) & 0x00ffffff;
+        let access_addr = (self.read_rn_l(7)? - 4) & ADDRESS_MASK;
         self.write_dec_ern_l(7, self.pc)?;
         let disp = ((opcode as u8) as i8) as i32;
         self.pc = (self.pc as i32 + disp) as u32;
@@ -13,7 +13,7 @@ impl Cpu {
     }
 
     pub(in super::super) fn bsr_disp24(&mut self, _opcode: u16) -> Result<u8> {
-        let access_addr = (self.read_rn_l(7)? - 4) & 0x00ffffff;
+        let access_addr = (self.read_rn_l(7)? - 4) & ADDRESS_MASK;
         let opcode2 = self.fetch();
         self.write_dec_ern_l(7, self.pc)?;
         let disp = (opcode2 as i16) as i32;

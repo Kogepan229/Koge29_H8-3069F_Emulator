@@ -1,4 +1,4 @@
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, ADDRESS_MASK};
 use anyhow::{Context as _, Result};
 
 impl Cpu {
@@ -6,7 +6,7 @@ impl Cpu {
         let addr = self
             .read_rn_l(register_field)
             .with_context(|| format!("register [{:x}]", register_field))?;
-        Ok(addr & 0x00ffffff)
+        Ok(addr & ADDRESS_MASK)
     }
 
     pub(in super::super) fn write_ern_b(&mut self, register_field: u8, value: u8) -> Result<()> {

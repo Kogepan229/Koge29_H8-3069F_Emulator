@@ -1,4 +1,4 @@
-use crate::cpu::{Cpu, StateType, CCR};
+use crate::cpu::{Cpu, StateType, ADDRESS_MASK, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
@@ -113,7 +113,7 @@ impl Cpu {
     fn mov_w_inc_or_dec(&mut self, opcode: u16) -> Result<u8> {
         if opcode & 0x0080 == 0 {
             let register_ern = Cpu::get_nibble_opcode(opcode, 3)?;
-            let access_addr = self.read_rn_l(register_ern)? & 0x00ffffff;
+            let access_addr = self.read_rn_l(register_ern)? & ADDRESS_MASK;
             let value = self.read_inc_ern_w(register_ern)?;
             self.write_rn_w(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
             self.mov_w_proc_pcc(value);
@@ -122,7 +122,7 @@ impl Cpu {
                 + self.calc_state(StateType::N, 2)?)
         } else {
             let register_ern = Cpu::get_nibble_opcode(opcode, 3)? & 0x07;
-            let access_addr = (self.read_rn_l(register_ern)? - 1) & 0x00ffffff;
+            let access_addr = (self.read_rn_l(register_ern)? - 1) & ADDRESS_MASK;
             let value = self.read_rn_w(Cpu::get_nibble_opcode(opcode, 4)?)?;
             self.write_dec_ern_w(register_ern, value)?;
             self.mov_w_proc_pcc(value);

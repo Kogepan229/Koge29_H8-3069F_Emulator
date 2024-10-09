@@ -1,4 +1,4 @@
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, ADDRESS_MASK};
 use anyhow::{anyhow, Result};
 
 impl Cpu {
@@ -7,19 +7,19 @@ impl Cpu {
         let result = addr
             .checked_add_signed((disp as i16) as i32)
             .ok_or_else(|| anyhow!("attempt to add with overflow [{:x} + {:x}]", addr, disp as i16))?
-            & 0x00ffffff;
+            & ADDRESS_MASK;
         Ok(result)
     }
 
     pub(in super::super) fn get_addr_disp24(&self, register_field: u8, disp: u32) -> Result<u32> {
         let addr = self.read_rn_l(register_field)?;
         if disp & 0x800000 == 0x000000 {
-            Ok((addr + disp) & 0x00ffffff)
+            Ok((addr + disp) & ADDRESS_MASK)
         } else {
             let result = addr
                 .checked_add_signed((0xff000000 + disp) as i32)
                 .ok_or_else(|| anyhow!("attempt to add with overflow [{:x} + {:x}]", addr, (0xffff0000 + disp)))?
-                & 0x00ffffff;
+                & ADDRESS_MASK;
             Ok(result)
         }
     }
