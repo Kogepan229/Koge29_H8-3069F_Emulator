@@ -42,7 +42,7 @@ pub const AREA7_END_ADDR: u32 = 0xffffff;
 pub const AREA7_SIZE: usize = (AREA7_END_ADDR - AREA7_START_ADDR + 1) as usize;
 
 pub const IO_REGISTERS1_START_ADDR: u32 = 0xfee000;
-pub const IO_REGISTERS1_END_ADDR: u32 = 0xfee0bf;
+pub const IO_REGISTERS1_END_ADDR: u32 = 0xfee0ff;
 pub const IO_REGISTERS1_SIZE: usize = (IO_REGISTERS1_END_ADDR - IO_REGISTERS1_START_ADDR + 1) as usize;
 
 pub const IO_REGISTERS2_EMC1_START_ADDR: u32 = 0xffff20;
