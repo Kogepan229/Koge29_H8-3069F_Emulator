@@ -28,15 +28,16 @@ impl Cpu {
         match id {
             113 => {
                 // set_handler
-                let arg1 = self.read_rn_l(1)?;
-                let arg2 = self.read_rn_l(2)?;
+                let arg_addr = self.read_rn_l(1)?;
+                let arg0 = self.read_abs24_l(arg_addr)?;
+                let arg1 = self.read_abs24_l(arg_addr + 4)?;
 
-                if arg1 < 1 || arg1 >= 64 {
+                if arg0 < 1 || arg0 >= 64 {
                     return Ok(());
                 }
 
-                let inst = arg2 + 0x5a000000;
-                self.write_abs24_l(arg1 * 4, inst)?;
+                let inst = arg1 + 0x5a000000;
+                self.write_abs24_l(arg0 * 4, inst)?;
             }
             104 => {
                 // __write
