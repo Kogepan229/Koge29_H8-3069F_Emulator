@@ -39,8 +39,7 @@ impl Cpu {
         self.bus.read(real_addr).with_context(|| format!("addr [{:x}]", addr))
     }
 
-    pub(in super::super) fn get_addr_abs16(&self, mut addr: u16) -> u32 {
-        addr &= !1u16;
+    pub(in super::super) fn get_addr_abs16(&self, addr: u16) -> u32 {
         if addr & 0x8000 == 0x0000 {
             addr as u32
         } else {
@@ -62,8 +61,7 @@ impl Cpu {
         return self.bus.read(real_addr).with_context(|| format!("addr [{:x}]", addr));
     }
 
-    pub(in super::super) fn write_abs24_b(&mut self, mut addr: u32, value: u8) -> Result<()> {
-        addr &= !1u32;
+    pub(in super::super) fn write_abs24_b(&mut self, addr: u32, value: u8) -> Result<()> {
         self.bus
             .write(addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
@@ -71,8 +69,7 @@ impl Cpu {
         Ok(())
     }
 
-    pub(in super::super) fn read_abs24_b(&self, mut addr: u32) -> Result<u8> {
-        addr &= !1u32;
+    pub(in super::super) fn read_abs24_b(&self, addr: u32) -> Result<u8> {
         self.bus.read(addr).with_context(|| format!("addr [{:x}]", addr))
     }
 
@@ -120,8 +117,7 @@ impl Cpu {
         self._read_abs16_w(addr).with_context(|| format!("addr [{:x}]", addr))
     }
 
-    pub(in super::super) fn write_abs24_w(&mut self, mut addr: u32, value: u16) -> Result<()> {
-        addr &= !1u32;
+    pub(in super::super) fn write_abs24_w(&mut self, addr: u32, value: u16) -> Result<()> {
         self.bus
             .write(addr, (value >> 8) as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
@@ -132,8 +128,7 @@ impl Cpu {
         Ok(())
     }
 
-    pub(in super::super) fn read_abs24_w(&self, mut addr: u32) -> Result<u16> {
-        addr &= !1u32;
+    pub(in super::super) fn read_abs24_w(&self, addr: u32) -> Result<u16> {
         Ok((self.bus.read(addr).with_context(|| format!("addr [{:x}]", addr))? as u16) << 8
             | self.bus.read(addr + 1).with_context(|| format!("addr [{:x}]", addr))? as u16)
     }
@@ -179,8 +174,7 @@ impl Cpu {
         self._read_abs16_l(addr).with_context(|| format!("addr [{:x}]", addr))
     }
 
-    pub(in super::super) fn write_abs24_l(&mut self, mut addr: u32, value: u32) -> Result<()> {
-        addr &= !1u32;
+    pub(in super::super) fn write_abs24_l(&mut self, addr: u32, value: u32) -> Result<()> {
         self.write_abs24_w(addr, (value >> 16) as u16)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         self.write_abs24_w(addr + 2, value as u16)
@@ -189,8 +183,7 @@ impl Cpu {
         Ok(())
     }
 
-    pub(in super::super) fn read_abs24_l(&self, mut addr: u32) -> Result<u32> {
-        addr &= !1u32;
+    pub(in super::super) fn read_abs24_l(&self, addr: u32) -> Result<u32> {
         Ok(
             (self.read_abs24_w(addr).with_context(|| format!("addr [{:x}]", addr))? as u32) << 16
                 | self.read_abs24_w(addr + 2).with_context(|| format!("addr [{:x}]", addr))? as u32,
