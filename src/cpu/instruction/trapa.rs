@@ -38,6 +38,24 @@ impl Cpu {
                 let inst = arg2 + 0x5a000000;
                 self.write_abs24_l(arg1 * 4, inst)?;
             }
+            104 => {
+                // __write
+                let arg_addr = self.read_rn_l(1)?;
+                let arg0 = self.read_abs24_l(arg_addr)?;
+                let arg1 = self.read_abs24_l(arg_addr + 4)?;
+                let arg2 = self.read_abs24_l(arg_addr + 8)?;
+
+                let mut chars = Vec::<u8>::new();
+                for i in 0..arg2 {
+                    let char_addr = arg1 + i;
+                    let char = self.read_abs24_b(char_addr)?;
+                    chars.push(char);
+                }
+                let print_string = String::from_utf8(chars)?;
+
+                // Print strings
+                println!("[program] [__write] [fd: {}] {}", arg0, print_string);
+            }
             _ => bail!("unsupported mes2 command id:{}", id),
         }
         Ok(())
