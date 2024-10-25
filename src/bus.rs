@@ -82,7 +82,7 @@ impl Bus {
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
                 self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
-            _ => bail!("Invalid address [{:x}]", addr),
+            _ => bail!("Invalid address [0x{:x}]", addr),
         }
         Ok(())
     }
@@ -98,7 +98,7 @@ impl Bus {
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
                 return Ok(self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize])
             }
-            _ => bail!("Invalid address [{:x}]", addr),
+            _ => bail!("Invalid address [0x{:x}]", addr),
         }
     }
 
@@ -128,7 +128,7 @@ impl Bus {
             AREA7_START_ADDR..=AREA7_END_ADDR => {
                 return Ok(7);
             }
-            _ => bail!("Invalid Addr [{}].", target_addr),
+            _ => bail!("Invalid Addr [0x{:x}].", target_addr),
         }
     }
 

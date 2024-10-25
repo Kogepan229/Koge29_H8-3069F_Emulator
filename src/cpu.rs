@@ -53,7 +53,7 @@ pub enum StateType {
 macro_rules! unimpl {
     ($op:expr, $pc:expr ) => {
         bail!(
-            "unimplemented instruction:[{:>04x}] pc:[{:x}({:x})]",
+            "unimplemented instruction:[0x{:>04x}] pc:[0x{:x}(0x{:x})]",
             $op,
             $pc - 2,
             $pc - 2 - PROGRAM_START_ADDR as u32
@@ -439,7 +439,7 @@ impl Cpu {
         match val {
             0 => self.ccr &= !(1 << target as u8),
             1 => self.ccr |= 1 << target as u8,
-            _ => panic!("[write_ccr] invalid value [{:x}]", val),
+            _ => panic!("[write_ccr] invalid value [0x{:x}]", val),
         }
     }
 
@@ -537,7 +537,7 @@ impl Cpu {
                     }
                 }
             }
-            _ => bail!("Invalid addr [{}]", target_addr),
+            _ => bail!("Invalid addr [0x{:x}]", target_addr),
         }
     }
 
@@ -553,7 +553,7 @@ impl Cpu {
 
     fn print_er(&self) {
         for i in 0..8 {
-            print!("ER{}:[{:x}] ", i, self.er[i]);
+            print!("ER{}:[0x{:x}] ", i, self.er[i]);
         }
         println!("");
     }
