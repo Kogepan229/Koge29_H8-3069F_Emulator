@@ -12,7 +12,7 @@ impl Cpu {
     pub(in super::super) fn read_inc_ern_b(&mut self, register_field: u8) -> Result<u8> {
         let addr = self.read_rn_l(register_field)? & ADDRESS_MASK;
         let value = self.read_abs24_b(addr)?;
-        println!("inc 0x{:x}", addr);
+        println!("\ninc 0x{:x}", addr);
         self.write_rn_l(register_field, addr + 1)?;
         Ok(value)
     }

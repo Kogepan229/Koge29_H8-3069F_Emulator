@@ -82,27 +82,27 @@ impl Cpu {
         let disp = self.fetch();
         // println!("opcode: 0x{:x}", opcode2);
         if opcode2 & 0x0080 == 0 {
-            println!(
-                "before er6: 0x{:x}, er3: 0x{:x}, disp: 0x{:x}",
-                self.read_rn_l(6)?,
-                self.read_rn_l(3)?,
-                disp
-            );
-            {
-                let tmp_disp = self.read_disp16_ern_l(6, 0xffe4)?;
-                println!("tmp 0x{:x}", tmp_disp);
-            }
+            // println!(
+            //     "before er6: 0x{:x}, er3: 0x{:x}, disp: 0x{:x}",
+            //     self.read_rn_l(6)?,
+            //     self.read_rn_l(3)?,
+            //     disp
+            // );
+            // {
+            //     let tmp_disp = self.read_disp16_ern_l(6, 0xffe4)?;
+            //     println!("tmp 0x{:x}", tmp_disp);
+            // }
             let register_ern = Cpu::get_nibble_opcode(opcode2, 3)?;
             let access_addr = self.get_addr_disp16(register_ern, disp)?;
             let value = self.read_disp16_ern_l(register_ern, disp)?;
             self.write_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?, value)?;
             self.mov_l_proc_pcc(value);
-            println!(
-                "after er6: 0x{:x}, er3: 0x{:x} value: 0x{:x}",
-                self.read_rn_l(6)?,
-                self.read_rn_l(3)?,
-                self.read_abs24_b(value)?
-            );
+            // println!(
+            //     "after er6: 0x{:x}, er3: 0x{:x} value: 0x{:x}",
+            //     self.read_rn_l(6)?,
+            //     self.read_rn_l(3)?,
+            //     self.read_abs24_b(value)?
+            // );
             // println!(
             //     "0x{:x} 0x{:x} 0x{:x} 0x{:x} 0x{:x}",
             //     // self.read_abs24_b(value - 16)?,
@@ -118,7 +118,7 @@ impl Cpu {
             let register_ern = Cpu::get_nibble_opcode(opcode2, 3)? & 0x07;
             let access_addr = self.get_addr_disp16(register_ern, disp)?;
             let value = self.read_rn_l(Cpu::get_nibble_opcode(opcode2, 4)?)?;
-            println!("wirtten value: 0x{:x}", value);
+            // println!("wirtten value: 0x{:x}", value);
             self.write_disp16_ern_l(register_ern, disp, value)?;
             self.mov_l_proc_pcc(value);
             Ok(self.calc_state(StateType::I, 3)? + self.calc_state_with_addr(StateType::M, 2, access_addr)?)
