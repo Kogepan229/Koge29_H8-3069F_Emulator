@@ -1,0 +1,1989 @@
+Set er2 [0x416900]
+Set er7(stack pointer) [0x417fd8]
+Set er5 [0x417b78(0x1278)]
+Set ___exit address
+    0:   01 00 78 50 6b 23 00 00 00 5c 
+    a:   5d 30 
+   18:   01 00 6d f6 
+   1c:   0f f6 
+   1e:   01 00 6d f5 
+   22:   01 00 78 50 6b 22 00 00 00 00 
+   2c:   01 00 6d f2 
+   30:   01 00 78 50 6b 22 00 00 00 38 
+   3a:   5d 20 
+  c9e:   01 00 6d f6 
+  ca2:   0f f6 
+  ca4:   1b 97 
+  ca6:   01 00 6d f5 
+  caa:   1a a2 
+  cac:   8a 08 
+  cae:   0a e2 
+  cb0:   01 00 6d 23 
+  cb4:   0f e0 
+  cb6:   01 00 6d 82 
+  cba:   01 00 6d f3 
+  cbe:   1a a2 
+  cc0:   1a 91 
+  cc2:   01 00 78 50 6b 23 00 00 00 20 
+  ccc:   5d 30 
+  4f2:   01 00 6d f6 
+  4f6:   0f f6 
+  4f8:   7a 17 ff ff ff d4 
+  4fe:   01 00 6d f4 
+  502:   01 00 6d f5 
+  506:   01 00 6f e0 ff e8 disp signed: -24
+wirtten value: 0x417fbc
+disp signed: -24
+
+  50c:   01 00 6f e1 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  512:   01 00 6f e2 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+  518:   01 00 6f 60 00 08 before er6: 0x417fac, er3: 0x416df2, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x416df2 value: 0x48
+
+  51e:   68 0a 
+  520:   58 70 03 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x416df2, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x416df2 value: 0x48
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bd9
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x416df2, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x416df2 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x416df2, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x416df2 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x48
+[program] [__write] [fd: 0] H
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bd9 value: 0x48
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bd9, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bd9 value: 0x48
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bda
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bd9, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bd9 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bd9, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bd9 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x48
+[program] [__write] [fd: 0] H
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bda value: 0x6c
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bda, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bda value: 0x6c
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bdb
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bda, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bda value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bda, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bda value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x6c
+[program] [__write] [fd: 0] l
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdb value: 0x6c
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bdb, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdb value: 0x6c
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bdc
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bdb, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bdb value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bdb, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bdb value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x6c
+[program] [__write] [fd: 0] l
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdc value: 0x6f
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bdc, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdc value: 0x6f
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bdd
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bdc, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bdc value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bdc, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bdc value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x6f
+[program] [__write] [fd: 0] o
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdd value: 0x6f
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bdd, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdd value: 0x6f
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bde
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bdd, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bdd value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bdd, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bdd value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x6f
+[program] [__write] [fd: 0] o
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bde value: 0x57
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bde, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bde value: 0x57
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417bdf
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bde, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bde value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bde, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bde value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x57
+[program] [__write] [fd: 0] W
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdf value: 0x57
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417bdf, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417bdf value: 0x57
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417be0
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417bdf, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417bdf value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417bdf, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417bdf value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x57
+[program] [__write] [fd: 0] W
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be0 value: 0x72
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417be0, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be0 value: 0x72
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417be1
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417be0, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417be0 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417be0, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417be0 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x72
+[program] [__write] [fd: 0] r
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be1 value: 0x72
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417be1, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be1 value: 0x72
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417be2
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417be1, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417be1 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417be1, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417be1 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x72
+[program] [__write] [fd: 0] r
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be2 value: 0x64
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417be2, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be2 value: 0x64
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417be3
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417be2, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417be2 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417be2, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417be2 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x64
+[program] [__write] [fd: 0] d
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be3 value: 0x64
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  524:   01 00 6f 62 00 08 before er6: 0x417fac, er3: 0x417be3, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be3 value: 0x64
+
+  52a:   6c 29 
+  52c:   01 00 6f e2 00 08 disp signed: 8
+wirtten value: 0x417be4
+disp signed: 8
+
+  532:   a9 25 
+  534:   58 60 03 40 
+  878:   0c 9a 
+  87a:   01 00 6f 61 ff e0 before er6: 0x417fac, er3: 0x417be3, disp: 0xffe0
+disp signed: -28
+tmp 0x0
+disp signed: -32
+disp signed: -32
+after er6: 0x417fac, er3: 0x417be3 value: 0x0
+
+  880:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417be3, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417be3 value: 0x0
+
+  886:   01 00 78 50 6b 23 00 00 00 14 
+  890:   5d 30 
+  37e:   01 00 6d f6 
+  382:   0f f6 
+  384:   1b 97 
+  386:   01 00 6d f4 
+  38a:   01 00 6d f5 
+  38e:   0f 84 
+  390:   0f 90 
+  392:   6e ea ff ff disp signed: -1
+disp signed: -1
+
+  396:   0f c4 
+  398:   46 16 
+  39a:   1a a2 
+  39c:   8a 01 
+  39e:   0f e1 
+  3a0:   1b 01 
+  3a2:   01 00 78 50 6b 23 00 00 00 50 
+  3ac:   5d 30 
+  f2e:   01 00 6d f6 
+  f32:   0f f6 
+  f34:   01 00 6d f5 
+  f38:   01 00 6d f2 
+  f3c:   0f 92 
+  f3e:   0f 81 
+  f40:   1a 80 
+  f42:   88 68 
+  f44:   01 00 78 50 6b 23 00 00 00 34 
+  f4e:   5d 30 
+   70:   01 00 6d f6 
+   74:   0f f6 
+   76:   7a 17 ff ff ff e0 
+   7c:   01 00 6f e1 ff e0 disp signed: -32
+wirtten value: 0x0
+disp signed: -32
+
+   82:   01 00 6f e2 ff e4 disp signed: -28
+wirtten value: 0x417f6f
+disp signed: -28
+
+   88:   01 00 6f 62 00 08 before er6: 0x417f4c, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x417f6f
+disp signed: 8
+disp signed: 8
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   8e:   01 00 6f e2 ff e8 disp signed: -24
+wirtten value: 0x1
+disp signed: -24
+
+   94:   01 00 6f 62 00 0c before er6: 0x417f4c, er3: 0x416970, disp: 0xc
+disp signed: -28
+tmp 0x417f6f
+disp signed: 12
+disp signed: 12
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   9a:   01 00 6f e2 ff ec disp signed: -20
+wirtten value: 0x417b78
+disp signed: -20
+
+   a0:   01 00 6f 62 00 10 before er6: 0x417f4c, er3: 0x416970, disp: 0x10
+disp signed: -28
+tmp 0x417f6f
+disp signed: 16
+disp signed: 16
+after er6: 0x417f4c, er3: 0x416970 value: 0x0
+
+   a6:   01 00 6f e2 ff f0 disp signed: -16
+wirtten value: 0x417f70
+disp signed: -16
+
+   ac:   01 00 6f 62 00 14 before er6: 0x417f4c, er3: 0x416970, disp: 0x14
+disp signed: -28
+tmp 0x417f6f
+disp signed: 20
+disp signed: 20
+after er6: 0x417f4c, er3: 0x416970 value: 0x40
+
+   b2:   01 00 6f e2 ff f4 disp signed: -12
+wirtten value: 0x416cae
+disp signed: -12
+
+   b8:   1a a2 
+   ba:   01 00 6f e2 ff f8 disp signed: -8
+wirtten value: 0x0
+disp signed: -8
+
+   c0:   01 00 6f e2 ff fc disp signed: -4
+wirtten value: 0x0
+disp signed: -4
+
+   c6:   0f 80 
+   c8:   0f e2 
+   ca:   7a 12 ff ff ff e0 
+   d0:   0f a1 
+   d2:   57 00 __write a0[fd]:0, a1[ptr]:0x417f6f, a2[size]:1
+char 0x64
+[program] [__write] [fd: 0] d
+
+   d4:   0f 80 
+   d6:   7a 17 00 00 00 20 
+   dc:   01 00 6d 76 
+   e0:   54 70 
+  f50:   0b 97 
+  f52:   01 00 6d 75 
+  f56:   01 00 6d 76 
+  f5a:   54 70 
+  3ae:   40 08 
+  3b8:   0f c0 
+  3ba:   01 00 6d 75 
+  3be:   01 00 6d 74 
+  3c2:   0b 97 
+  3c4:   01 00 6d 76 
+  3c8:   54 70 
+  892:   01 00 6f e0 ff e4 disp signed: -28
+wirtten value: 0x0
+disp signed: -28
+
+  898:   01 00 6f 63 00 08 before er6: 0x417fac, er3: 0x416970, disp: 0x8
+disp signed: -28
+tmp 0x0
+disp signed: 8
+disp signed: 8
+after er6: 0x417fac, er3: 0x417be4 value: 0x0
+
+  89e:   68 3a 
+  8a0:   58 60 fc 80 
+  8a4:   01 00 6f 60 ff e4 before er6: 0x417fac, er3: 0x417be4, disp: 0xffe4
+disp signed: -28
+tmp 0x0
+disp signed: -28
+disp signed: -28
+after er6: 0x417fac, er3: 0x417be4 value: 0x0
+
+  8aa:   47 14 
+  8c0:   01 00 6d 75 
+  8c4:   01 00 6d 74 
+  8c8:   7a 17 00 00 00 2c 
+  8ce:   01 00 6d 76 
+  8d2:   54 70 
+  cce:   0b 97 
+  cd0:   01 00 6d 75 
+  cd4:   0b 97 
+  cd6:   01 00 6d 76 
+  cda:   54 70 
+   3c:   0b 97 
+   3e:   1a 80 
+   40:   01 00 6d 75 
+   44:   01 00 6d 76 
+   48:   54 70 
+    c:   01 00 78 50 6b 23 00 00 00 30 
+   16:   59 30 
+ER0:[0x0] ER1:[0x417f2c] ER2:[0x417f00] ER3:[0x41694a] ER4:[0x0] ER5:[0x417b78] ER6:[0x0] ER7:[0x417fd8] 
+state: 74736, time: 0.00547767sec

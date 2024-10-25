@@ -4,6 +4,7 @@ use anyhow::{anyhow, Result};
 impl Cpu {
     pub(in super::super) fn get_addr_disp16(&self, register_field: u8, disp: u16) -> Result<u32> {
         let addr = self.read_rn_l(register_field)?;
+        println!("disp signed: {}", (disp as i16) as i32);
         let result = addr
             .checked_add_signed((disp as i16) as i32)
             .ok_or_else(|| anyhow!("attempt to add with overflow [{:x} + {:x}]", addr, disp as i16))?
