@@ -6,8 +6,8 @@ use crate::{
     setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
-use std::time;
 use std::time::Duration;
+use std::{collections::VecDeque, time};
 
 mod addressing_mode;
 mod instruction;
@@ -25,6 +25,7 @@ pub struct Cpu {
     operating_pc: u32,
     ccr: u8,
     pub er: [u32; 8],
+    interrupt_requests: VecDeque<u8>,
     pub exit_addr: u32, // address of ___exit
 }
 
@@ -69,6 +70,7 @@ impl Cpu {
             operating_pc: 0,
             ccr: 0,
             er: [0; 8],
+            interrupt_requests: VecDeque::new(),
             exit_addr: 0,
         }
     }
@@ -449,6 +451,10 @@ impl Cpu {
 
     pub fn read_pc(&self) -> u32 {
         self.pc
+    }
+
+    pub fn request_interrupt(&mut self, num: u8) {
+        self.interrupt_requests.push_back(num);
     }
 
     fn get_wait_state(&self, area_index: u8) -> Result<u8> {
