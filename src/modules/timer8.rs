@@ -1,4 +1,4 @@
-use crate::cpu::Cpu;
+use crate::{bus::Bus, cpu::Cpu};
 use anyhow::Result;
 
 // Timer 0
@@ -61,20 +61,23 @@ impl Timer8_0 {
         }
     }
 
-    pub fn update_timer8_0(&mut self, cpu: &mut Cpu, state: u8) -> Result<()> {
+    pub fn update_timer8_0(&mut self, bus: &mut Bus, state: u8) -> Result<()> {
+        if self.prescaler == 0 {
+            return Ok(());
+        }
         self.state += u16::from(state);
         let mut count = self.state / self.prescaler;
         self.state -= self.prescaler * count;
 
         while count != 0 {
             // count
-            let tcnt = cpu.bus.read(TCNT0_8)?;
+            let tcnt = bus.read(TCNT0_8)?;
             let (mut tcnt, is_overflowed) = tcnt.overflowing_add(1);
 
-            let tcora = cpu.bus.read(TCORA0)?;
-            let tcorb = cpu.bus.read(TCORB0)?;
+            let tcora = bus.read(TCORA0)?;
+            let tcorb = bus.read(TCORB0)?;
 
-            let mut tcsr = cpu.bus.read(TCSR0_8)?;
+            let mut tcsr = bus.read(TCSR0_8)?;
 
             // CMFA, Compare match on TCORA0
             if tcnt == tcora {
@@ -83,7 +86,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmia {
-                    cpu.request_interrupt(36);
+                    // cpu.request_interrupt(36);
                 }
             }
 
@@ -94,7 +97,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmib {
-                    cpu.request_interrupt(37);
+                    // cpu.request_interrupt(37);
                 }
             }
 
@@ -102,12 +105,12 @@ impl Timer8_0 {
             if is_overflowed {
                 tcsr |= 0b0010_0000;
                 if self.is_allowed_ovi {
-                    cpu.request_interrupt(39);
+                    // cpu.request_interrupt(39);
                 }
             }
 
-            cpu.bus.write(TCNT0_8, tcnt)?;
-            cpu.bus.write(TCSR0_8, tcsr);
+            bus.write(TCNT0_8, tcnt)?;
+            bus.write(TCSR0_8, tcsr)?;
 
             count -= 1;
         }

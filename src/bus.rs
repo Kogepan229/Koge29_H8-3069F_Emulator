@@ -1,5 +1,8 @@
+use std::{borrow::Borrow, cell::RefCell, rc::Weak};
+
 use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
+    modules::ModuleManager,
     registers::DRCRA,
 };
 use anyhow::{bail, Result};
@@ -55,6 +58,7 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize = (IO_REGISTERS2_EMC1_END_ADDR - IO_REG
 
 #[derive(Clone)]
 pub struct Bus {
+    pub module_manager: Weak<RefCell<ModuleManager>>,
     pub memory: Memory,
     pub exception_handling_vector: Box<[u8]>,
     pub dram: Box<[u8]>,
@@ -63,8 +67,9 @@ pub struct Bus {
 }
 
 impl Bus {
-    pub fn new() -> Self {
+    pub fn new(module_manager: Weak<RefCell<ModuleManager>>) -> Self {
         Bus {
+            module_manager,
             memory: create_memory(),
             exception_handling_vector: vec![0; VENCTOR_SIZE].into_boxed_slice(),
             dram: vec![0; AREA2_SIZE].into_boxed_slice(),
@@ -76,10 +81,26 @@ impl Bus {
     pub fn write(&mut self, addr: u32, value: u8) -> Result<()> {
         match addr {
             VENCTOR_START_ADDR..=VENCTOR_END_ADDR => self.exception_handling_vector[addr as usize] = value,
-            IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value,
+            IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
+                self.module_manager
+                    .borrow()
+                    .upgrade()
+                    .unwrap()
+                    .borrow_mut()
+                    .write_registers(addr, value);
+                // self.module_manager.write_registers(addr, value);
+                self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value
+            }
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
+                // self.module_manager.write_registers(addr, value);
+                self.module_manager
+                    .borrow()
+                    .upgrade()
+                    .unwrap()
+                    .borrow_mut()
+                    .write_registers(addr, value);
                 self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
             _ => bail!("Invalid address [0x{:x}]", addr),
@@ -164,19 +185,28 @@ impl Bus {
 
 #[cfg(test)]
 mod tests {
+    use std::{cell::RefCell, rc::Rc};
+
     use crate::{
         bus::{
             IO_REGISTERS1_END_ADDR, IO_REGISTERS1_SIZE, IO_REGISTERS1_START_ADDR, IO_REGISTERS2_EMC1_END_ADDR, IO_REGISTERS2_EMC1_SIZE,
             IO_REGISTERS2_EMC1_START_ADDR,
         },
+        cpu::Cpu,
         memory::{MEMORY_END_ADDR, MEMORY_SIZE, MEMORY_START_ADDR},
+        modules::ModuleManager,
     };
 
     use super::Bus;
 
+    fn create_bus() -> Bus {
+        let module_manager = Rc::new(RefCell::new(ModuleManager::new()));
+        Bus::new(Rc::downgrade(&module_manager))
+    }
+
     #[test]
     fn test_write_memory() {
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.memory[0] = 0xff;
         bus.write(MEMORY_START_ADDR, 0xff).unwrap();
         assert_eq!(bus.memory[0], 0xff);
@@ -188,7 +218,7 @@ mod tests {
 
     #[test]
     fn test_read_memory() {
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.memory[0] = 0xff;
         assert_eq!(bus.read(MEMORY_START_ADDR).unwrap(), 0xff);
 
@@ -198,42 +228,42 @@ mod tests {
 
     #[test]
     fn test_write_io_registers() {
-        let mut bus = Bus::new();
-        bus.io_registrs1[0] = 0xff;
-        bus.write(IO_REGISTERS1_START_ADDR, 0xff).unwrap();
-        assert_eq!(bus.io_registrs1[0], 0xff);
+        let mut cpu = Cpu::new();
+        cpu.bus.io_registrs1[0] = 0xff;
+        cpu.bus.write(IO_REGISTERS1_START_ADDR, 0xff).unwrap();
+        assert_eq!(cpu.bus.io_registrs1[0], 0xff);
 
-        let mut bus = Bus::new();
-        bus.io_registrs1[IO_REGISTERS1_SIZE - 1] = 0xff;
-        bus.write(IO_REGISTERS1_END_ADDR, 0xff).unwrap();
-        assert_eq!(bus.io_registrs1[IO_REGISTERS1_SIZE - 1], 0xff);
+        let mut cpu = Cpu::new();
+        cpu.bus.io_registrs1[IO_REGISTERS1_SIZE - 1] = 0xff;
+        cpu.bus.write(IO_REGISTERS1_END_ADDR, 0xff).unwrap();
+        assert_eq!(cpu.bus.io_registrs1[IO_REGISTERS1_SIZE - 1], 0xff);
 
-        let mut bus = Bus::new();
-        bus.io_registrs2[0] = 0xff;
-        bus.write(IO_REGISTERS2_EMC1_START_ADDR, 0xff).unwrap();
-        assert_eq!(bus.io_registrs2[0], 0xff);
+        let mut cpu = Cpu::new();
+        cpu.bus.io_registrs2[0] = 0xff;
+        cpu.bus.write(IO_REGISTERS2_EMC1_START_ADDR, 0xff).unwrap();
+        assert_eq!(cpu.bus.io_registrs2[0], 0xff);
 
-        let mut bus = Bus::new();
-        bus.io_registrs2[IO_REGISTERS2_EMC1_SIZE - 1] = 0xff;
-        bus.write(IO_REGISTERS2_EMC1_END_ADDR, 0xff).unwrap();
-        assert_eq!(bus.io_registrs2[IO_REGISTERS2_EMC1_SIZE - 1], 0xff)
+        let mut cpu = Cpu::new();
+        cpu.bus.io_registrs2[IO_REGISTERS2_EMC1_SIZE - 1] = 0xff;
+        cpu.bus.write(IO_REGISTERS2_EMC1_END_ADDR, 0xff).unwrap();
+        assert_eq!(cpu.bus.io_registrs2[IO_REGISTERS2_EMC1_SIZE - 1], 0xff)
     }
 
     #[test]
     fn test_read_io_registers() {
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.io_registrs1[0] = 0xff;
         assert_eq!(bus.read(IO_REGISTERS1_START_ADDR).unwrap(), 0xff);
 
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.io_registrs1[IO_REGISTERS1_SIZE - 1] = 0xff;
         assert_eq!(bus.read(IO_REGISTERS1_END_ADDR).unwrap(), 0xff);
 
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.io_registrs2[0] = 0xff;
         assert_eq!(bus.read(IO_REGISTERS2_EMC1_START_ADDR).unwrap(), 0xff);
 
-        let mut bus = Bus::new();
+        let mut bus = create_bus();
         bus.io_registrs2[IO_REGISTERS2_EMC1_SIZE - 1] = 0xff;
         assert_eq!(bus.read(IO_REGISTERS2_EMC1_END_ADDR).unwrap(), 0xff)
     }
