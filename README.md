@@ -1,5 +1,10 @@
 # Koge29_H8-3069F_Emulator
 
+## How to Run example
+```
+cargo run --release -- --elf=./example/one.elf --disable-socket --print-messages 
+```
+
 ## Implemented
 
 <details><summary>Instructions</summary>
