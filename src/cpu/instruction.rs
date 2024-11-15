@@ -31,6 +31,7 @@ mod jsr;
 mod mov_b;
 mod mov_l;
 mod mov_w;
+mod mulxu;
 mod or;
 mod rotl;
 mod rotr;
