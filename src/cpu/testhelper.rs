@@ -313,6 +313,7 @@ impl AddressingMode<Disp16Data> for Disp16Mode {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Disp24Data {
     pub disp: u32,
     pub base_addr: u32,
@@ -320,7 +321,7 @@ pub struct Disp24Data {
     pub target_i: u8,
 }
 impl Disp24Data {
-    fn as8(&self, index: u8) -> u8 {
+    pub fn as8(&self, index: u8) -> u8 {
         match index {
             1 => return (self.disp >> 24) as u8,
             2 => return (self.disp >> 16) as u8,

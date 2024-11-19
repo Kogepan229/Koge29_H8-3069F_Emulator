@@ -27,16 +27,15 @@ impl Cpu {
     }
 
     pub(in super::super) fn stc_w_disp24(&mut self, opcode2: u16) -> Result<u8> {
-        println!("disp24");
         let erd_i = Cpu::get_nibble_opcode(opcode2, 3)?;
         self.fetch(); // opcode3
         let opcode4 = self.fetch();
         let opcode5 = self.fetch();
         let disp = (u32::from(opcode4) << 16) | u32::from(opcode5);
-        println!("erd_i: {}, disp: {:x}", erd_i, disp);
+        let addr = self.get_addr_disp24(erd_i, disp)?;
         self.write_disp24_ern_w(erd_i, disp, u16::from(self.ccr))?;
 
-        Ok(self.calc_state(StateType::I, 5)? + self.calc_state(StateType::M, 1)?)
+        Ok(self.calc_state(StateType::I, 5)? + self.calc_state_with_addr(StateType::M, 1, addr)?)
     }
 
     pub(in super::super) fn stc_w_inc_ern(&mut self, opcode2: u16) -> Result<u8> {
@@ -67,7 +66,7 @@ impl Cpu {
 mod tests {
     use std::vec;
 
-    use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Disp16Mode, ErnMode, ImmMode, RnMode, TestHelper};
+    use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Disp16Mode, Disp24Mode, ErnMode, ImmMode, RnMode, TestHelper};
 
     #[test]
     fn test_stc_b() {
@@ -78,7 +77,6 @@ mod tests {
                 .set_opcode(&[0x02, target_i])
                 .access_cpu(|cpu| {
                     cpu.ccr = ccr;
-                    println!("test ccr: {}", ccr);
                 })
                 .should_check_ccr(false)
                 .should_state(2)
@@ -123,6 +121,37 @@ mod tests {
                 .should_check_ccr(false)
                 .exec(|cpu| {
                     assert_eq!(cpu.read_disp16_ern_w(disp.target_i, disp.disp).unwrap(), ccr.into());
+                    true
+                });
+        });
+    }
+
+    #[test]
+    fn test_stc_w_disp24() {
+        // Using ImmMode as ccr
+        TestHelper::build(ImmMode::new(vec![0, 0xf]), Disp24Mode::new()).run(|operator, ccr, disp| {
+            operator
+                .clone()
+                .set_opcode(&[
+                    0x01,
+                    0x40,
+                    0x78,
+                    (disp.target_i << 4),
+                    0x6b,
+                    0xa0,
+                    disp.as8(1),
+                    disp.as8(2),
+                    disp.as8(3),
+                    disp.as8(4),
+                ])
+                .access_cpu(|cpu| {
+                    cpu.ccr = ccr;
+                    cpu.write_rn_l(disp.target_i, disp.base_addr).unwrap();
+                })
+                .should_state(12)
+                .should_check_ccr(false)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_disp24_ern_w(disp.target_i, disp.disp).unwrap(), ccr.into());
                     true
                 });
         });
