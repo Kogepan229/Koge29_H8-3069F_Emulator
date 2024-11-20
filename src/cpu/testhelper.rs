@@ -52,6 +52,7 @@ where
 pub struct TestOperator {
     cpu: cpu::Cpu,
     should_success: bool,
+    should_check_ccr: bool,
     initial_ccr: [u8; 2],
     expect_ccr: [u8; 2],
     expect_state: u8,
@@ -62,6 +63,7 @@ impl TestOperator {
         TestOperator {
             cpu: cpu::Cpu::new(),
             should_success,
+            should_check_ccr: true,
             initial_ccr: [0, 0xff], // Invariant values are 0 and 1
             expect_ccr: [0, 0xff],
             expect_state: 0,
@@ -72,18 +74,23 @@ impl TestOperator {
         for i in 0..=1 {
             let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
-            cpu.ccr = self.initial_ccr[i];
+            if self.should_check_ccr {
+                cpu.ccr = self.initial_ccr[i];
+            }
             let opcode = cpu.fetch();
             let result = cpu.exec(opcode);
             if self.should_success {
-                assert!(result.is_ok());
                 assert_eq!(result.unwrap(), self.expect_state);
-                assert_eq!(cpu.ccr, self.expect_ccr[i]);
+                if self.should_check_ccr {
+                    assert_eq!(cpu.ccr, self.expect_ccr[i]);
+                }
                 assert!(f(cpu));
             } else {
-                assert!(
-                    result.is_err() || result.is_ok_and(|state| state != self.expect_state) || cpu.ccr != self.expect_ccr[1] || !f(cpu)
-                );
+                let mut is_err = result.is_err() || cpu.ccr != self.expect_ccr[1] || !f(cpu);
+                if self.should_check_ccr {
+                    is_err = is_err || result.is_ok_and(|state| state != self.expect_state);
+                }
+                assert!(is_err);
             }
         }
     }
@@ -100,6 +107,11 @@ impl TestOperator {
 
     pub fn should_success(mut self, success: bool) -> TestOperator {
         self.should_success = success;
+        self
+    }
+
+    pub fn should_check_ccr(mut self, check: bool) -> TestOperator {
+        self.should_check_ccr = check;
         self
     }
 
@@ -229,8 +241,8 @@ pub struct ImmMode {
     values: Vec<u8>,
 }
 impl ImmMode {
-    pub fn new(value: u8) -> Box<ImmMode> {
-        Box::new(ImmMode { values: [value].to_vec() })
+    pub fn new(values: Vec<u8>) -> Box<ImmMode> {
+        Box::new(ImmMode { values })
     }
 }
 impl AddressingMode<u8> for ImmMode {
@@ -255,6 +267,138 @@ impl AddressingMode<u8> for ErnMode {
     }
 
     fn get_invalid_index(&mut self) -> Vec<u8> {
+        Vec::new()
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Disp16Data {
+    pub disp: u16,
+    pub base_addr: u32,
+    pub target_addr: u32,
+    pub er_i: u8,
+}
+impl Disp16Data {
+    pub fn as8(&self, index: u8) -> u8 {
+        match index {
+            1 => return (self.disp >> 8) as u8,
+            2 => return self.disp as u8,
+            _ => panic!(),
+        }
+    }
+}
+
+pub struct Disp16Mode {}
+impl Disp16Mode {
+    pub fn new() -> Box<Disp16Mode> {
+        Box::new(Disp16Mode {})
+    }
+}
+impl AddressingMode<Disp16Data> for Disp16Mode {
+    fn get_valid_index(&mut self) -> Vec<Disp16Data> {
+        let list: Vec<Disp16Data> = vec![0, 1, 2, 3, 4, 5, 6, 7]
+            .iter()
+            .map(|i| Disp16Data {
+                disp: 0x0eee,
+                base_addr: 0xffcf20,
+                target_addr: 0xffde0e,
+                er_i: *i,
+            })
+            .collect();
+        list
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<Disp16Data> {
+        Vec::new()
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Disp24Data {
+    pub disp: u32,
+    pub base_addr: u32,
+    pub target_addr: u32,
+    pub er_i: u8,
+}
+impl Disp24Data {
+    pub fn as8(&self, index: u8) -> u8 {
+        match index {
+            1 => return (self.disp >> 24) as u8,
+            2 => return (self.disp >> 16) as u8,
+            3 => return (self.disp >> 8) as u8,
+            4 => return self.disp as u8,
+            _ => panic!(),
+        }
+    }
+}
+
+pub struct Disp24Mode {}
+impl Disp24Mode {
+    pub fn new() -> Box<Disp24Mode> {
+        Box::new(Disp24Mode {})
+    }
+}
+impl AddressingMode<Disp24Data> for Disp24Mode {
+    fn get_valid_index(&mut self) -> Vec<Disp24Data> {
+        let list: Vec<Disp24Data> = vec![0, 1, 2, 3, 4, 5, 6, 7]
+            .iter()
+            .map(|i| Disp24Data {
+                disp: 0xfffeee,
+                base_addr: 0xffcf20,
+                target_addr: 0xffce0e,
+                er_i: *i,
+            })
+            .collect();
+        list
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<Disp24Data> {
+        Vec::new()
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct IncErnData {
+    pub base_addr: u32,
+    pub result_addr: u32,
+    pub er_i: u8,
+}
+
+pub struct IncErnMode {
+    valid_index_list: Vec<IncErnData>,
+}
+impl IncErnMode {
+    fn new(diff: u32) -> Box<IncErnMode> {
+        Box::new(IncErnMode {
+            valid_index_list: vec![0, 1, 2, 3, 4, 5, 6, 7]
+                .iter()
+                .map(|i| IncErnData {
+                    base_addr: 0xffcf20,
+                    result_addr: 0xffcf20 + diff,
+                    er_i: *i,
+                })
+                .collect(),
+        })
+    }
+
+    pub fn new_b() -> Box<IncErnMode> {
+        IncErnMode::new(1)
+    }
+
+    pub fn new_w() -> Box<IncErnMode> {
+        IncErnMode::new(2)
+    }
+
+    pub fn new_l() -> Box<IncErnMode> {
+        IncErnMode::new(4)
+    }
+}
+impl AddressingMode<IncErnData> for IncErnMode {
+    fn get_valid_index(&mut self) -> Vec<IncErnData> {
+        self.valid_index_list.clone()
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<IncErnData> {
         Vec::new()
     }
 }

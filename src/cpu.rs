@@ -189,6 +189,21 @@ impl Cpu {
 
             0x01 => match opcode as u8 {
                 0x00 => return self.mov_l(opcode),
+                0x40 => {
+                    let opcode2 = self.fetch();
+                    match (opcode2 >> 8) as u8 {
+                        0x69 => return self.stc_w_ern(opcode2),
+                        0x6f => return self.stc_w_disp16(opcode2),
+                        0x78 => return self.stc_w_disp24(opcode2),
+                        0x6d => return self.stc_w_inc_ern(opcode2),
+                        0x6b => match opcode2 as u8 {
+                            0x80 => return self.stc_abs16(),
+                            0xa0 => return self.stc_abs24(),
+                            _ => unimpl!(opcode, self.pc),
+                        },
+                        _ => unimpl!(opcode, self.pc),
+                    }
+                }
                 0xf0 => {
                     let opcode2 = self.fetch();
                     match (opcode2 >> 8) as u8 {
@@ -200,6 +215,8 @@ impl Cpu {
                 }
                 _ => unimpl!(opcode, self.pc),
             },
+
+            0x02 => return self.stc_b(opcode),
 
             0x50 => return self.mulxu_b(opcode),
             0x52 => return self.mulxu_w(opcode),

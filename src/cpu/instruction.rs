@@ -43,6 +43,7 @@ mod shal;
 mod shar;
 mod shll;
 mod shlr;
+mod stc;
 mod sub_b;
 mod sub_l;
 mod sub_w;

@@ -216,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_mov_b_imm_helper() {
-        TestHelper::build(ImmMode::new(0xa5), RnMode::new()).run(|operator, imm, target_i| {
+        TestHelper::build(ImmMode::new(vec![0xa5]), RnMode::new()).run(|operator, imm, target_i| {
             operator // negative value
                 .clone()
                 .set_opcode(&[0xf0 | target_i, imm])
@@ -226,7 +226,7 @@ mod tests {
                 .should_ccr_n(true)
                 .exec(|cpu| cpu.read_rn_b(target_i).unwrap() == 0xa5);
         });
-        TestHelper::build(ImmMode::new(0x00), RnMode::new()).run(|operator, imm, target_i| {
+        TestHelper::build(ImmMode::new(vec![0x00]), RnMode::new()).run(|operator, imm, target_i| {
             operator // negative value
                 .clone()
                 .set_opcode(&[0xf0 | target_i, imm])
