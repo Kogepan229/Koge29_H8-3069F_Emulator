@@ -40,16 +40,18 @@ impl Cpu {
 
     pub(in super::super) fn stc_w_inc_ern(&mut self, opcode2: u16) -> Result<u8> {
         let erd_i = Cpu::get_nibble_opcode(opcode2, 3)? & 0b111;
+        let addr = self.read_rn_l(erd_i)?;
         self.write_inc_ern_w(erd_i, u16::from(self.ccr))?;
 
-        Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::M, 1)? + self.calc_state(StateType::N, 2)?)
+        Ok(self.calc_state(StateType::I, 2)? + self.calc_state_with_addr(StateType::M, 1, addr)? + self.calc_state(StateType::N, 2)?)
     }
 
     pub(in super::super) fn stc_abs16(&mut self) -> Result<u8> {
         let addr = self.fetch();
+        let read_addr = self.get_addr_abs16(addr);
         self.write_abs16_w(addr, u16::from(self.ccr))?;
 
-        Ok(self.calc_state(StateType::I, 3)? + self.calc_state(StateType::M, 1)?)
+        Ok(self.calc_state(StateType::I, 3)? + self.calc_state_with_addr(StateType::M, 1, read_addr)?)
     }
 
     pub(in super::super) fn stc_abs24(&mut self) -> Result<u8> {
@@ -58,7 +60,7 @@ impl Cpu {
         let addr = (u32::from(opcode3) << 16) | u32::from(opcode4);
         self.write_abs24_w(addr, u16::from(self.ccr))?;
 
-        Ok(self.calc_state(StateType::I, 4)? + self.calc_state(StateType::M, 1)?)
+        Ok(self.calc_state(StateType::I, 4)? + self.calc_state_with_addr(StateType::M, 1, addr)?)
     }
 }
 
@@ -66,7 +68,7 @@ impl Cpu {
 mod tests {
     use std::vec;
 
-    use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Disp16Mode, Disp24Mode, ErnMode, ImmMode, RnMode, TestHelper};
+    use crate::cpu::testhelper::{Abs16Mode, Abs24Mode, Disp16Mode, Disp24Mode, ErnMode, ImmMode, IncErnMode, RnMode, TestHelper};
 
     #[test]
     fn test_stc_b() {
@@ -155,5 +157,64 @@ mod tests {
                     true
                 });
         });
+    }
+
+    #[test]
+    fn test_stc_w_inc_ern() {
+        // Using ImmMode as ccr
+        TestHelper::build(ImmMode::new(vec![0, 0xf]), IncErnMode::new_w()).run(|operator, ccr, inc| {
+            operator
+                .clone()
+                .set_opcode(&[0x01, 0x40, 0x6d, (inc.target_i << 4) | 0x80])
+                .access_cpu(|cpu| {
+                    cpu.ccr = ccr;
+                    cpu.write_rn_l(inc.target_i, inc.base_addr).unwrap()
+                })
+                .should_state(8)
+                .should_check_ccr(false)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_abs24_w(inc.base_addr).unwrap(), ccr.into());
+                    assert_eq!(cpu.read_rn_l(inc.target_i).unwrap(), inc.result_addr);
+                    true
+                });
+        })
+    }
+
+    #[test]
+    fn test_stc_w_abs16() {
+        // Using ImmMode as ccr
+        TestHelper::build(ImmMode::new(vec![0, 0xf]), Abs16Mode::new()).run(|operator, ccr, abs| {
+            operator
+                .clone()
+                .set_opcode(&[&[0x01, 0x40, 0x6b, 0x80], &abs.to_be_bytes()[..]].concat())
+                .access_cpu(|cpu| {
+                    cpu.ccr = ccr;
+                })
+                .should_state(8)
+                .should_check_ccr(false)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_abs16_w(abs).unwrap(), ccr.into());
+                    true
+                });
+        })
+    }
+
+    #[test]
+    fn test_stc_w_abs24() {
+        // Using ImmMode as ccr
+        TestHelper::build(ImmMode::new(vec![0, 0xf]), Abs24Mode::new()).run(|operator, ccr, abs| {
+            operator
+                .clone()
+                .set_opcode(&[&[0x01, 0x40, 0x6b, 0xa0], &abs.to_be_bytes()[..]].concat())
+                .access_cpu(|cpu| {
+                    cpu.ccr = ccr;
+                })
+                .should_state(10)
+                .should_check_ccr(false)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_abs24_w(abs).unwrap(), ccr.into());
+                    true
+                });
+        })
     }
 }

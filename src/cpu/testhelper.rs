@@ -357,6 +357,52 @@ impl AddressingMode<Disp24Data> for Disp24Mode {
     }
 }
 
+#[derive(Clone, Copy)]
+pub struct IncErnData {
+    pub base_addr: u32,
+    pub result_addr: u32,
+    pub target_i: u8,
+}
+
+pub struct IncErnMode {
+    valid_index_list: Vec<IncErnData>,
+}
+impl IncErnMode {
+    fn new(diff: u32) -> Box<IncErnMode> {
+        Box::new(IncErnMode {
+            valid_index_list: vec![0, 1, 2, 3, 4, 5, 6, 7]
+                .iter()
+                .map(|i| IncErnData {
+                    base_addr: 0xffcf20,
+                    result_addr: 0xffcf20 + diff,
+                    target_i: *i,
+                })
+                .collect(),
+        })
+    }
+
+    pub fn new_b() -> Box<IncErnMode> {
+        IncErnMode::new(1)
+    }
+
+    pub fn new_w() -> Box<IncErnMode> {
+        IncErnMode::new(2)
+    }
+
+    pub fn new_l() -> Box<IncErnMode> {
+        IncErnMode::new(4)
+    }
+}
+impl AddressingMode<IncErnData> for IncErnMode {
+    fn get_valid_index(&mut self) -> Vec<IncErnData> {
+        self.valid_index_list.clone()
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<IncErnData> {
+        Vec::new()
+    }
+}
+
 pub struct Abs8Mode {}
 impl Abs8Mode {
     pub fn new() -> Box<Abs8Mode> {
