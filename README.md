@@ -27,7 +27,7 @@ cargo run --release -- --elf=./example/one.elf --disable-socket --print-messages
 | DEC         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | DAA         | <ul><li>[ ] B</ul>                     |
 | DAS         | <ul><li>[ ] B</ul>                     |
-| MULXU       | <ul><li>[ ] B<li> [ ] W</ul>           |
+| MULXU       | <ul><li>[x] B<li> [x] W</ul>           |
 | DIVXU       | <ul><li>[ ] B<li> [ ] W</ul>           |
 | MULXS       | <ul><li>[ ] B<li> [ ] W</ul>           |
 | DIVXS       | <ul><li>[ ] B<li> [ ] W</ul>           |
