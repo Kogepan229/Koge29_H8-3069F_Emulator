@@ -276,7 +276,7 @@ pub struct Disp16Data {
     pub disp: u16,
     pub base_addr: u32,
     pub target_addr: u32,
-    pub target_i: u8,
+    pub er_i: u8,
 }
 impl Disp16Data {
     pub fn as8(&self, index: u8) -> u8 {
@@ -302,7 +302,7 @@ impl AddressingMode<Disp16Data> for Disp16Mode {
                 disp: 0x0eee,
                 base_addr: 0xffcf20,
                 target_addr: 0xffde0e,
-                target_i: *i,
+                er_i: *i,
             })
             .collect();
         list
@@ -318,7 +318,7 @@ pub struct Disp24Data {
     pub disp: u32,
     pub base_addr: u32,
     pub target_addr: u32,
-    pub target_i: u8,
+    pub er_i: u8,
 }
 impl Disp24Data {
     pub fn as8(&self, index: u8) -> u8 {
@@ -346,7 +346,7 @@ impl AddressingMode<Disp24Data> for Disp24Mode {
                 disp: 0xfffeee,
                 base_addr: 0xffcf20,
                 target_addr: 0xffce0e,
-                target_i: *i,
+                er_i: *i,
             })
             .collect();
         list
@@ -361,7 +361,7 @@ impl AddressingMode<Disp24Data> for Disp24Mode {
 pub struct IncErnData {
     pub base_addr: u32,
     pub result_addr: u32,
-    pub target_i: u8,
+    pub er_i: u8,
 }
 
 pub struct IncErnMode {
@@ -375,7 +375,7 @@ impl IncErnMode {
                 .map(|i| IncErnData {
                     base_addr: 0xffcf20,
                     result_addr: 0xffcf20 + diff,
-                    target_i: *i,
+                    er_i: *i,
                 })
                 .collect(),
         })

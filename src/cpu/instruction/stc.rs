@@ -114,15 +114,15 @@ mod tests {
         TestHelper::build(ImmMode::new(vec![0, 0xf]), Disp16Mode::new()).run(|operator, ccr, disp| {
             operator
                 .clone()
-                .set_opcode(&[0x01, 0x40, 0x6f, (disp.target_i << 4) | 0x80, disp.as8(1), disp.as8(2)])
+                .set_opcode(&[0x01, 0x40, 0x6f, (disp.er_i << 4) | 0x80, disp.as8(1), disp.as8(2)])
                 .access_cpu(|cpu| {
                     cpu.ccr = ccr;
-                    cpu.write_rn_l(disp.target_i, disp.base_addr).unwrap();
+                    cpu.write_rn_l(disp.er_i, disp.base_addr).unwrap();
                 })
                 .should_state(8)
                 .should_check_ccr(false)
                 .exec(|cpu| {
-                    assert_eq!(cpu.read_disp16_ern_w(disp.target_i, disp.disp).unwrap(), ccr.into());
+                    assert_eq!(cpu.read_disp16_ern_w(disp.er_i, disp.disp).unwrap(), ccr.into());
                     true
                 });
         });
@@ -138,7 +138,7 @@ mod tests {
                     0x01,
                     0x40,
                     0x78,
-                    (disp.target_i << 4),
+                    (disp.er_i << 4),
                     0x6b,
                     0xa0,
                     disp.as8(1),
@@ -148,12 +148,12 @@ mod tests {
                 ])
                 .access_cpu(|cpu| {
                     cpu.ccr = ccr;
-                    cpu.write_rn_l(disp.target_i, disp.base_addr).unwrap();
+                    cpu.write_rn_l(disp.er_i, disp.base_addr).unwrap();
                 })
                 .should_state(12)
                 .should_check_ccr(false)
                 .exec(|cpu| {
-                    assert_eq!(cpu.read_disp24_ern_w(disp.target_i, disp.disp).unwrap(), ccr.into());
+                    assert_eq!(cpu.read_disp24_ern_w(disp.er_i, disp.disp).unwrap(), ccr.into());
                     true
                 });
         });
@@ -165,16 +165,16 @@ mod tests {
         TestHelper::build(ImmMode::new(vec![0, 0xf]), IncErnMode::new_w()).run(|operator, ccr, inc| {
             operator
                 .clone()
-                .set_opcode(&[0x01, 0x40, 0x6d, (inc.target_i << 4) | 0x80])
+                .set_opcode(&[0x01, 0x40, 0x6d, (inc.er_i << 4) | 0x80])
                 .access_cpu(|cpu| {
                     cpu.ccr = ccr;
-                    cpu.write_rn_l(inc.target_i, inc.base_addr).unwrap()
+                    cpu.write_rn_l(inc.er_i, inc.base_addr).unwrap()
                 })
                 .should_state(8)
                 .should_check_ccr(false)
                 .exec(|cpu| {
                     assert_eq!(cpu.read_abs24_w(inc.base_addr).unwrap(), ccr.into());
-                    assert_eq!(cpu.read_rn_l(inc.target_i).unwrap(), inc.result_addr);
+                    assert_eq!(cpu.read_rn_l(inc.er_i).unwrap(), inc.result_addr);
                     true
                 });
         })
