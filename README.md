@@ -68,7 +68,7 @@ cargo run --release -- --elf=./example/one.elf --disable-socket --print-messages
 | RTE         | <ul><li>[x] </ul>                      |
 | SLEEP       | <ul><li>[ ] </ul>                      |
 | LDC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
-| STC         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| STC         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | ANDC        | <ul><li>[ ] B</ul>                     |
 | ORC         | <ul><li>[ ] B</ul>                     |
 | XORC        | <ul><li>[ ] B</ul>                     |
