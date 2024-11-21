@@ -209,6 +209,9 @@ impl Cpu {
 
             0x02 => return self.stc_b(opcode),
 
+            0x50 => return self.mulxu_b(opcode),
+            0x52 => return self.mulxu_w(opcode),
+
             0x55 => return self.bsr_disp16(opcode),
             0x5c => return self.bsr_disp24(opcode),
 
