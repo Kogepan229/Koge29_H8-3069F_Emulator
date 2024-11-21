@@ -4,12 +4,13 @@ use anyhow::Result;
 impl Cpu {
     fn neg_b_proc(&mut self, value: u8) -> u8 {
         let (result, overflowed) = 0u8.overflowing_sub(value);
+        println!("v: {}, result: {}, o:{}", value as i8, result as i8, overflowed);
 
-        self.change_ccr(CCR::H, (!value & 0x0f) + 1 > 0x0f);
+        self.change_ccr(CCR::H, 0 < (value & 0x0f));
         self.change_ccr(CCR::N, (result as i8) < 0);
         self.change_ccr(CCR::Z, result == 0);
         self.change_ccr(CCR::V, overflowed);
-        self.change_ccr(CCR::C, (!value as u16) + 1 > 0xff);
+        self.change_ccr(CCR::C, 0 < value);
 
         result
     }
@@ -66,5 +67,62 @@ impl Cpu {
         self.write_rn_l(rd_i, result)?;
 
         Ok(self.calc_state(StateType::I, 1)?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cpu::testhelper::{NoneMode, RnMode, TestHelper};
+
+    #[test]
+    fn test_neg_b() {
+        TestHelper::build(RnMode::new(), NoneMode::new()).run(|_operator, src_i, _| {
+            let operator = _operator.clone().set_opcode(&[0x17, 0x80 | src_i]).should_state(2);
+
+            operator
+                .clone()
+                .access_cpu(|cpu| {
+                    cpu.write_rn_b(src_i, 0).unwrap();
+                })
+                .should_ccr_h(false)
+                .should_ccr_n(false)
+                .should_ccr_z(true)
+                .should_ccr_v(false)
+                .should_ccr_c(false)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_rn_b(src_i).unwrap(), 0);
+                    true
+                });
+
+            operator
+                .clone()
+                .access_cpu(|cpu| {
+                    cpu.write_rn_b(src_i, -1i8 as u8).unwrap();
+                })
+                .should_ccr_h(true)
+                .should_ccr_n(false)
+                .should_ccr_z(false)
+                .should_ccr_v(false)
+                .should_ccr_c(true)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_rn_b(src_i).unwrap(), 1);
+                    true
+                });
+
+            operator
+                .clone()
+                .access_cpu(|cpu| {
+                    cpu.write_rn_b(src_i, 1).unwrap();
+                })
+                .should_ccr_h(true)
+                .should_ccr_n(true)
+                .should_ccr_z(false)
+                .should_ccr_v(false)
+                .should_ccr_c(true)
+                .exec(|cpu| {
+                    assert_eq!(cpu.read_rn_b(src_i).unwrap(), -1i8 as u8);
+                    true
+                });
+        });
     }
 }

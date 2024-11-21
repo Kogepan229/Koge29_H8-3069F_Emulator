@@ -71,6 +71,7 @@ impl TestOperator {
     }
 
     pub fn exec(self, f: impl Fn(cpu::Cpu) -> bool) {
+        println!("exec");
         for i in 0..=1 {
             let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
@@ -81,7 +82,9 @@ impl TestOperator {
             let result = cpu.exec(opcode);
             if self.should_success {
                 assert_eq!(result.unwrap(), self.expect_state);
+                println!("koko");
                 if self.should_check_ccr {
+                    println!("{:b} {:b}", cpu.ccr, self.expect_ccr[i]);
                     assert_eq!(cpu.ccr, self.expect_ccr[i]);
                 }
                 assert!(f(cpu));
@@ -212,6 +215,22 @@ impl TestOperator {
 pub trait AddressingMode<T> {
     fn get_valid_index(&mut self) -> Vec<T>;
     fn get_invalid_index(&mut self) -> Vec<T>;
+}
+
+pub struct NoneMode {}
+impl NoneMode {
+    pub fn new() -> Box<NoneMode> {
+        Box::new(NoneMode {})
+    }
+}
+impl AddressingMode<()> for NoneMode {
+    fn get_valid_index(&mut self) -> Vec<()> {
+        vec![()]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<()> {
+        vec![()]
+    }
 }
 
 pub struct RnMode {
