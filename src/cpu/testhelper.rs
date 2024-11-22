@@ -86,10 +86,11 @@ impl TestOperator {
                 }
                 assert!(f(cpu));
             } else {
-                let mut is_err = result.is_err() || cpu.ccr != self.expect_ccr[1] || !f(cpu);
+                let mut is_err = false;
                 if self.should_check_ccr {
-                    is_err = is_err || result.is_ok_and(|state| state != self.expect_state);
+                    is_err = is_err || cpu.ccr != self.expect_ccr[1];
                 }
+                is_err = is_err || result.is_err() || result.is_ok_and(|state| state != self.expect_state) || !f(cpu);
                 assert!(is_err);
             }
         }
@@ -212,6 +213,22 @@ impl TestOperator {
 pub trait AddressingMode<T> {
     fn get_valid_index(&mut self) -> Vec<T>;
     fn get_invalid_index(&mut self) -> Vec<T>;
+}
+
+pub struct NoneMode {}
+impl NoneMode {
+    pub fn new() -> Box<NoneMode> {
+        Box::new(NoneMode {})
+    }
+}
+impl AddressingMode<()> for NoneMode {
+    fn get_valid_index(&mut self) -> Vec<()> {
+        vec![()]
+    }
+
+    fn get_invalid_index(&mut self) -> Vec<()> {
+        vec![]
+    }
 }
 
 pub struct RnMode {
