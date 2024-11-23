@@ -51,6 +51,7 @@ where
 #[derive(Clone)]
 pub struct TestOperator {
     cpu: cpu::Cpu,
+    ignore: bool,
     should_success: bool,
     should_check_ccr: bool,
     initial_ccr: [u8; 2],
@@ -62,6 +63,7 @@ impl TestOperator {
     fn new(should_success: bool) -> TestOperator {
         TestOperator {
             cpu: cpu::Cpu::new(),
+            ignore: false,
             should_success,
             should_check_ccr: true,
             initial_ccr: [0, 0xff], // Invariant values are 0 and 1
@@ -71,6 +73,9 @@ impl TestOperator {
     }
 
     pub fn exec(self, f: impl Fn(cpu::Cpu) -> bool) {
+        if self.ignore {
+            return;
+        }
         for i in 0..=1 {
             let mut cpu = self.cpu.clone();
             cpu.pc = MEMORY_START_ADDR;
@@ -82,7 +87,11 @@ impl TestOperator {
             if self.should_success {
                 assert_eq!(result.unwrap(), self.expect_state);
                 if self.should_check_ccr {
-                    assert_eq!(cpu.ccr, self.expect_ccr[i]);
+                    assert_eq!(
+                        cpu.ccr, self.expect_ccr[i],
+                        "cpu_ccr: {:b}, expect_ccr: {:b}",
+                        cpu.ccr, self.expect_ccr[i]
+                    );
                 }
                 assert!(f(cpu));
             } else {
@@ -94,6 +103,11 @@ impl TestOperator {
                 assert!(is_err);
             }
         }
+    }
+
+    pub fn ignore(mut self, ignore: bool) -> TestOperator {
+        self.ignore = ignore;
+        self
     }
 
     pub fn access_cpu(mut self, f: impl Fn(&mut cpu::Cpu)) -> TestOperator {
