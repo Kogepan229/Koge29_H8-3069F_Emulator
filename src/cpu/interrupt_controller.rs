@@ -32,7 +32,6 @@ impl Cpu {
         self.write_dec_ern_l(7, ((self.ccr as u32) << 24) | self.pc)?;
         let vec_addr: u32 = (4 * vector).into();
         let dest_addr = self.read_abs24_l(vec_addr)?;
-        println!("interrupt addr: {:x}, vec_addr: {}", dest_addr, vec_addr);
         self.pc = dest_addr & ADDRESS_MASK;
         self.write_ccr(crate::cpu::CCR::I, 1);
         Ok(())
