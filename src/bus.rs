@@ -4,6 +4,7 @@ use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
     modules::ModuleManager,
     registers::DRCRA,
+    socket::send_addr_value_u8,
 };
 use anyhow::{bail, Result};
 
@@ -88,6 +89,13 @@ impl Bus {
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
+                // Send I/O Port value if changed
+                if addr >= 0xffffd0 && addr <= 0xffffda {
+                    let previous = self.read(addr)?;
+                    if value != previous {
+                        send_addr_value_u8(addr, value);
+                    }
+                }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
                 self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
