@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, cell::RefCell, rc::Weak};
+use std::{cell::RefCell, rc::Weak};
 
 use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
@@ -62,8 +62,8 @@ pub struct Bus {
     pub memory: Memory,
     pub exception_handling_vector: Box<[u8]>,
     pub dram: Box<[u8]>,
-    io_registrs1: Box<[u8]>,
-    io_registrs2: Box<[u8]>,
+    pub io_registrs1: Box<[u8]>,
+    pub io_registrs2: Box<[u8]>,
 }
 
 impl Bus {
@@ -82,25 +82,13 @@ impl Bus {
         match addr {
             VENCTOR_START_ADDR..=VENCTOR_END_ADDR => self.exception_handling_vector[addr as usize] = value,
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
-                self.module_manager
-                    .borrow()
-                    .upgrade()
-                    .unwrap()
-                    .borrow_mut()
-                    .write_registers(addr, value);
-                // self.module_manager.write_registers(addr, value);
+                (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
                 self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value
             }
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
-                // self.module_manager.write_registers(addr, value);
-                self.module_manager
-                    .borrow()
-                    .upgrade()
-                    .unwrap()
-                    .borrow_mut()
-                    .write_registers(addr, value);
+                (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
                 self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
             _ => bail!("Invalid address [0x{:x}]", addr),

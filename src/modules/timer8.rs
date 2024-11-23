@@ -1,4 +1,4 @@
-use crate::{bus::Bus, cpu::Cpu};
+use crate::bus::{Bus, IO_REGISTERS2_EMC1_START_ADDR};
 use anyhow::Result;
 
 // Timer 0
@@ -86,6 +86,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmia {
+                    println!("interrupt 36");
                     // cpu.request_interrupt(36);
                 }
             }
@@ -97,6 +98,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmib {
+                    println!("interrupt 37");
                     // cpu.request_interrupt(37);
                 }
             }
@@ -105,12 +107,14 @@ impl Timer8_0 {
             if is_overflowed {
                 tcsr |= 0b0010_0000;
                 if self.is_allowed_ovi {
+                    println!("interrupt 39");
                     // cpu.request_interrupt(39);
                 }
             }
 
-            bus.write(TCNT0_8, tcnt)?;
-            bus.write(TCSR0_8, tcsr)?;
+            // Don't use bus.write()
+            bus.io_registrs1[(TCNT0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcnt;
+            bus.io_registrs1[(TCNT0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcsr;
 
             count -= 1;
         }
@@ -119,6 +123,7 @@ impl Timer8_0 {
     }
 
     pub fn update_tcr(&mut self, tcr: u8) {
+        println!("start timer");
         self.is_allowed_cmib = tcr & 0b1000_0000 != 0;
         self.is_allowed_cmia = tcr & 0b0100_0000 != 0;
         self.is_allowed_ovi = tcr & 0b0010_0000 != 0;
