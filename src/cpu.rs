@@ -221,6 +221,9 @@ impl Cpu {
             0x50 => return self.mulxu_b(opcode),
             0x52 => return self.mulxu_w(opcode),
 
+            0x51 => return self.divxu_b(opcode),
+            0x53 => return self.divxu_w(opcode),
+
             0x55 => return self.bsr_disp16(opcode),
             0x5c => return self.bsr_disp24(opcode),
 
@@ -411,6 +414,9 @@ impl Cpu {
             0x17 => match opcode as u8 {
                 0x50..=0x5f => return self.extu_w(opcode),
                 0x70..=0x77 => return self.extu_l(opcode),
+                0x80..=0x8f => return self.neg_b(opcode),
+                0x90..=0x9f => return self.neg_w(opcode),
+                0xb0..=0xb7 => return self.neg_l(opcode),
                 _ => unimpl!(opcode, self.pc),
             },
 
@@ -471,6 +477,14 @@ impl Cpu {
             0 => self.ccr &= !(1 << target as u8),
             1 => self.ccr |= 1 << target as u8,
             _ => panic!("[write_ccr] invalid value [0x{:x}]", val),
+        }
+    }
+
+    pub fn change_ccr(&mut self, target: CCR, onoff: bool) {
+        if onoff {
+            self.ccr |= 1 << target as u8;
+        } else {
+            self.ccr &= !(1 << target as u8);
         }
     }
 
