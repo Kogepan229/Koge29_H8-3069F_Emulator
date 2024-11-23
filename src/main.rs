@@ -19,10 +19,10 @@ struct Args {
     elf: String,
 
     /// Print executed opcode
-    #[arg(long)]
+    #[arg(short = 'i', long)]
     print_instruction: bool,
 
-    #[arg(long)]
+    #[arg(short = 'm', long)]
     print_messages: bool,
 
     #[arg(short, long)]
