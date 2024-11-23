@@ -113,8 +113,8 @@ impl Timer8_0 {
             }
 
             // Don't use bus.write()
-            bus.io_registrs1[(TCNT0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcnt;
-            bus.io_registrs1[(TCNT0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcsr;
+            bus.io_registrs2[(TCNT0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcnt;
+            bus.io_registrs2[(TCSR0_8 - IO_REGISTERS2_EMC1_START_ADDR) as usize] = tcsr;
 
             count -= 1;
         }
