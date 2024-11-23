@@ -1,4 +1,7 @@
-use crate::bus::{Bus, IO_REGISTERS2_EMC1_START_ADDR};
+use crate::{
+    bus::{Bus, IO_REGISTERS2_EMC1_START_ADDR},
+    cpu::interrupt_controller::InterruptController,
+};
 use anyhow::Result;
 
 // Timer 0
@@ -61,7 +64,7 @@ impl Timer8_0 {
         }
     }
 
-    pub fn update_timer8_0(&mut self, bus: &mut Bus, state: u8) -> Result<()> {
+    pub fn update_timer8_0(&mut self, bus: &mut Bus, state: u8, interrupt_controller: &mut InterruptController) -> Result<()> {
         if self.prescaler == 0 {
             return Ok(());
         }
@@ -87,7 +90,7 @@ impl Timer8_0 {
                 }
                 if self.is_allowed_cmia {
                     println!("interrupt 36");
-                    // cpu.request_interrupt(36);
+                    interrupt_controller.request_interrupt(36);
                 }
             }
 
@@ -99,7 +102,7 @@ impl Timer8_0 {
                 }
                 if self.is_allowed_cmib {
                     println!("interrupt 37");
-                    // cpu.request_interrupt(37);
+                    interrupt_controller.request_interrupt(37);
                 }
             }
 
@@ -108,7 +111,7 @@ impl Timer8_0 {
                 tcsr |= 0b0010_0000;
                 if self.is_allowed_ovi {
                     println!("interrupt 39");
-                    // cpu.request_interrupt(39);
+                    interrupt_controller.request_interrupt(39);
                 }
             }
 

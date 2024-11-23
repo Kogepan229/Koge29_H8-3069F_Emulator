@@ -1,7 +1,7 @@
 use anyhow::Result;
 use timer8::{Timer8_0, TCR0_8};
 
-use crate::{bus::Bus, cpu::Cpu};
+use crate::{bus::Bus, cpu::interrupt_controller::InterruptController};
 
 mod timer8;
 
@@ -31,8 +31,8 @@ impl ModuleManager {
         }
     }
 
-    pub fn update_modules(&mut self, bus: &mut Bus, state: u8) -> Result<()> {
-        self.modules.timer8_0.update_timer8_0(bus, state)?;
+    pub fn update_modules(&mut self, bus: &mut Bus, state: u8, interrupt_controller: &mut InterruptController) -> Result<()> {
+        self.modules.timer8_0.update_timer8_0(bus, state, interrupt_controller)?;
 
         Ok(())
     }
