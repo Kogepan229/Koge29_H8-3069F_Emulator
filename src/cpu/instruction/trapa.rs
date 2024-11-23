@@ -29,8 +29,8 @@ impl Cpu {
             113 => {
                 // set_handler
                 let arg_addr = self.read_rn_l(1)?;
-                let arg0 = self.read_abs24_l(arg_addr)?;
-                let arg1 = self.read_abs24_l(arg_addr + 4)?;
+                let arg0 = self.read_abs24_l(arg_addr)?; // vector num
+                let arg1 = self.read_abs24_l(arg_addr + 4)?; // callback address
 
                 if arg0 < 1 || arg0 >= 64 {
                     return Ok(());
@@ -38,6 +38,11 @@ impl Cpu {
 
                 let inst = arg1 + 0x5a000000;
                 self.write_abs24_l(arg0 * 4, inst)?;
+
+                let gotsave = 0xfffd10 + arg0 * 4; // segment + vector num * 4
+                self.write_abs24_l(gotsave, self.er[5])?;
+
+                println!("[set_handler] vector: {}, addr: 0x{:x}", arg0, arg1);
             }
             104 => {
                 // __write
