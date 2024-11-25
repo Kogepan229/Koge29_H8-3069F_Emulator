@@ -403,6 +403,9 @@ impl Cpu {
             },
 
             0x17 => match opcode as u8 {
+                0x00..=0x0f => return self.not_b(opcode),
+                0x10..=0x1f => return self.not_w(opcode),
+                0x30..=0x37 => return self.not_l(opcode),
                 0x50..=0x5f => return self.extu_w(opcode),
                 0x70..=0x77 => return self.extu_l(opcode),
                 0x80..=0x8f => return self.neg_b(opcode),

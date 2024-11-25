@@ -34,6 +34,7 @@ mod mov_l;
 mod mov_w;
 mod mulxu;
 mod neg;
+mod not;
 mod or;
 mod rotl;
 mod rotr;
