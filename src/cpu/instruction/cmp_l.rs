@@ -24,7 +24,10 @@ impl Cpu {
 
     fn cmp_l_imm(&mut self, opcode: u16) -> Result<u8> {
         let dest = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 4)?)?;
-        let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
+        let opcode2 = self.fetch();
+        let opcode3 = self.fetch();
+
+        let imm = ((opcode2 as u32) << 16) | opcode3 as u32;
         self.cmp_l_proc(dest, imm);
         Ok(self.calc_state(StateType::I, 3)?)
     }
