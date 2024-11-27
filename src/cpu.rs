@@ -2,15 +2,18 @@ use crate::{
     bus::{Bus, AREA0_START_ADDR, AREA7_END_ADDR},
     elf::PROGRAM_START_ADDR,
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
+    modules::ModuleManager,
     registers::{ABWCR, ASTCR, DRCRA, WCRH, WCRL},
     setting, socket,
 };
 use anyhow::{bail, Context as _, Result};
-use std::time::Duration;
-use std::{collections::VecDeque, time};
+use interrupt_controller::InterruptController;
+use std::time;
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
 mod addressing_mode;
 mod instruction;
+pub(crate) mod interrupt_controller;
 
 #[cfg(test)]
 mod testhelper;
@@ -25,8 +28,9 @@ pub struct Cpu {
     operating_pc: u32,
     ccr: u8,
     pub er: [u32; 8],
-    interrupt_requests: VecDeque<u8>,
+    interrupt_controller: InterruptController,
     pub exit_addr: u32, // address of ___exit
+    module_manager: Rc<RefCell<ModuleManager>>,
 }
 
 #[allow(dead_code)]
@@ -64,14 +68,16 @@ macro_rules! unimpl {
 
 impl Cpu {
     pub fn new() -> Self {
+        let module_manager = Rc::new(RefCell::new(ModuleManager::new()));
         Cpu {
-            bus: Bus::new(),
+            bus: Bus::new(Rc::downgrade(&module_manager)),
             pc: 0,
             operating_pc: 0,
             ccr: 0,
             er: [0; 8],
-            interrupt_requests: VecDeque::new(),
+            interrupt_controller: InterruptController::new(),
             exit_addr: 0,
+            module_manager: module_manager.clone(),
         }
     }
 
@@ -114,6 +120,9 @@ impl Cpu {
                 continue;
             }
 
+            // Interrupt
+            self.try_interrupt()?;
+
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 print!(" {:4x}:   ", self.pc.wrapping_sub(PROGRAM_START_ADDR as u32));
             }
@@ -130,6 +139,10 @@ impl Cpu {
             state_sum += state as usize;
             loop_count += state as usize;
             one_sec_count += state as usize;
+
+            self.module_manager
+                .borrow_mut()
+                .update_modules(&mut self.bus, state, &mut self.interrupt_controller)?;
 
             if *setting::ENABLE_PRINT_OPCODE.read().unwrap() {
                 println!("");
@@ -490,10 +503,6 @@ impl Cpu {
 
     pub fn read_pc(&self) -> u32 {
         self.pc
-    }
-
-    pub fn request_interrupt(&mut self, num: u8) {
-        self.interrupt_requests.push_back(num);
     }
 
     fn get_wait_state(&self, area_index: u8) -> Result<u8> {

@@ -1,26 +1,7 @@
 use crate::cpu::Cpu;
-use crate::socket::{send_addr_value_u16, send_addr_value_u32, send_addr_value_u8};
 use anyhow::{Context as _, Result};
 
 impl Cpu {
-    fn send_port_value8(&mut self, addr: u32, value: u8) {
-        if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u8(addr, value);
-        }
-    }
-
-    fn send_port_value16(&mut self, addr: u32, value: u16) {
-        if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u16(addr, value);
-        }
-    }
-
-    fn send_port_value32(&mut self, addr: u32, value: u32) {
-        if addr >= 0xffffd0 && addr <= 0xffffda {
-            send_addr_value_u32(addr, value);
-        }
-    }
-
     pub(in super::super) fn get_addr_abs8(&self, addr: u8) -> u32 {
         0xffff00 | addr as u32
     }
@@ -30,7 +11,6 @@ impl Cpu {
         self.bus
             .write(real_addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value8(real_addr, value);
         Ok(())
     }
 
@@ -52,7 +32,6 @@ impl Cpu {
         self.bus
             .write(real_addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value8(real_addr, value);
         Ok(())
     }
 
@@ -65,7 +44,6 @@ impl Cpu {
         self.bus
             .write(addr, value)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value8(addr, value);
         Ok(())
     }
 
@@ -81,7 +59,6 @@ impl Cpu {
         self.bus
             .write(real_addr + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value16(real_addr, value);
         Ok(())
     }
 
@@ -98,7 +75,6 @@ impl Cpu {
         let real_addr = self.get_addr_abs16(addr);
         self.bus.write(real_addr, (value >> 8) as u8)?;
         self.bus.write(real_addr + 1, value as u8)?;
-        self.send_port_value16(real_addr, value);
         Ok(())
     }
 
@@ -124,7 +100,6 @@ impl Cpu {
         self.bus
             .write(addr + 1, value as u8)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value16(addr, value);
         Ok(())
     }
 
@@ -139,7 +114,6 @@ impl Cpu {
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         self.write_abs24_w(real_addr + 2, value as u16)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value32(real_addr, value);
         Ok(())
     }
 
@@ -156,7 +130,6 @@ impl Cpu {
         let real_addr = self.get_addr_abs16(addr);
         self.write_abs24_w(real_addr, (value >> 16) as u16)?;
         self.write_abs24_w(real_addr + 2, value as u16)?;
-        self.send_port_value32(real_addr, value);
         Ok(())
     }
 
@@ -179,7 +152,6 @@ impl Cpu {
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
         self.write_abs24_w(addr + 2, value as u16)
             .with_context(|| format!("addr [{:x}] value [{:x}]", addr, value))?;
-        self.send_port_value32(addr, value);
         Ok(())
     }
 
