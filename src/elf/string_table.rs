@@ -37,8 +37,7 @@ pub fn parse_string_table_entry(raw: &[u8]) -> IResult<&[u8], String> {
 }
 
 fn parse_ascii_string(raw: &[u8]) -> IResult<&[u8], String> {
-    map(
-        take_while(|c: u8| c.is_ascii_graphic()),
-        |raw_name: &[u8]| String::from_utf8(raw_name.to_vec()).unwrap().to_string(),
-    )(raw)
+    map(take_while(|c: u8| c.is_ascii_graphic()), |raw_name: &[u8]| {
+        String::from_utf8(raw_name.to_vec()).unwrap().to_string()
+    })(raw)
 }

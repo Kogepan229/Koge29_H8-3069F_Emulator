@@ -30,9 +30,7 @@ use nom::number::complete::{be_u16, be_u32};
 use nom::IResult;
 use nom::{bytes::complete::tag, combinator::map, number::complete::u8 as read_u8};
 
-use crate::elf::header::{
-    ElfClass, ElfData, ElfHeader32, ElfIdentification, ElfOsAbi, ElfVersion, ELF_MAGIC_SIGNATURE,
-};
+use crate::elf::header::{ElfClass, ElfData, ElfHeader32, ElfIdentification, ElfOsAbi, ElfVersion, ELF_MAGIC_SIGNATURE};
 
 // 32bit, big endian only
 

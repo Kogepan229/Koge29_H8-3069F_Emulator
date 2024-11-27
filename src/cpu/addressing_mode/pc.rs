@@ -7,13 +7,10 @@ impl Cpu {
         if (disp & 0x80) == 0x80 {
             _disp |= 0xffffff00
         }
-        self.pc = self.pc.checked_add_signed(_disp as i32).ok_or_else(|| {
-            anyhow!(
-                "attempt to add with overflow [{:x} + {:x}]",
-                self.pc,
-                _disp as i32
-            )
-        })?;
+        self.pc = self
+            .pc
+            .checked_add_signed(_disp as i32)
+            .ok_or_else(|| anyhow!("attempt to add with overflow [{:x} + {:x}]", self.pc, _disp as i32))?;
         if self.pc % 2 != 0 {
             bail!("pc is not odd. [{:x}]]", self.pc);
         }
@@ -25,13 +22,10 @@ impl Cpu {
         if (disp & 0x8000) == 0x8000 {
             _disp |= 0xffff0000
         }
-        self.pc = self.pc.checked_add_signed(_disp as i32).ok_or_else(|| {
-            anyhow!(
-                "attempt to add with overflow [{:x} + {:x}]",
-                self.pc,
-                _disp as i32
-            )
-        })?;
+        self.pc = self
+            .pc
+            .checked_add_signed(_disp as i32)
+            .ok_or_else(|| anyhow!("attempt to add with overflow [{:x} + {:x}]", self.pc, _disp as i32))?;
         if self.pc % 2 != 0 {
             bail!("pc is not odd. [{:x}]]", self.pc);
         }

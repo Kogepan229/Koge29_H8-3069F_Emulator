@@ -1,12 +1,7 @@
 use crate::elf::symtab::SymbolTable32;
-use nom::{
-    multi::count, number::complete::be_u16, number::complete::be_u32, number::complete::be_u8,
-    IResult,
-};
+use nom::{multi::count, number::complete::be_u16, number::complete::be_u32, number::complete::be_u8, IResult};
 
-pub fn parse_symbol_table32<'a>(
-    entries: usize,
-) -> impl Fn(&'a [u8]) -> IResult<&'a [u8], Vec<SymbolTable32>> {
+pub fn parse_symbol_table32<'a>(entries: usize) -> impl Fn(&'a [u8]) -> IResult<&'a [u8], Vec<SymbolTable32>> {
     move |raw: &'a [u8]| count(parse_symbol_table_header32, entries)(raw)
 }
 

@@ -5,15 +5,9 @@ impl Cpu {
     pub(in super::super) fn write_rn_b(&mut self, register_field: u8, value: u8) -> Result<()> {
         match register_field {
             // R0H..=R7H
-            0..=7 => {
-                self.er[register_field as usize] =
-                    (self.er[register_field as usize] & 0xffff00ff) | ((value as u32) << 8)
-            }
+            0..=7 => self.er[register_field as usize] = (self.er[register_field as usize] & 0xffff00ff) | ((value as u32) << 8),
             // R0L..=R7L
-            8..=15 => {
-                self.er[register_field as usize - 8] =
-                    (self.er[register_field as usize - 8] & 0xffffff00) | (value as u32)
-            }
+            8..=15 => self.er[register_field as usize - 8] = (self.er[register_field as usize - 8] & 0xffffff00) | (value as u32),
             _ => bail!("Invalid register [{:x}]", register_field),
         };
         Ok(())
@@ -32,15 +26,9 @@ impl Cpu {
     pub(in super::super) fn write_rn_w(&mut self, register_field: u8, value: u16) -> Result<()> {
         match register_field {
             // R0..=R7
-            0..=7 => {
-                self.er[register_field as usize] =
-                    (self.er[register_field as usize] & 0xffff0000) | (value as u32)
-            }
+            0..=7 => self.er[register_field as usize] = (self.er[register_field as usize] & 0xffff0000) | (value as u32),
             // E0..=E7
-            8..=15 => {
-                self.er[register_field as usize - 8] =
-                    (self.er[register_field as usize - 8] & 0x0000ffff) | ((value as u32) << 16)
-            }
+            8..=15 => self.er[register_field as usize - 8] = (self.er[register_field as usize - 8] & 0x0000ffff) | ((value as u32) << 16),
             _ => bail!("Invalid register [{:x}]", register_field),
         }
         Ok(())

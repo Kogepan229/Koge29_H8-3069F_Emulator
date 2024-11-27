@@ -2,7 +2,7 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super)  fn bcc(&mut self, opcode: u16) -> Result<u8> {
+    pub(in super::super) fn bcc(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
             0x40 => return self.bra8(opcode),
             0x41 => return self.brn8(),
@@ -43,247 +43,232 @@ impl Cpu {
         }
     }
 
-     fn bra8(&mut self, opcode: u16) -> Result<u8> {
+    fn bra8(&mut self, opcode: u16) -> Result<u8> {
         self.pc_disp8(opcode as u8)?;
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bra16(&mut self) -> Result<u8> {
+    fn bra16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
-        self.pc_disp16(opcode2)
-            .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+        self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn brn8(&mut self) -> Result<u8> {
+    fn brn8(&mut self) -> Result<u8> {
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn brn16(&mut self) -> Result<u8> {
+    fn brn16(&mut self) -> Result<u8> {
         let _opcode2 = self.fetch();
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bhi8(&mut self, opcode: u16) -> Result<u8> {
+    fn bhi8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::C) | self.read_ccr(CCR::Z) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bhi16(&mut self) -> Result<u8> {
+    fn bhi16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::C) | self.read_ccr(CCR::Z) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bls8(&mut self, opcode: u16) -> Result<u8> {
+    fn bls8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::C) | self.read_ccr(CCR::Z) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bls16(&mut self) -> Result<u8> {
+    fn bls16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::C) | self.read_ccr(CCR::Z) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bcc8(&mut self, opcode: u16) -> Result<u8> {
+    fn bcc8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::C) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bcc16(&mut self) -> Result<u8> {
+    fn bcc16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::C) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bcs8(&mut self, opcode: u16) -> Result<u8> {
+    fn bcs8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::C) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bcs16(&mut self) -> Result<u8> {
+    fn bcs16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::C) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bne8(&mut self, opcode: u16) -> Result<u8> {
+    fn bne8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::Z) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bne16(&mut self) -> Result<u8> {
+    fn bne16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::Z) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn beq8(&mut self, opcode: u16) -> Result<u8> {
+    fn beq8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::Z) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn beq16(&mut self) -> Result<u8> {
+    fn beq16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::Z) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bvc8(&mut self, opcode: u16) -> Result<u8> {
+    fn bvc8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::V) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bvc16(&mut self) -> Result<u8> {
+    fn bvc16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::V) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bvs8(&mut self, opcode: u16) -> Result<u8> {
+    fn bvs8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::V) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bvs16(&mut self) -> Result<u8> {
+    fn bvs16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::V) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bpl8(&mut self, opcode: u16) -> Result<u8> {
+    fn bpl8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::N) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bpl16(&mut self) -> Result<u8> {
+    fn bpl16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::N) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bmi8(&mut self, opcode: u16) -> Result<u8> {
+    fn bmi8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::N) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bmi16(&mut self) -> Result<u8> {
+    fn bmi16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::N) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bge8(&mut self, opcode: u16) -> Result<u8> {
+    fn bge8(&mut self, opcode: u16) -> Result<u8> {
         if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bge16(&mut self) -> Result<u8> {
+    fn bge16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn blt8(&mut self, opcode: u16) -> Result<u8> {
+    fn blt8(&mut self, opcode: u16) -> Result<u8> {
         if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn blt16(&mut self) -> Result<u8> {
+    fn blt16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn bgt8(&mut self, opcode: u16) -> Result<u8> {
+    fn bgt8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn bgt16(&mut self) -> Result<u8> {
+    fn bgt16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 0 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }
 
-     fn ble8(&mut self, opcode: u16) -> Result<u8> {
+    fn ble8(&mut self, opcode: u16) -> Result<u8> {
         if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
             self.pc_disp8(opcode as u8)?;
         }
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
-     fn ble16(&mut self) -> Result<u8> {
+    fn ble16(&mut self) -> Result<u8> {
         let opcode2 = self.fetch();
         if self.read_ccr(CCR::Z) | (self.read_ccr(CCR::N) ^ self.read_ccr(CCR::V)) == 1 {
-            self.pc_disp16(opcode2)
-                .with_context(|| format!("opcode2 [{:x}]", opcode2))?;
+            self.pc_disp16(opcode2).with_context(|| format!("opcode2 [{:x}]", opcode2))?;
         }
         Ok(self.calc_state(StateType::I, 2)? + self.calc_state(StateType::N, 2)?)
     }

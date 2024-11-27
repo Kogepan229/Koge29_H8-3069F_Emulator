@@ -2,7 +2,7 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
-    pub(in super::super)  fn sub_l(&mut self, opcode: u16) -> Result<u8> {
+    pub(in super::super) fn sub_l(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
             0x7a => return self.sub_l_imm(opcode),
             0x1a => return self.sub_l_rn(opcode),
@@ -46,7 +46,7 @@ impl Cpu {
     }
 
     // 仕様書の図ではimmが16bitになっているが実際は32bit
-     fn sub_l_imm(&mut self, opcode: u16) -> Result<u8> {
+    fn sub_l_imm(&mut self, opcode: u16) -> Result<u8> {
         let imm = (self.fetch() as u32) << 16 | self.fetch() as u32;
         let mut f = || -> Result<()> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
@@ -59,7 +59,7 @@ impl Cpu {
         Ok(self.calc_state(StateType::I, 3)?)
     }
 
-     fn sub_l_rn(&mut self, opcode: u16) -> Result<u8> {
+    fn sub_l_rn(&mut self, opcode: u16) -> Result<u8> {
         let register_dest = Cpu::get_nibble_opcode(opcode, 4)?;
         let dest = self.read_rn_l(register_dest)?;
         let register_src = Cpu::get_nibble_opcode(opcode, 3)? & 0x7;
