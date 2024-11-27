@@ -36,6 +36,4 @@ impl ModuleManager {
 
         Ok(())
     }
-
-    pub fn test(&mut self, bus: &Bus) {}
 }
