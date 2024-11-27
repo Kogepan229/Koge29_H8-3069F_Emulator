@@ -15,6 +15,7 @@ mod string_table;
 mod symtab;
 
 pub const PROGRAM_START_ADDR: usize = 0x416900;
+const SIZE_OF_TCB: usize = 88;
 
 fn read_elf(path: String) -> Vec<u8> {
     let mut file = std::fs::File::open(path).expect("failed open elf");
@@ -23,7 +24,7 @@ fn read_elf(path: String) -> Vec<u8> {
     return buf;
 }
 
-pub fn load(elf_path: String, cpu: &mut Cpu) {
+pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
     let elf_binary = read_elf(elf_path);
     let (_, hd) = parse_header::parse_elf_header32(&elf_binary).unwrap();
     // println!("{:?}", hd);
@@ -81,8 +82,40 @@ pub fn load(elf_path: String, cpu: &mut Cpu) {
             let mut a = PROGRAM_START_ADDR + program_size as usize + stack_size as usize + 3;
             a >>= 2;
             a <<= 2;
-            cpu.er[7] = a as u32 - 12;
+            cpu.er[7] = a as u32 - 8;
             println!("Set er7(stack pointer) [0x{:x}]", cpu.er[7]);
+
+            a += SIZE_OF_TCB + 3;
+            a >>= 2;
+            a <<= 2;
+
+            println!("args: [{}]", args);
+            println!("arg addr: 0x{:x}", a);
+            let mut args_list: Vec<&str> = args.split_whitespace().collect();
+            args_list.insert(0, "prog.elf");
+
+            cpu.er[0] = args_list.len() as u32;
+            println!("Set er0 [0x{:x}]", cpu.er[0]);
+            cpu.er[1] = a as u32;
+            println!("Set er1 [0x{:x}]", cpu.er[1]);
+
+            let mut argp = a;
+            a += 4 * (args_list.len() + 1);
+
+            for arg in args_list {
+                // Set args pointer
+                let argp_i = argp - AREA2_START_ADDR as usize;
+                cpu.bus.dram[argp_i..argp_i + 4].copy_from_slice(&(a as u32).to_be_bytes());
+                argp += 4;
+
+                // Set args string
+                for char in arg.as_bytes() {
+                    cpu.bus.dram[a - AREA2_START_ADDR as usize] = *char;
+                    a += 1;
+                }
+                cpu.bus.dram[a - AREA2_START_ADDR as usize] = b'\0';
+                a += 1;
+            }
         } else if s.name == ".symtab" {
             let (_, symtabs) =
                 parse_symbol_table32((s.header.size / s.header.entry_size) as usize)(&elf_binary[s.header.offset as usize..]).unwrap();

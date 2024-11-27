@@ -18,6 +18,9 @@ struct Args {
     #[arg(short, long)]
     elf: String,
 
+    #[arg(short, long, default_value = "")]
+    args: String,
+
     /// Print executed opcode
     #[arg(short = 'i', long)]
     print_instruction: bool,
@@ -59,7 +62,7 @@ async fn main() {
     });
      */
 
-    elf::load(args.elf, &mut cpu);
+    elf::load(args.elf, &mut cpu, args.args);
     // print_memory(&cpu.bus.memory);
 
     cpu.run().await.unwrap();
