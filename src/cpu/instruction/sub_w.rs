@@ -2,6 +2,18 @@ use crate::cpu::{Cpu, StateType, CCR};
 use anyhow::{bail, Context as _, Result};
 
 impl Cpu {
+    pub fn sub_w_calc(&mut self, dest: u16, src: u16) -> u16 {
+        let (result, overflowed) = (dest as i16).overflowing_sub(src as i16);
+
+        self.change_ccr(CCR::H, (dest & 0x0fff) < (src & 0x0fff));
+        self.change_ccr(CCR::N, result < 0);
+        self.change_ccr(CCR::Z, result == 0);
+        self.change_ccr(CCR::V, overflowed);
+        self.change_ccr(CCR::C, dest < src);
+
+        result as u16
+    }
+
     pub(in super::super) fn sub_w(&mut self, opcode: u16) -> Result<u8> {
         match (opcode >> 8) as u8 {
             0x79 => return self.sub_w_imm(opcode),
@@ -10,47 +22,12 @@ impl Cpu {
         }
     }
 
-    fn sub_w_proc(&mut self, dest: u16, src: u16) -> u16 {
-        let (value, overflowed) = (dest as i16).overflowing_sub(src as i16);
-        if (dest & 0x0fff) + (!src & 0x0fff) + 1 > 0x0fff {
-            self.write_ccr(CCR::H, 1);
-        } else {
-            self.write_ccr(CCR::H, 0);
-        }
-
-        if value < 0 {
-            self.write_ccr(CCR::N, 1);
-        } else {
-            self.write_ccr(CCR::N, 0);
-        }
-
-        if value == 0 {
-            self.write_ccr(CCR::Z, 1);
-        } else {
-            self.write_ccr(CCR::Z, 0);
-        }
-
-        if overflowed {
-            self.write_ccr(CCR::V, 1);
-        } else {
-            self.write_ccr(CCR::V, 0);
-        }
-
-        if (dest as u32) + (!src as u32) + 1 > 0xffff {
-            self.write_ccr(CCR::C, 1);
-        } else {
-            self.write_ccr(CCR::C, 0);
-        }
-
-        value as u16
-    }
-
     fn sub_w_imm(&mut self, opcode: u16) -> Result<u8> {
         let imm = self.fetch();
         let mut f = || -> Result<()> {
             let register = Cpu::get_nibble_opcode(opcode, 4)?;
             let dest = self.read_rn_w(register)?;
-            let result = self.sub_w_proc(dest, imm);
+            let result = self.sub_w_calc(dest, imm);
             self.write_rn_w(register, result)?;
             Ok(())
         };
@@ -63,7 +40,7 @@ impl Cpu {
         let dest = self.read_rn_w(register_dest)?;
         let register_src = Cpu::get_nibble_opcode(opcode, 3)?;
         let src = self.read_rn_w(register_src)?;
-        let result = self.sub_w_proc(dest, src);
+        let result = self.sub_w_calc(dest, src);
         self.write_rn_w(register_dest, result)?;
         Ok(self.calc_state(StateType::I, 1)?)
     }

@@ -1,4 +1,4 @@
-use crate::cpu::{Cpu, StateType, CCR};
+use crate::cpu::{Cpu, StateType};
 use anyhow::{bail, Result};
 
 impl Cpu {
@@ -10,32 +10,21 @@ impl Cpu {
         }
     }
 
-    fn cmp_l_proc(&mut self, dest: u32, src: u32) -> u32 {
-        let (result, overflowed) = dest.overflowing_sub(src);
-
-        self.change_ccr(CCR::H, (dest & 0x0fffffff) < (src & 0x0fffffff));
-        self.change_ccr(CCR::N, (result as i32) < 0);
-        self.change_ccr(CCR::Z, result == 0);
-        self.change_ccr(CCR::V, overflowed);
-        self.change_ccr(CCR::C, dest < src);
-
-        result
-    }
-
     fn cmp_l_imm(&mut self, opcode: u16) -> Result<u8> {
         let dest = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 4)?)?;
         let opcode2 = self.fetch();
         let opcode3 = self.fetch();
-
         let imm = ((opcode2 as u32) << 16) | opcode3 as u32;
-        self.cmp_l_proc(dest, imm);
+        self.sub_l_calc(dest, imm);
+
         Ok(self.calc_state(StateType::I, 3)?)
     }
 
     fn cmp_l_rn(&mut self, opcode: u16) -> Result<u8> {
         let src = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 3)? & 0x7)?;
         let dest = self.read_rn_l(Cpu::get_nibble_opcode(opcode, 4)?)?;
-        self.cmp_l_proc(dest, src);
+        self.sub_l_calc(dest, src);
+
         Ok(self.calc_state(StateType::I, 1)?)
     }
 }

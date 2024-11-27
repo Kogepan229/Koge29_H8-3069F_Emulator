@@ -1,4 +1,4 @@
-use crate::cpu::{Cpu, StateType, CCR};
+use crate::cpu::{Cpu, StateType};
 use anyhow::{bail, Result};
 
 impl Cpu {
@@ -10,30 +10,18 @@ impl Cpu {
         }
     }
 
-    fn cmp_b_proc(&mut self, dest: u8, src: u8) -> u8 {
-        let (result, overflowed) = dest.overflowing_sub(src);
-
-        self.change_ccr(CCR::H, (dest & 0x0f) < (src & 0x0f));
-        self.change_ccr(CCR::N, (result as i8) < 0);
-        self.change_ccr(CCR::Z, result == 0);
-        self.change_ccr(CCR::V, overflowed);
-        self.change_ccr(CCR::C, dest < src);
-
-        result
-    }
-
     fn cmp_b_imm(&mut self, opcode: u16) -> Result<u8> {
         let rd_i = Cpu::get_nibble_opcode(opcode, 2)?;
         let rd = self.read_rn_b(rd_i)?;
         let imm = opcode as u8;
-        self.cmp_b_proc(rd, imm);
+        self.sub_b_calc(rd, imm);
         Ok(self.calc_state(StateType::I, 1)?)
     }
 
     fn cmp_b_rn(&mut self, opcode: u16) -> Result<u8> {
         let src = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 3)?)?;
         let dest = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 4)?)?;
-        self.cmp_b_proc(dest, src);
+        self.sub_b_calc(dest, src);
         Ok(self.calc_state(StateType::I, 1)?)
     }
 }
