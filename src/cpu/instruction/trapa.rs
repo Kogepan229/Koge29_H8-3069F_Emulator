@@ -55,7 +55,8 @@ impl Cpu {
                 let print_string = String::from_utf8(chars)?;
 
                 // Print strings
-                println!("[program] [__write] [fd: {}] {}", arg0, print_string);
+                print!("{}", print_string);
+                // println!("[program] [__write] [fd: {}] {}", arg0, print_string);
             }
             _ => bail!("unsupported mes2 command id:{}", id),
         }
