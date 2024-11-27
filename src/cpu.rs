@@ -234,7 +234,7 @@ impl Cpu {
             0x60 => return self.bset_rn_from_rn(opcode),
             0x61 => return self.bnot_rn_from_rn(opcode),
             0x62 => return self.bclr_rn_from_rn(opcode),
-            0x63 => return self.btst_rn_from_rn(opcode),
+            0x63 => return self.btst_rn_rn(opcode),
 
             0x67 => match opcode & 0x80 {
                 0x00 => return self.bst_rn(opcode),
@@ -245,7 +245,7 @@ impl Cpu {
             0x70 => return self.bset_rn_from_imm(opcode),
             0x71 => return self.bnot_rn_from_imm(opcode),
             0x72 => return self.bclr_rn_from_imm(opcode),
-            0x73 => return self.btst_rn_from_imm(opcode),
+            0x73 => return self.btst_imm_rn(opcode),
 
             0x74 => match opcode & 0x80 {
                 0x00 => return self.bor_rn(opcode),
@@ -305,7 +305,8 @@ impl Cpu {
             0x7c => {
                 let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
-                    0x6300 | 0x6380 | 0x7300 => return self.btst_ern(opcode, opcode2),
+                    0x6300 | 0x6380 => return self.btst_rn_ern(opcode, opcode2),
+                    0x7300 => return self.btst_imm_ern(opcode, opcode2),
                     0x7400 => return self.bor_ern(opcode, opcode2),
                     0x7480 => return self.bior_ern(opcode, opcode2),
                     0x7500 => return self.bxor_ern(opcode, opcode2),
@@ -333,7 +334,8 @@ impl Cpu {
             0x7e => {
                 let opcode2 = self.fetch();
                 match opcode2 & 0xff80 {
-                    0x6300 | 0x6380 | 0x7300 => return self.btst_abs(opcode, opcode2),
+                    0x6300 | 0x6380 => return self.btst_rn_abs(opcode, opcode2),
+                    0x7300 => return self.btst_imm_abs(opcode, opcode2),
                     0x7400 => return self.bor_abs(opcode, opcode2),
                     0x7480 => return self.bior_abs(opcode, opcode2),
                     0x7500 => return self.bxor_abs(opcode, opcode2),
@@ -416,6 +418,9 @@ impl Cpu {
             },
 
             0x17 => match opcode as u8 {
+                0x00..=0x0f => return self.not_b(opcode),
+                0x10..=0x1f => return self.not_w(opcode),
+                0x30..=0x37 => return self.not_l(opcode),
                 0x50..=0x5f => return self.extu_w(opcode),
                 0x70..=0x77 => return self.extu_l(opcode),
                 0x80..=0x8f => return self.neg_b(opcode),
