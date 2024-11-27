@@ -53,17 +53,7 @@ async fn main() {
         socket::listen(format!("127.0.0.1:{}", args.port)).await.unwrap();
     }
 
-    /* // test code
-    let cpu_emu_share = cpu.emu_share_values.clone();
-    tokio::spawn(async move {
-        loop {
-            println!("{}", cpu_emu_share.lock().await.pc)
-        }
-    });
-     */
-
     elf::load(args.elf, &mut cpu, args.args);
-    // print_memory(&cpu.bus.memory);
 
     cpu.run().await.unwrap();
 }
