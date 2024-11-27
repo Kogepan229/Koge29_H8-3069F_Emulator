@@ -31,7 +31,7 @@ cargo run --release -- --elf=./example/one.elf --disable-socket --print-messages
 | DIVXU       | <ul><li>[x] B<li> [x] W</ul>           |
 | MULXS       | <ul><li>[ ] B<li> [ ] W</ul>           |
 | DIVXS       | <ul><li>[ ] B<li> [ ] W</ul>           |
-| NEG         | <ul><li>[ ] B<li> [ ] W<li> [ ] L</ul> |
+| NEG         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
 | EXTU        | <ul><li>[x] W<li> [x] L</ul>           |
 | EXTS        | <ul><li>[ ] W<li> [ ] L</ul>           |
 | AND         | <ul><li>[x] B<li> [x] W<li> [x] L</ul> |
