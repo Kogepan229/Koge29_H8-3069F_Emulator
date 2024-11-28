@@ -7,8 +7,6 @@ mod registers;
 mod setting;
 mod socket;
 
-use std::fmt::Display;
-
 use clap::Parser;
 use log::error;
 
@@ -36,7 +34,7 @@ struct Args {
     print_messages: bool,
 
     #[arg(short, long)]
-    disable_socket: bool,
+    socket: bool,
 
     #[arg(short = 'r', long)]
     print_ready: bool,
@@ -57,7 +55,7 @@ async fn main() {
 
     let mut cpu = Cpu::new();
 
-    if !args.disable_socket {
+    if args.socket {
         socket::listen(format!("127.0.0.1:{}", args.port)).await.unwrap();
     }
 
