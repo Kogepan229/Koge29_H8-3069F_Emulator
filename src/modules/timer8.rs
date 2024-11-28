@@ -89,7 +89,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmia {
-                    println!("interrupt 36");
+                    log::trace!("interrupt 36");
                     interrupt_controller.request_interrupt(36);
                 }
             }
@@ -101,7 +101,7 @@ impl Timer8_0 {
                     tcnt = 0;
                 }
                 if self.is_allowed_cmib {
-                    println!("interrupt 37");
+                    log::trace!("interrupt 37");
                     interrupt_controller.request_interrupt(37);
                 }
             }
@@ -110,7 +110,7 @@ impl Timer8_0 {
             if is_overflowed {
                 tcsr |= 0b0010_0000;
                 if self.is_allowed_ovi {
-                    println!("interrupt 39");
+                    log::trace!("interrupt 39");
                     interrupt_controller.request_interrupt(39);
                 }
             }
@@ -126,7 +126,7 @@ impl Timer8_0 {
     }
 
     pub fn update_tcr(&mut self, tcr: u8) {
-        println!("start timer");
+        log::trace!("start timer");
         self.is_allowed_cmib = tcr & 0b1000_0000 != 0;
         self.is_allowed_cmia = tcr & 0b0100_0000 != 0;
         self.is_allowed_ovi = tcr & 0b0010_0000 != 0;

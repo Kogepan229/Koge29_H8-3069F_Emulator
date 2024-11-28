@@ -7,7 +7,10 @@ mod registers;
 mod setting;
 mod socket;
 
+use std::fmt::Display;
+
 use clap::Parser;
+use log::error;
 
 use crate::cpu::Cpu;
 
@@ -20,6 +23,10 @@ struct Args {
 
     #[arg(short, long, default_value = "")]
     args: String,
+
+    /// log level (error, warn, info, debug, trace)
+    #[arg(short = 'l', long, default_value = "info")]
+    log: String,
 
     /// Print executed opcode
     #[arg(short = 'i', long)]
@@ -41,10 +48,11 @@ struct Args {
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
+
+    init_logger(args.log);
+
     *setting::ENABLE_PRINT_OPCODE.write().unwrap() = args.print_instruction;
-
     *setting::ENABLE_PRINT_MESSAGES.write().unwrap() = args.print_messages;
-
     *setting::ENABLE_PRINT_READY.write().unwrap() = args.print_ready;
 
     let mut cpu = Cpu::new();
@@ -56,4 +64,26 @@ async fn main() {
     elf::load(args.elf, &mut cpu, args.args);
 
     cpu.run().await.unwrap();
+}
+
+fn _init_logger(level: &str) {
+    use std::io::Write;
+    env_logger::Builder::from_env(env_logger::Env::new().default_filter_or(level))
+        .format(|buf, record| {
+            let level_style = buf.default_level_style(record.level());
+            let level_str = format!("{}{}{:#}", level_style, record.level(), level_style);
+
+            writeln!(buf, "[{}] {}", level_str, record.args())
+        })
+        .init();
+}
+
+fn init_logger(arg_log_level: String) {
+    match arg_log_level.to_lowercase().as_str() {
+        "error" | "warn" | "info" | "debug" | "trace" => _init_logger(&arg_log_level),
+        _ => {
+            _init_logger("info");
+            error!("Invalid log_level: {}", arg_log_level);
+        }
+    }
 }

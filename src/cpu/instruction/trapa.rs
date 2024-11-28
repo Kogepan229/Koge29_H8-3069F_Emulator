@@ -42,7 +42,7 @@ impl Cpu {
                 let gotsave = 0xfffd10 + arg0 * 4; // segment + vector num * 4
                 self.write_abs24_l(gotsave, self.er[5])?;
 
-                println!("[set_handler] vector: {}, addr: 0x{:x}", arg0, arg1);
+                log::trace!("[set_handler] vector: {}, addr: 0x{:x}", arg0, arg1);
             }
             104 => {
                 // __write

@@ -96,6 +96,7 @@ impl Cpu {
 
         self.init_registers()?;
 
+        log::info!("Execute program");
         loop {
             // Print received messages
             if let Some(msgs) = socket::get_received_msgs() {
@@ -149,8 +150,9 @@ impl Cpu {
             }
 
             if self.pc == self.exit_addr {
+                log::info!("Finished program");
                 self.print_er();
-                println!("state: {}, time: {}sec", state_sum, exec_time.elapsed().as_secs_f64());
+                log::info!("state: {}, time: {}sec", state_sum, exec_time.elapsed().as_secs_f64());
                 return Ok(());
             }
 
@@ -607,10 +609,11 @@ impl Cpu {
     }
 
     fn print_er(&self) {
+        let mut info = String::new();
         for i in 0..8 {
-            print!("ER{}:[0x{:x}] ", i, self.er[i]);
+            info += &format!("ER{}:[0x{:x}] ", i, self.er[i]).to_string();
         }
-        println!("");
+        log::info!("Registers {}", info);
     }
 }
 
