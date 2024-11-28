@@ -22,7 +22,7 @@ struct Args {
     #[arg(short, long, default_value = "")]
     args: String,
 
-    /// log level (error, warn, info, debug, trace)
+    /// log level (error, warn, info, debug, trace, off)
     #[arg(short = 'l', long, default_value = "info")]
     log: String,
 
@@ -78,7 +78,7 @@ fn _init_logger(level: &str) {
 
 fn init_logger(arg_log_level: String) {
     match arg_log_level.to_lowercase().as_str() {
-        "error" | "warn" | "info" | "debug" | "trace" => _init_logger(&arg_log_level),
+        "error" | "warn" | "info" | "debug" | "trace" | "off" => _init_logger(&arg_log_level),
         _ => {
             _init_logger("info");
             error!("Invalid log_level: {}", arg_log_level);
