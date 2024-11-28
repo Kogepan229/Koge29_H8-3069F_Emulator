@@ -151,8 +151,9 @@ impl Cpu {
 
             if self.pc == self.exit_addr {
                 log::info!("Finished program");
-                self.print_er();
+                log::info!("Exit Code: {}", self.er[0]);
                 log::info!("state: {}, time: {}sec", state_sum, exec_time.elapsed().as_secs_f64());
+                self.print_er();
                 return Ok(());
             }
 
@@ -613,7 +614,7 @@ impl Cpu {
         for i in 0..8 {
             info += &format!("ER{}:[0x{:x}] ", i, self.er[i]).to_string();
         }
-        log::info!("Registers {}", info);
+        log::trace!("Registers {}", info);
     }
 }
 

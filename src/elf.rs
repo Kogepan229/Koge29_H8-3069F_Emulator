@@ -45,7 +45,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
     let (_, pht) = parse_program_header::parse_program_header_table32(hd.phnum as usize)(&elf_binary[hd.phoff as usize..]).unwrap();
 
     cpu.er[2] = PROGRAM_START_ADDR as u32;
-    log::info!("Set er2 [0x{:x}]", cpu.er[2]);
+    log::trace!("Set er2 [0x{:x}]", cpu.er[2]);
 
     // load to memory
     let program_dram_offset = PROGRAM_START_ADDR - AREA2_START_ADDR as usize;
@@ -61,7 +61,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
         if s.name == ".got" {
             // set .got section address to er5
             cpu.er[5] = s.header.addr + PROGRAM_START_ADDR as u32;
-            log::info!("Set er5 [0x{:x}(0x{:x})]", cpu.er[5], s.header.addr);
+            log::trace!("Set er5 [0x{:x}(0x{:x})]", cpu.er[5], s.header.addr);
 
             // Add start address of program to Global Offset
             for i in 0..(s.header.size / 4) {
@@ -80,7 +80,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
             a >>= 2;
             a <<= 2;
             cpu.er[7] = a as u32 - 8;
-            log::info!("Set er7(stack pointer) [0x{:x}]", cpu.er[7]);
+            log::trace!("Set er7(stack pointer) [0x{:x}]", cpu.er[7]);
 
             a += SIZE_OF_TCB + 3;
             a >>= 2;
@@ -91,9 +91,9 @@ pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
             args_list.insert(0, "prog.elf");
 
             cpu.er[0] = args_list.len() as u32;
-            log::info!("Set er0 [0x{:x}]", cpu.er[0]);
+            log::trace!("Set er0 [0x{:x}]", cpu.er[0]);
             cpu.er[1] = a as u32;
-            log::info!("Set er1 [0x{:x}]", cpu.er[1]);
+            log::trace!("Set er1 [0x{:x}]", cpu.er[1]);
 
             let mut argp = a;
             a += 4 * (args_list.len() + 1);
@@ -134,7 +134,7 @@ pub fn load(elf_path: String, cpu: &mut Cpu, args: String) {
             for symtab in symtabs_with_name {
                 if symtab.name == "___exit" {
                     cpu.exit_addr = symtab.symtab.value + PROGRAM_START_ADDR as u32;
-                    log::info!("Set ___exit address [0x{:x}]", cpu.exit_addr);
+                    log::trace!("Set ___exit address [0x{:x}]", cpu.exit_addr);
                 }
             }
         }
