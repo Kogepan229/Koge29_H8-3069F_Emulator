@@ -2,7 +2,7 @@
 
 ## How to Run example
 ```
-cargo run --release -- --elf=./example/one.elf --disable-socket --print-messages
+cargo run --release -- --elf=./example/one.elf -m
 ```
 
 ## Implemented
