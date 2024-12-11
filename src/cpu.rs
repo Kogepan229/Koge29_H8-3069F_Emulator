@@ -14,6 +14,7 @@ use std::{cell::RefCell, rc::Rc, time::Duration};
 mod addressing_mode;
 mod instruction;
 pub(crate) mod interrupt_controller;
+mod messages;
 
 #[cfg(test)]
 mod testhelper;
@@ -89,7 +90,12 @@ impl Cpu {
         let mut loop_count: usize = 0;
         let mut one_sec_count: usize = 0;
 
-        let mut is_paused = false;
+        let mut is_paused = if *setting::ENABLE_WAIT_START.read().unwrap() {
+            socket::send_message("ready");
+            true
+        } else {
+            false
+        };
 
         // Set program counter
         self.pc = self.er[2];
@@ -98,21 +104,30 @@ impl Cpu {
 
         log::info!("Execute program");
         loop {
-            // Print received messages
-            if let Some(msgs) = socket::get_received_msgs() {
-                for val in msgs {
-                    let ls = val.lines();
-                    for l in ls {
-                        println!("rec: {}", l);
-                        if l == "pause" {
-                            is_paused = true;
-                        } else if l == "restart" {
-                            is_paused = false;
-                            loop_time = time::Instant::now();
-                        } else if l == "stop" {
-                            println!("Stopped by message.");
-                            return Ok(());
+            // Parse socket messages
+            if let Some(messages) = socket::get_received_msgs() {
+                for message in messages {
+                    let list: Vec<&str> = message.split(':').collect();
+                    match list[0] {
+                        "cmd" => {
+                            if list.len() != 2 {
+                                break;
+                            }
+                            match list[1] {
+                                "pause" => is_paused = true,
+                                "start" => {
+                                    is_paused = false;
+                                    loop_time = time::Instant::now();
+                                }
+                                "stop" => {
+                                    log::info!("Stopped program");
+                                    return Ok(());
+                                }
+                                _ => (),
+                            }
                         }
+                        "u8" => self.parse_u8(list)?,
+                        _ => (),
                     }
                 }
             }

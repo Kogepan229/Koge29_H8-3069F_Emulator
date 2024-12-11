@@ -17,9 +17,6 @@ static MESSAGE_SENDER: OnceLock<Sender<String>> = OnceLock::new();
 pub async fn listen(addr: String) -> Result<()> {
     let listener = TcpListener::bind(addr).await.unwrap();
 
-    if *setting::ENABLE_PRINT_READY.read().unwrap() {
-        println!("ready");
-    }
     let (stream, _) = listener.accept().await.unwrap();
     let (socket_reader, socket_writer) = stream.into_split();
 
@@ -34,15 +31,28 @@ pub async fn listen(addr: String) -> Result<()> {
 
 fn start_receive_worker(socket_reader: OwnedReadHalf) {
     tokio::spawn(async move {
+        let mut message: Vec<u8> = Vec::new();
         loop {
-            let mut msg = vec![0; 1024];
+            let mut received = vec![0; 1024];
             socket_reader.readable().await.unwrap();
-            match socket_reader.try_read(&mut msg) {
+            match socket_reader.try_read(&mut received) {
                 Ok(n) => {
-                    msg.truncate(n);
+                    if n == 0 {
+                        break;
+                    }
+                    received.truncate(n);
                     match READ_BUF.get() {
                         Some(b) => {
-                            b.lock().unwrap().push(String::from_utf8(msg).unwrap());
+                            for ch in received {
+                                if ch == b'\n' {
+                                    b.lock()
+                                        .unwrap()
+                                        .push(String::from_utf8(message.clone()).unwrap().trim().to_string());
+                                    message.clear();
+                                } else {
+                                    message.push(ch);
+                                }
+                            }
                         }
                         None => return,
                     }
@@ -110,16 +120,16 @@ pub fn send_one_sec_message() {
 }
 
 pub fn send_addr_value_u8(addr: u32, value: u8) {
-    let str = format!("u8:0x{:x}:0x{:x}", addr, value);
+    let str = format!("u8:{:x}:{:x}", addr, value);
     send_message(&str);
 }
 
 pub fn send_addr_value_u16(addr: u32, value: u16) {
-    let str = format!("u16:0x{:x}:0x{:x}", addr, value);
+    let str = format!("u16:{:x}:{:x}", addr, value);
     send_message(&str);
 }
 
 pub fn send_addr_value_u32(addr: u32, value: u32) {
-    let str = format!("u32:0x{:x}:0x{:x}", addr, value);
+    let str = format!("u32:{:x}:{:x}", addr, value);
     send_message(&str);
 }

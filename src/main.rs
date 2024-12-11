@@ -36,8 +36,9 @@ struct Args {
     #[arg(short, long)]
     socket: bool,
 
-    #[arg(short = 'r', long)]
-    print_ready: bool,
+    /// Wait for a start message from the socket
+    #[arg(short = 'w', long)]
+    wait_start: bool,
 
     #[arg(short, long, default_value = "12345")]
     port: u16,
@@ -51,7 +52,7 @@ async fn main() {
 
     *setting::ENABLE_PRINT_OPCODE.write().unwrap() = args.print_instruction;
     *setting::ENABLE_PRINT_MESSAGES.write().unwrap() = args.print_messages;
-    *setting::ENABLE_PRINT_READY.write().unwrap() = args.print_ready;
+    *setting::ENABLE_WAIT_START.write().unwrap() = args.socket && args.wait_start;
 
     let mut cpu = Cpu::new();
 
