@@ -30,7 +30,7 @@ jobs:
     if: ${{needs.check-version.outputs.is_new_version}}
     runs-on: windows-latest
     env:
-      ARTIFACT_NAME: h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
+      ARTIFACT_NAME: koge29_h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
     outputs:
       artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
@@ -61,7 +61,7 @@ jobs:
     if: ${{needs.check-version.outputs.is_new_version}}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
+      ARTIFACT_NAME: koge29_h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
     outputs:
       artifact_name: ${{env.ARTIFACT_NAME}}
     steps:
