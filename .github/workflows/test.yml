@@ -17,8 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set rust-toolchain
+      - name: Setup rust-toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache rust
+        uses: Swatinem/rust-cache@v2
 
       - name: Run test
         run: cargo test --all-features
