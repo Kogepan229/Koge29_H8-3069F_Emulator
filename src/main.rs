@@ -63,6 +63,9 @@ async fn main() {
     elf::load(args.elf, &mut cpu, args.args);
 
     cpu.run().await.unwrap();
+    log::info!("finish");
+
+    // socket::wait_sending().await;
 }
 
 fn _init_logger(level: &str) {

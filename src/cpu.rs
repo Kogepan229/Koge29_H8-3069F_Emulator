@@ -191,6 +191,8 @@ impl Cpu {
                 socket::send_one_sec_message();
                 one_sec_count -= CPU_CLOCK;
             }
+
+            // socket::filter_handles();
         }
     }
 

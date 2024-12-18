@@ -1,18 +1,23 @@
 use anyhow::Result;
 use std::sync::{Mutex, OnceLock};
 use tokio::{
-    io,
+    io, join,
     net::{
         tcp::{OwnedReadHalf, OwnedWriteHalf},
         TcpListener,
     },
-    sync::mpsc::{self, Receiver, Sender},
+    sync::{
+        mpsc::{self, Receiver, Sender},
+        RwLock,
+    },
+    task::JoinHandle,
 };
 
 use crate::setting;
 
 static READ_BUF: OnceLock<Mutex<Vec<String>>> = OnceLock::new();
-static MESSAGE_SENDER: OnceLock<Sender<String>> = OnceLock::new();
+static MESSAGE_SENDER: OnceLock<RwLock<Option<Sender<String>>>> = OnceLock::new();
+static JOIN_HANDLES: OnceLock<Mutex<Vec<JoinHandle<()>>>> = OnceLock::new();
 
 pub async fn listen(addr: String) -> Result<()> {
     let listener = TcpListener::bind(addr).await.unwrap();
@@ -23,8 +28,9 @@ pub async fn listen(addr: String) -> Result<()> {
     READ_BUF.set(Mutex::new(Vec::<String>::new())).unwrap();
     start_receive_worker(socket_reader);
 
+    JOIN_HANDLES.set(Mutex::new(Vec::new())).unwrap();
     let (tx, rx) = mpsc::channel(32);
-    MESSAGE_SENDER.set(tx).unwrap();
+    MESSAGE_SENDER.set(RwLock::new(Some(tx))).unwrap();
     start_send_workder(rx, socket_writer);
     Ok(())
 }
@@ -70,11 +76,12 @@ fn start_receive_worker(socket_reader: OwnedReadHalf) {
 }
 
 fn start_send_workder(mut rx: Receiver<String>, socket_writer: OwnedWriteHalf) {
-    tokio::spawn(async move {
+    let job = tokio::spawn(async move {
         while let Some(message) = rx.recv().await {
             let _msg = message.replace('\\', "\\\\").replace('\n', "\\n") + "\n";
             let str_bytes = _msg.as_bytes();
             let mut written_bytes = 0;
+            println!("{}", _msg);
             loop {
                 socket_writer.writable().await.unwrap();
                 match socket_writer.try_write(str_bytes) {
@@ -89,6 +96,7 @@ fn start_send_workder(mut rx: Receiver<String>, socket_writer: OwnedWriteHalf) {
             }
         }
     });
+    JOIN_HANDLES.get().unwrap().lock().unwrap().push(job);
 }
 
 pub fn get_received_msgs() -> Option<Vec<String>> {
@@ -103,12 +111,41 @@ pub fn get_received_msgs() -> Option<Vec<String>> {
     }
 }
 
+pub fn filter_handles() {
+    // let mut handles = JOIN_HANDLES.get().unwrap().lock().unwrap();
+    // let new: Vec<JoinHandle<()>> = handles.iter().filter(|job| !job.is_finished());
+    if let Some(handles_mutex) = JOIN_HANDLES.get() {
+        let mut handles = handles_mutex.lock().unwrap();
+        let mut new_handles = vec![];
+        while let Some(job) = handles.pop() {
+            if !job.is_finished() {
+                new_handles.push(job);
+            }
+        }
+        *handles = new_handles;
+    }
+}
+
+pub async fn wait_sending() {
+    if let Some(v) = MESSAGE_SENDER.get() {
+        *v.write().await = None;
+    }
+    if let Some(handles_mutex) = JOIN_HANDLES.get() {
+        let mut handles = handles_mutex.lock().unwrap();
+        while let Some(job) = handles.pop() {
+            job.await.unwrap();
+        }
+    }
+}
+
 pub fn send_message(str: &str) {
     if let Some(v) = MESSAGE_SENDER.get() {
         let _str = str.to_string();
-        tokio::spawn(async move {
-            v.send(_str).await.unwrap();
+        let job = tokio::spawn(async move {
+            let sender = v.read().await;
+            sender.as_ref().unwrap().send(_str).await.unwrap();
         });
+        JOIN_HANDLES.get().unwrap().lock().unwrap().push(job);
     }
     if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
         println!("msg: {}", str);
