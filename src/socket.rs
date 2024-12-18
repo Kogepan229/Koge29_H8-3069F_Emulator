@@ -72,7 +72,7 @@ fn start_receive_worker(socket_reader: OwnedReadHalf) {
 fn start_send_workder(mut rx: Receiver<String>, socket_writer: OwnedWriteHalf) {
     tokio::spawn(async move {
         while let Some(message) = rx.recv().await {
-            let _msg = message + "\n";
+            let _msg = message.replace('\\', "\\\\").replace('\n', "\\n") + "\n";
             let str_bytes = _msg.as_bytes();
             let mut written_bytes = 0;
             loop {
