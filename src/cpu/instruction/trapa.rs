@@ -1,4 +1,7 @@
-use crate::cpu::{Cpu, StateType, ADDRESS_MASK};
+use crate::{
+    cpu::{Cpu, StateType, ADDRESS_MASK},
+    socket,
+};
 use anyhow::{bail, Result};
 
 impl Cpu {
@@ -62,6 +65,7 @@ impl Cpu {
                 // Print strings
                 print!("{}", print_string);
                 // println!("[program] [__write] [fd: {}] {}", arg0, print_string);
+                socket::send_message(&format!("stdout:{}", print_string));
             }
             _ => bail!("unsupported mes2 command id:{}", id),
         }
