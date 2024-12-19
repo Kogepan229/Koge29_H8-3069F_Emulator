@@ -25,7 +25,6 @@ mod testhelper;
 const CPU_CLOCK: usize = 20_000_000;
 pub const ADDRESS_MASK: u32 = 0x00ffffff;
 
-// #[derive(Clone)]
 #[cfg_attr(test, derive(Clone))]
 pub struct Cpu {
     #[cfg(not(test))]

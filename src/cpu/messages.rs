@@ -64,16 +64,4 @@ impl Bus {
         self.send_message(&str)?;
         Ok(())
     }
-
-    pub fn send_addr_value_u16(&mut self, addr: u32, value: u16) -> Result<()> {
-        let str = format!("u16:{:x}:{:x}", addr, value);
-        self.send_message(&str)?;
-        Ok(())
-    }
-
-    pub fn send_addr_value_u32(&mut self, addr: u32, value: u32) -> Result<()> {
-        let str = format!("u32:{:x}:{:x}", addr, value);
-        self.send_message(&str)?;
-        Ok(())
-    }
 }
