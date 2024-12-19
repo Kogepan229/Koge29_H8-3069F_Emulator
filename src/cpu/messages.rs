@@ -1,7 +1,10 @@
+use crate::{bus::Bus, setting};
+
 use super::Cpu;
 use anyhow::Result;
 
 impl Cpu {
+    #[cfg(not(test))]
     pub fn parse_u8(&mut self, list: Vec<&str>) -> Result<()> {
         if list.len() != 3 {
             return Ok(());
@@ -15,6 +18,62 @@ impl Cpu {
                 }
             }
         }
+        Ok(())
+    }
+
+    pub fn send_message(&mut self, message: &String) -> Result<()> {
+        #[cfg(not(test))]
+        if let Some(socket) = &self.socket {
+            socket.send_message(message)?;
+        }
+        if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
+            println!("msg: {}", message);
+        }
+        Ok(())
+    }
+
+    pub fn send_ready_message(&mut self) -> Result<()> {
+        self.send_message(&"ready".to_string())?;
+        Ok(())
+    }
+
+    pub fn send_one_sec_message(&mut self) -> Result<()> {
+        self.send_message(&"1sec".to_string())?;
+        Ok(())
+    }
+
+    pub fn send_stdout_message(&mut self, string: &String) -> Result<()> {
+        self.send_message(&format!("stdout:{}", string))?;
+        Ok(())
+    }
+}
+
+impl Bus {
+    pub fn send_message(&mut self, message: &String) -> Result<()> {
+        if let Some(tx) = &self.message_tx {
+            tx.send(message.clone())?;
+        }
+        if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
+            println!("msg: {}", message);
+        }
+        Ok(())
+    }
+
+    pub fn send_addr_value_u8(&mut self, addr: u32, value: u8) -> Result<()> {
+        let str = format!("u8:{:x}:{:x}", addr, value);
+        self.send_message(&str)?;
+        Ok(())
+    }
+
+    pub fn send_addr_value_u16(&mut self, addr: u32, value: u16) -> Result<()> {
+        let str = format!("u16:{:x}:{:x}", addr, value);
+        self.send_message(&str)?;
+        Ok(())
+    }
+
+    pub fn send_addr_value_u32(&mut self, addr: u32, value: u32) -> Result<()> {
+        let str = format!("u32:{:x}:{:x}", addr, value);
+        self.send_message(&str)?;
         Ok(())
     }
 }

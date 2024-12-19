@@ -4,12 +4,15 @@ use crate::{
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     modules::ModuleManager,
     registers::{ABWCR, ASTCR, DRCRA, WCRH, WCRL},
-    setting, socket,
+    setting,
 };
 use anyhow::{bail, Context as _, Result};
 use interrupt_controller::InterruptController;
 use std::{cell::RefCell, ops::Sub, rc::Rc, time::Duration};
 use std::{ops::Add, time};
+
+#[cfg(not(test))]
+use crate::socket::Socket;
 
 mod addressing_mode;
 mod instruction;
@@ -22,8 +25,11 @@ mod testhelper;
 const CPU_CLOCK: usize = 20_000_000;
 pub const ADDRESS_MASK: u32 = 0x00ffffff;
 
-#[derive(Clone)]
+// #[derive(Clone)]
+#[cfg_attr(test, derive(Clone))]
 pub struct Cpu {
+    #[cfg(not(test))]
+    socket: Option<Socket>,
     pub bus: Bus,
     pc: u32,
     operating_pc: u32,
@@ -71,6 +77,8 @@ impl Cpu {
     pub fn new() -> Self {
         let module_manager = Rc::new(RefCell::new(ModuleManager::new()));
         Cpu {
+            #[cfg(not(test))]
+            socket: None,
             bus: Bus::new(Rc::downgrade(&module_manager)),
             pc: 0,
             operating_pc: 0,
@@ -80,6 +88,15 @@ impl Cpu {
             exit_addr: 0,
             module_manager: module_manager.clone(),
         }
+    }
+
+    #[cfg(not(test))]
+    pub fn connect_socket(&mut self, addr: &String) -> Result<()> {
+        let socket = Socket::connect(addr)?;
+        self.bus.message_tx = Some(socket.clonse_message_tx());
+        self.socket = Some(socket);
+
+        Ok(())
     }
 
     pub fn run(&mut self) -> Result<()> {
@@ -92,8 +109,9 @@ impl Cpu {
         let mut one_sec_count: usize = 0;
         let mut sleep_time = time::Duration::ZERO;
 
+        #[cfg_attr(test, allow(unused_mut))]
         let mut is_paused = if *setting::ENABLE_WAIT_START.read().unwrap() {
-            socket::send_message("ready");
+            self.send_ready_message()?;
             true
         } else {
             false
@@ -107,8 +125,9 @@ impl Cpu {
         log::info!("Execute program");
         loop {
             // Parse socket messages
-            if let Some(messages) = socket::get_received_msgs() {
-                for message in messages {
+            #[cfg(not(test))]
+            if let Some(socket) = &self.socket {
+                for message in socket.pop_messages()? {
                     let list: Vec<&str> = message.split(':').collect();
                     match list[0] {
                         "cmd" => {
@@ -189,7 +208,7 @@ impl Cpu {
             }
 
             if one_sec_count >= CPU_CLOCK {
-                socket::send_one_sec_message();
+                self.send_one_sec_message()?;
                 one_sec_count -= CPU_CLOCK;
             }
         }
@@ -650,8 +669,8 @@ mod tests {
         registers::{ABWCR, ASTCR, WCRH, WCRL},
     };
 
-    #[tokio::test]
-    async fn test_get_wait_state_wcrl() {
+    #[test]
+    fn test_get_wait_state_wcrl() {
         let mut cpu = Cpu::new();
         cpu.bus.write(WCRL, 0xff).unwrap();
         assert_eq!(cpu.get_wait_state(0).unwrap(), 3);
@@ -674,8 +693,8 @@ mod tests {
         assert_eq!(cpu.get_wait_state(4).unwrap(), 0);
     }
 
-    #[tokio::test]
-    async fn test_get_wait_state_wcrh() {
+    #[test]
+    fn test_get_wait_state_wcrh() {
         let mut cpu = Cpu::new();
         cpu.bus.write(WCRH, 0xff).unwrap();
         assert_eq!(cpu.get_wait_state(4).unwrap(), 3);
@@ -698,24 +717,24 @@ mod tests {
         assert_eq!(cpu.get_wait_state(3).unwrap(), 0);
     }
 
-    #[tokio::test]
+    #[test]
     #[should_panic]
-    async fn test_calc_state_type_l() {
+    fn test_calc_state_type_l() {
         let cpu = Cpu::new();
         const STATE: u8 = 2;
         cpu.calc_state(StateType::L, STATE).unwrap();
     }
 
-    #[tokio::test]
+    #[test]
     #[should_panic]
-    async fn test_calc_state_type_m() {
+    fn test_calc_state_type_m() {
         let cpu = Cpu::new();
         const STATE: u8 = 2;
         cpu.calc_state(StateType::M, STATE).unwrap();
     }
 
-    #[tokio::test]
-    async fn test_calc_state_memory() {
+    #[test]
+    fn test_calc_state_memory() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = MEMORY_START_ADDR;
         const STATE: u8 = 2;
@@ -725,8 +744,8 @@ mod tests {
         assert_eq!(cpu.calc_state(StateType::N, STATE).unwrap(), 1 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_external_8bit_2state() {
+    #[test]
+    fn test_calc_state_external_8bit_2state() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = AREA0_START_ADDR;
         cpu.bus.write(ABWCR, 0x01).unwrap();
@@ -738,8 +757,8 @@ mod tests {
         assert_eq!(cpu.calc_state(StateType::N, STATE).unwrap(), 1 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_external_8bit_3state() {
+    #[test]
+    fn test_calc_state_external_8bit_3state() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = AREA0_START_ADDR;
         cpu.bus.write(ABWCR, 0x01).unwrap();
@@ -753,8 +772,8 @@ mod tests {
         assert_eq!(cpu.calc_state(StateType::N, STATE).unwrap(), 1 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_external_16bit_2state() {
+    #[test]
+    fn test_calc_state_external_16bit_2state() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = AREA0_START_ADDR;
         cpu.bus.write(ABWCR, 0xfe).unwrap();
@@ -766,8 +785,8 @@ mod tests {
         assert_eq!(cpu.calc_state(StateType::N, STATE).unwrap(), 1 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_external_16bit_3state() {
+    #[test]
+    fn test_calc_state_external_16bit_3state() {
         let mut cpu = Cpu::new();
         cpu.operating_pc = AREA0_START_ADDR;
         cpu.bus.write(ABWCR, 0xfe).unwrap();
@@ -781,16 +800,16 @@ mod tests {
         assert_eq!(cpu.calc_state(StateType::N, STATE).unwrap(), 1 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_with_addr_memory() {
+    #[test]
+    fn test_calc_state_with_addr_memory() {
         let cpu = Cpu::new();
         const STATE: u8 = 2;
         assert_eq!(cpu.calc_state_with_addr(StateType::L, STATE, MEMORY_START_ADDR).unwrap(), 2 * STATE);
         assert_eq!(cpu.calc_state_with_addr(StateType::M, STATE, MEMORY_START_ADDR).unwrap(), 2 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_with_addr_external_8bit_2state() {
+    #[test]
+    fn test_calc_state_with_addr_external_8bit_2state() {
         let mut cpu = Cpu::new();
         cpu.bus.write(ABWCR, 0x01).unwrap();
         cpu.bus.write(ASTCR, 0xfe).unwrap();
@@ -799,8 +818,8 @@ mod tests {
         assert_eq!(cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).unwrap(), 4 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_with_addr_external_8bit_3state() {
+    #[test]
+    fn test_calc_state_with_addr_external_8bit_3state() {
         let mut cpu = Cpu::new();
         cpu.bus.write(ABWCR, 0x01).unwrap();
         cpu.bus.write(ASTCR, 0x01).unwrap();
@@ -817,8 +836,8 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_calc_state_with_addr_external_16bit_2state() {
+    #[test]
+    fn test_calc_state_with_addr_external_16bit_2state() {
         let mut cpu = Cpu::new();
         cpu.bus.write(ABWCR, 0xfe).unwrap();
         cpu.bus.write(ASTCR, 0xfe).unwrap();
@@ -827,8 +846,8 @@ mod tests {
         assert_eq!(cpu.calc_state_with_addr(StateType::M, STATE, AREA0_START_ADDR).unwrap(), 2 * STATE);
     }
 
-    #[tokio::test]
-    async fn test_calc_state_with_addr_external_16bit_3state() {
+    #[test]
+    fn test_calc_state_with_addr_external_16bit_3state() {
         let mut cpu = Cpu::new();
         cpu.bus.write(ABWCR, 0xfe).unwrap();
         cpu.bus.write(ASTCR, 0x01).unwrap();

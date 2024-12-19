@@ -5,6 +5,7 @@ mod memory;
 mod modules;
 mod registers;
 mod setting;
+
 mod socket;
 
 use clap::Parser;
@@ -44,8 +45,7 @@ struct Args {
     port: u16,
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let args = Args::parse();
 
     init_logger(args.log);
@@ -56,8 +56,9 @@ async fn main() {
 
     let mut cpu = Cpu::new();
 
+    #[cfg(not(test))]
     if args.socket {
-        socket::listen(format!("127.0.0.1:{}", args.port)).await.unwrap();
+        cpu.connect_socket(&format!("127.0.0.1:{}", args.port)).unwrap();
     }
 
     elf::load(args.elf, &mut cpu, args.args);
