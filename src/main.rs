@@ -45,8 +45,7 @@ struct Args {
     port: u16,
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let args = Args::parse();
 
     init_logger(args.log);
