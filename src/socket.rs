@@ -1,4 +1,6 @@
+#[cfg(not(test))]
 use anyhow::Result;
+#[cfg(not(test))]
 use std::{
     io::{BufRead, BufReader, BufWriter, Write},
     net::{TcpListener, TcpStream},
@@ -6,11 +8,13 @@ use std::{
     thread,
 };
 
+#[cfg(not(test))]
 pub struct Socket {
     message_tx: Sender<String>,
     message_rx: Receiver<String>,
 }
 
+#[cfg(not(test))]
 impl Socket {
     pub fn connect(addr: &String) -> Result<Self> {
         let listener = TcpListener::bind(addr)?;

@@ -3,9 +3,9 @@ mod cpu;
 mod elf;
 mod memory;
 mod modules;
-// mod new_socket;
 mod registers;
 mod setting;
+
 mod socket;
 
 use clap::Parser;

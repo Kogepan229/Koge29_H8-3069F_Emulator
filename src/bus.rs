@@ -1,8 +1,4 @@
-use std::{
-    cell::RefCell,
-    rc::{Rc, Weak},
-    sync::mpsc::Sender,
-};
+use std::{cell::RefCell, rc::Weak, sync::mpsc::Sender};
 
 use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},

@@ -1,7 +1,4 @@
-use crate::{
-    cpu::{Cpu, StateType, ADDRESS_MASK},
-    socket,
-};
+use crate::cpu::{Cpu, StateType, ADDRESS_MASK};
 use anyhow::{bail, Result};
 
 impl Cpu {

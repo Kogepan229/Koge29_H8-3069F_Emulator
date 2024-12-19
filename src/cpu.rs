@@ -208,9 +208,6 @@ impl Cpu {
             }
 
             if one_sec_count >= CPU_CLOCK {
-                // if let Some(socket) = &self.socket {
-                //     socket.borrow_mut().send_one_sec_message()?;
-                // }
                 self.send_one_sec_message()?;
                 one_sec_count -= CPU_CLOCK;
             }
