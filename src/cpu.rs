@@ -4,12 +4,15 @@ use crate::{
     memory::{MEMORY_END_ADDR, MEMORY_START_ADDR},
     modules::ModuleManager,
     registers::{ABWCR, ASTCR, DRCRA, WCRH, WCRL},
-    setting, socket,
+    setting,
 };
 use anyhow::{bail, Context as _, Result};
 use interrupt_controller::InterruptController;
 use std::{cell::RefCell, ops::Sub, rc::Rc, time::Duration};
 use std::{ops::Add, time};
+
+#[cfg(not(test))]
+use crate::new_socket::Socket;
 
 mod addressing_mode;
 mod instruction;
@@ -22,8 +25,11 @@ mod testhelper;
 const CPU_CLOCK: usize = 20_000_000;
 pub const ADDRESS_MASK: u32 = 0x00ffffff;
 
-#[derive(Clone)]
+// #[derive(Clone)]
+#[cfg_attr(test, derive(Clone))]
 pub struct Cpu {
+    #[cfg(not(test))]
+    socket: Option<Socket>,
     pub bus: Bus,
     pc: u32,
     operating_pc: u32,
@@ -71,6 +77,8 @@ impl Cpu {
     pub fn new() -> Self {
         let module_manager = Rc::new(RefCell::new(ModuleManager::new()));
         Cpu {
+            #[cfg(not(test))]
+            socket: None,
             bus: Bus::new(Rc::downgrade(&module_manager)),
             pc: 0,
             operating_pc: 0,
@@ -80,6 +88,16 @@ impl Cpu {
             exit_addr: 0,
             module_manager: module_manager.clone(),
         }
+    }
+
+    #[cfg(not(test))]
+    pub fn connect_socket(&mut self, addr: &String) -> Result<()> {
+        let socket = Socket::connect(addr)?;
+        // let share = Rc::new(RefCell::new(socket));
+        self.bus.message_tx = Some(socket.clonse_message_tx());
+        self.socket = Some(socket);
+
+        Ok(())
     }
 
     pub fn run(&mut self) -> Result<()> {
@@ -92,8 +110,10 @@ impl Cpu {
         let mut one_sec_count: usize = 0;
         let mut sleep_time = time::Duration::ZERO;
 
+        #[cfg_attr(test, allow(unused_mut))]
         let mut is_paused = if *setting::ENABLE_WAIT_START.read().unwrap() {
-            socket::send_message("ready");
+            // socket::send_message("ready");
+            self.send_ready_message()?;
             true
         } else {
             false
@@ -107,8 +127,11 @@ impl Cpu {
         log::info!("Execute program");
         loop {
             // Parse socket messages
-            if let Some(messages) = socket::get_received_msgs() {
-                for message in messages {
+            #[cfg(not(test))]
+            if let Some(socket) = self.socket.as_mut() {
+                socket.pop_messages()?;
+                for message in socket.pop_messages()? {
+                    println!("message: {}", message);
                     let list: Vec<&str> = message.split(':').collect();
                     match list[0] {
                         "cmd" => {
@@ -189,7 +212,10 @@ impl Cpu {
             }
 
             if one_sec_count >= CPU_CLOCK {
-                socket::send_one_sec_message();
+                // if let Some(socket) = &self.socket {
+                //     socket.borrow_mut().send_one_sec_message()?;
+                // }
+                self.send_one_sec_message()?;
                 one_sec_count -= CPU_CLOCK;
             }
         }
