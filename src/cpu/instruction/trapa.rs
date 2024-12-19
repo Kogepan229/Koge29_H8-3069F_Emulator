@@ -65,7 +65,6 @@ impl Cpu {
                 // Print strings
                 print!("{}", print_string);
                 // println!("[program] [__write] [fd: {}] {}", arg0, print_string);
-                // socket::send_message(&format!("stdout:{}", print_string));
                 self.send_stdout_message(&print_string)?;
             }
             _ => bail!("unsupported mes2 command id:{}", id),

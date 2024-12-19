@@ -3,7 +3,7 @@ mod cpu;
 mod elf;
 mod memory;
 mod modules;
-mod new_socket;
+// mod new_socket;
 mod registers;
 mod setting;
 mod socket;
@@ -59,7 +59,6 @@ async fn main() {
 
     #[cfg(not(test))]
     if args.socket {
-        // socket::listen(format!("127.0.0.1:{}", args.port)).await.unwrap();
         cpu.connect_socket(&format!("127.0.0.1:{}", args.port)).unwrap();
     }
 

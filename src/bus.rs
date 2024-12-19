@@ -7,7 +7,6 @@ use std::{
 use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
     modules::ModuleManager,
-    new_socket::Socket,
     registers::DRCRA, // socket::send_addr_value_u8,
 };
 use anyhow::{bail, Result};
@@ -93,11 +92,7 @@ impl Bus {
                 if addr >= 0xfee000 && addr <= 0xfee00a {
                     let previous = self.read(addr)?;
                     if value != previous {
-                        // send_addr_value_u8(addr, value);
                         self.send_addr_value_u8(addr, value)?;
-                        // if let Some(socket) = &self.socket {
-                        // socket.borrow_mut().send_addr_value_u8(addr, value)?;
-                        // }
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
@@ -111,9 +106,6 @@ impl Bus {
                     let previous = self.read(addr)?;
                     if value != previous {
                         self.send_addr_value_u8(addr, value)?;
-                        // if let Some(socket) = &self.socket {
-                        // socket.borrow_mut().send_addr_value_u8(addr, value)?;
-                        // }
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);

@@ -1,135 +1,67 @@
-// use anyhow::Result;
-// use std::sync::{Mutex, OnceLock};
-// use tokio::{
-//     io,
-//     net::{
-//         tcp::{OwnedReadHalf, OwnedWriteHalf},
-//         TcpListener,
-//     },
-//     sync::mpsc::{self, Receiver, Sender},
-// };
+use anyhow::Result;
+use std::{
+    io::{BufRead, BufReader, BufWriter, Write},
+    net::{TcpListener, TcpStream},
+    sync::mpsc::{self, Receiver, Sender},
+    thread,
+};
 
-// use crate::setting;
+pub struct Socket {
+    message_tx: Sender<String>,
+    message_rx: Receiver<String>,
+}
 
-// static READ_BUF: OnceLock<Mutex<Vec<String>>> = OnceLock::new();
-// static MESSAGE_SENDER: OnceLock<Sender<String>> = OnceLock::new();
+impl Socket {
+    pub fn connect(addr: &String) -> Result<Self> {
+        let listener = TcpListener::bind(addr)?;
+        let (stream, _) = listener.accept()?;
+        let reader = BufReader::new(stream.try_clone()?);
+        let writer = BufWriter::new(stream);
 
-// pub async fn listen(addr: String) -> Result<()> {
-//     let listener = TcpListener::bind(addr).await.unwrap();
+        let (send_tx, send_rx) = mpsc::channel();
+        let (receive_tx, receive_rx) = mpsc::channel();
 
-//     let (stream, _) = listener.accept().await.unwrap();
-//     let (socket_reader, socket_writer) = stream.into_split();
+        Self::start_send_worker(writer, send_rx);
+        Self::start_receive_worker(reader, receive_tx);
+        Ok(Self {
+            message_tx: send_tx,
+            message_rx: receive_rx,
+        })
+    }
 
-//     READ_BUF.set(Mutex::new(Vec::<String>::new())).unwrap();
-//     start_receive_worker(socket_reader);
+    pub fn clonse_message_tx(&self) -> Sender<String> {
+        self.message_tx.clone()
+    }
 
-//     let (tx, rx) = mpsc::channel(32);
-//     MESSAGE_SENDER.set(tx).unwrap();
-//     start_send_workder(rx, socket_writer);
-//     Ok(())
-// }
+    fn start_send_worker(mut writer: BufWriter<TcpStream>, message_rx: Receiver<String>) {
+        thread::spawn(move || {
+            while let Ok(message) = message_rx.recv() {
+                let _msg = message.replace('\\', "\\\\").replace('\n', "\\n") + "\n";
+                writer.write_all(_msg.as_bytes()).unwrap();
+                writer.flush().unwrap();
+            }
+        });
+    }
 
-// fn start_receive_worker(socket_reader: OwnedReadHalf) {
-//     tokio::spawn(async move {
-//         let mut message: Vec<u8> = Vec::new();
-//         loop {
-//             let mut received = vec![0; 1024];
-//             socket_reader.readable().await.unwrap();
-//             match socket_reader.try_read(&mut received) {
-//                 Ok(n) => {
-//                     if n == 0 {
-//                         break;
-//                     }
-//                     received.truncate(n);
-//                     match READ_BUF.get() {
-//                         Some(b) => {
-//                             for ch in received {
-//                                 if ch == b'\n' {
-//                                     b.lock()
-//                                         .unwrap()
-//                                         .push(String::from_utf8(message.clone()).unwrap().trim().to_string());
-//                                     message.clear();
-//                                 } else {
-//                                     message.push(ch);
-//                                 }
-//                             }
-//                         }
-//                         None => return,
-//                     }
-//                 }
-//                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-//                     continue;
-//                 }
-//                 Err(e) => {
-//                     println!("{}", e.to_string());
-//                     return;
-//                 }
-//             }
-//         }
-//     });
-// }
+    fn start_receive_worker(mut reader: BufReader<TcpStream>, message_tx: Sender<String>) {
+        thread::spawn(move || {
+            let mut message = String::new();
+            loop {
+                if reader.read_line(&mut message).unwrap() == 0 {
+                    break;
+                }
+                message_tx.send(message.replace('\n', "")).unwrap();
+                message.clear();
+            }
+        });
+    }
 
-// fn start_send_workder(mut rx: Receiver<String>, socket_writer: OwnedWriteHalf) {
-//     tokio::spawn(async move {
-//         while let Some(message) = rx.recv().await {
-//             let _msg = message.replace('\\', "\\\\").replace('\n', "\\n") + "\n";
-//             let str_bytes = _msg.as_bytes();
-//             let mut written_bytes = 0;
-//             loop {
-//                 socket_writer.writable().await.unwrap();
-//                 match socket_writer.try_write(str_bytes) {
-//                     Ok(n) => {
-//                         written_bytes += n;
-//                     }
-//                     Err(_) => {}
-//                 }
-//                 if written_bytes == str_bytes.len() {
-//                     break;
-//                 }
-//             }
-//         }
-//     });
-// }
+    pub fn pop_messages(&self) -> Result<Vec<String>> {
+        Ok(self.message_rx.try_iter().collect())
+    }
 
-// pub fn get_received_msgs() -> Option<Vec<String>> {
-//     match READ_BUF.get() {
-//         Some(b) => {
-//             let mut v = b.lock().unwrap();
-//             let r = Some(v.clone());
-//             v.clear();
-//             return r;
-//         }
-//         None => return None,
-//     }
-// }
-
-// pub fn send_message(str: &str) {
-//     if let Some(v) = MESSAGE_SENDER.get() {
-//         let _str = str.to_string();
-//         tokio::spawn(async move {
-//             v.send(_str).await.unwrap();
-//         });
-//     }
-//     if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
-//         println!("msg: {}", str);
-//     }
-// }
-
-// // pub fn send_one_sec_message() {
-// //     send_message("1sec");
-// // }
-
-// // pub fn send_addr_value_u8(addr: u32, value: u8) {
-// //     let str = format!("u8:{:x}:{:x}", addr, value);
-// //     send_message(&str);
-// // }
-
-// // pub fn send_addr_value_u16(addr: u32, value: u16) {
-// //     let str = format!("u16:{:x}:{:x}", addr, value);
-// //     send_message(&str);
-// // }
-
-// // pub fn send_addr_value_u32(addr: u32, value: u32) {
-// //     let str = format!("u32:{:x}:{:x}", addr, value);
-// //     send_message(&str);
-// // }
+    pub fn send_message(&self, message: &String) -> Result<()> {
+        self.message_tx.send(message.clone())?;
+        Ok(())
+    }
+}

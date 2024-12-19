@@ -4,6 +4,7 @@ use super::Cpu;
 use anyhow::Result;
 
 impl Cpu {
+    #[cfg(not(test))]
     pub fn parse_u8(&mut self, list: Vec<&str>) -> Result<()> {
         if list.len() != 3 {
             return Ok(());
@@ -23,9 +24,7 @@ impl Cpu {
     pub fn send_message(&mut self, message: &String) -> Result<()> {
         #[cfg(not(test))]
         if let Some(socket) = &self.socket {
-            println!("ready print");
             socket.send_message(message)?;
-            println!("ready print after");
         }
         if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
             println!("msg: {}", message);

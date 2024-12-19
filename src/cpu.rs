@@ -12,7 +12,7 @@ use std::{cell::RefCell, ops::Sub, rc::Rc, time::Duration};
 use std::{ops::Add, time};
 
 #[cfg(not(test))]
-use crate::new_socket::Socket;
+use crate::socket::Socket;
 
 mod addressing_mode;
 mod instruction;
@@ -93,7 +93,6 @@ impl Cpu {
     #[cfg(not(test))]
     pub fn connect_socket(&mut self, addr: &String) -> Result<()> {
         let socket = Socket::connect(addr)?;
-        // let share = Rc::new(RefCell::new(socket));
         self.bus.message_tx = Some(socket.clonse_message_tx());
         self.socket = Some(socket);
 
@@ -112,7 +111,6 @@ impl Cpu {
 
         #[cfg_attr(test, allow(unused_mut))]
         let mut is_paused = if *setting::ENABLE_WAIT_START.read().unwrap() {
-            // socket::send_message("ready");
             self.send_ready_message()?;
             true
         } else {
@@ -128,10 +126,8 @@ impl Cpu {
         loop {
             // Parse socket messages
             #[cfg(not(test))]
-            if let Some(socket) = self.socket.as_mut() {
-                socket.pop_messages()?;
+            if let Some(socket) = &self.socket {
                 for message in socket.pop_messages()? {
-                    println!("message: {}", message);
                     let list: Vec<&str> = message.split(':').collect();
                     match list[0] {
                         "cmd" => {
