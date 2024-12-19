@@ -1,10 +1,9 @@
-use std::{cell::RefCell, rc::Weak};
+use std::{cell::RefCell, rc::Weak, sync::mpsc::Sender};
 
 use crate::{
     memory::{create_memory, Memory, MEMORY_END_ADDR, MEMORY_START_ADDR},
     modules::ModuleManager,
-    registers::DRCRA,
-    socket::send_addr_value_u8,
+    registers::DRCRA, // socket::send_addr_value_u8,
 };
 use anyhow::{bail, Result};
 
@@ -59,6 +58,7 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize = (IO_REGISTERS2_EMC1_END_ADDR - IO_REG
 
 #[derive(Clone)]
 pub struct Bus {
+    pub message_tx: Option<Sender<String>>,
     pub module_manager: Weak<RefCell<ModuleManager>>,
     pub memory: Memory,
     pub exception_handling_vector: Box<[u8]>,
@@ -70,6 +70,7 @@ pub struct Bus {
 impl Bus {
     pub fn new(module_manager: Weak<RefCell<ModuleManager>>) -> Self {
         Bus {
+            message_tx: None,
             module_manager,
             memory: create_memory(),
             exception_handling_vector: vec![0; VENCTOR_SIZE].into_boxed_slice(),
@@ -87,7 +88,7 @@ impl Bus {
                 if addr >= 0xfee000 && addr <= 0xfee00a {
                     let previous = self.read(addr)?;
                     if value != previous {
-                        send_addr_value_u8(addr, value);
+                        self.send_addr_value_u8(addr, value)?;
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
@@ -100,7 +101,7 @@ impl Bus {
                 if addr >= 0xffffd0 && addr <= 0xffffda {
                     let previous = self.read(addr)?;
                     if value != previous {
-                        send_addr_value_u8(addr, value);
+                        self.send_addr_value_u8(addr, value)?;
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
