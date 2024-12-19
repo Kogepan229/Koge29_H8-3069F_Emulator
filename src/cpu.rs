@@ -82,10 +82,11 @@ impl Cpu {
         }
     }
 
-    pub async fn run(&mut self) -> Result<()> {
+    pub fn run(&mut self) -> Result<()> {
         let mut state_sum: usize = 0;
         let exec_time = time::Instant::now();
 
+        let sleeper = spin_sleep::SpinSleeper::default();
         let mut loop_time = time::Instant::now();
         let mut count_1msec: usize = 0;
         let mut one_sec_count: usize = 0;
@@ -177,14 +178,14 @@ impl Cpu {
             if count_1msec >= 20000 {
                 let sleep_time_loop = Duration::from_secs_f64(count_1msec as f64 / CPU_CLOCK as f64).saturating_sub(loop_time.elapsed());
                 count_1msec = 0;
-                loop_time = time::Instant::now();
 
                 sleep_time = sleep_time.add(sleep_time_loop);
                 if sleep_time.as_millis() > 1 {
                     let sleep_duration = time::Duration::from_millis(sleep_time.as_millis() as u64);
                     sleep_time = sleep_time.sub(sleep_duration);
-                    spin_sleep_tokio::sleep(sleep_duration).await;
+                    sleeper.sleep(sleep_duration);
                 }
+                loop_time = time::Instant::now();
             }
 
             if one_sec_count >= CPU_CLOCK {

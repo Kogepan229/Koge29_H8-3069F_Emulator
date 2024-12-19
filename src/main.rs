@@ -62,7 +62,7 @@ async fn main() {
 
     elf::load(args.elf, &mut cpu, args.args);
 
-    cpu.run().await.unwrap();
+    cpu.run().unwrap();
 }
 
 fn _init_logger(level: &str) {
