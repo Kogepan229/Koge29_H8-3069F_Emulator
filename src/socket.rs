@@ -2,7 +2,7 @@
 use anyhow::Result;
 #[cfg(not(test))]
 use std::{
-    io::{BufRead, BufReader, BufWriter, Write},
+    io::{BufRead, BufReader, BufWriter, ErrorKind, Write},
     net::{TcpListener, TcpStream},
     sync::mpsc::{self, Receiver, Sender},
     thread,
@@ -44,6 +44,7 @@ impl Socket {
                 writer.write_all(_msg.as_bytes()).unwrap();
                 writer.flush().unwrap();
             }
+            writer.get_mut().shutdown(std::net::Shutdown::Both).unwrap();
         });
     }
 
@@ -51,8 +52,18 @@ impl Socket {
         thread::spawn(move || {
             let mut message = String::new();
             loop {
-                if reader.read_line(&mut message).unwrap() == 0 {
-                    break;
+                match reader.read_line(&mut message) {
+                    Ok(n) => {
+                        if n == 0 {
+                            break;
+                        }
+                    }
+                    Err(e) => {
+                        if e.kind() != ErrorKind::ConnectionAborted {
+                            eprintln!("{}", e);
+                        }
+                        break;
+                    }
                 }
                 message_tx.send(message.replace('\n', "")).unwrap();
                 message.clear();
