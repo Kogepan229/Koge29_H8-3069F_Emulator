@@ -56,6 +56,8 @@ pub const IO_REGISTERS2_EMC1_SIZE: usize = (IO_REGISTERS2_EMC1_END_ADDR - IO_REG
 // pub const IO_REGISTERIES2_EMC0_END_ADDR: u32 = 0xffffff;
 // pub const IO_REGISTERIES2_EMC0_SIZE: usize = (MEMORY_END_ADDR - MEMORY_START_ADDR + 1) as usize;
 
+pub const IO_PORT_SIZE: usize = 11;
+
 #[derive(Clone)]
 pub struct Bus {
     pub message_tx: Option<Sender<String>>,
@@ -65,6 +67,7 @@ pub struct Bus {
     pub dram: Box<[u8]>,
     pub io_registrs1: Box<[u8]>,
     pub io_registrs2: Box<[u8]>,
+    pub io_port_in: [u8; IO_PORT_SIZE],
 }
 
 impl Bus {
@@ -77,6 +80,7 @@ impl Bus {
             dram: vec![0; AREA2_SIZE].into_boxed_slice(),
             io_registrs1: vec![0; IO_REGISTERS1_SIZE].into_boxed_slice(),
             io_registrs2: vec![0; IO_REGISTERS2_EMC1_SIZE].into_boxed_slice(),
+            io_port_in: [0; IO_PORT_SIZE],
         }
     }
 
@@ -84,6 +88,7 @@ impl Bus {
         match addr {
             VENCTOR_START_ADDR..=VENCTOR_END_ADDR => self.exception_handling_vector[addr as usize] = value,
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
+                self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value;
                 // Send I/O Port DDR value if changed
                 if addr >= 0xfee000 && addr <= 0xfee00a {
                     let previous = self.read(addr)?;
@@ -92,11 +97,11 @@ impl Bus {
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
-                self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value
             }
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
+                self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value;
                 // Send I/O Port DR value if changed
                 if addr >= 0xffffd0 && addr <= 0xffffda {
                     let previous = self.read(addr)?;
@@ -105,7 +110,6 @@ impl Bus {
                     }
                 }
                 (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
-                self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value
             }
             _ => bail!("Invalid address [0x{:x}]", addr),
         }
