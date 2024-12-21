@@ -1,4 +1,5 @@
 use crate::bus::{Bus, IO_REGISTERS1_START_ADDR, IO_REGISTERS2_EMC1_START_ADDR};
+use anyhow::Result;
 
 pub const IO_PORT_1_DDR_ADDR: u32 = 0xfee000;
 pub const IO_PORT_1_DR_ADDR: u32 = 0xffffd0;
@@ -19,18 +20,16 @@ impl Bus {
         self.io_registrs2[index]
     }
 
-    pub fn write_port(&mut self, port_str: String, value: u8) {
-        if let Ok(port) = u8::from_str_radix(&port_str, 16) {
-            if port >= 1 && port <= 0xb {
-                self.io_port_in[port as usize - 1] = value;
-                let ddr = self.read_ddr(port);
-                let dr = (self.read_dr(port) & ddr) | (!ddr & value);
-                self.write_dr(port, dr);
-            }
+    pub fn write_port(&mut self, port: u8, value: u8) {
+        if port >= 1 && port <= 0xb {
+            self.io_port_in[port as usize - 1] = value;
+            let ddr = self.read_ddr(port);
+            let dr = (self.read_dr(port) & ddr) | (!ddr & value);
+            self.write_dr(port, dr);
         }
     }
 
-    pub fn on_write_ddr(&mut self, addr: u32, ddr: u8) {
+    pub fn on_write_ddr(&mut self, addr: u32, ddr: u8) -> Result<()> {
         let port = (addr - IO_PORT_1_DDR_ADDR) as u8 + 1;
         // Input
         let dr = (self.read_dr(port) & ddr) | (!ddr & self.io_port_in[port as usize - 1]);
@@ -38,10 +37,11 @@ impl Bus {
 
         // Output
         let io_port_out = self.read_dr(port) & ddr;
-        // TODO: send
+        self.send_io_port_value(port, io_port_out)?;
+        Ok(())
     }
 
-    pub fn on_write_dr(&mut self, addr: u32, dr: u8) {
+    pub fn on_write_dr(&mut self, addr: u32, dr: u8) -> Result<()> {
         let port = (addr - IO_PORT_1_DR_ADDR) as u8 + 1;
         let ddr = self.read_ddr(port);
         // Input
@@ -50,6 +50,7 @@ impl Bus {
 
         // Output
         let io_port_out = self.read_dr(dr) & ddr;
-        // TODO: send
+        self.send_io_port_value(port, io_port_out)?;
+        Ok(())
     }
 }

@@ -147,6 +147,7 @@ impl Cpu {
                             }
                         }
                         "u8" => self.parse_u8(list)?,
+                        "ioport" => self.parse_ioport(list),
                         _ => (),
                     }
                 }

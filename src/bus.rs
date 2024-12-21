@@ -88,28 +88,30 @@ impl Bus {
         match addr {
             VENCTOR_START_ADDR..=VENCTOR_END_ADDR => self.exception_handling_vector[addr as usize] = value,
             IO_REGISTERS1_START_ADDR..=IO_REGISTERS1_END_ADDR => {
-                self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value;
-                // Send I/O Port DDR value if changed
+                // I/O Port DDR value if changed
                 if addr >= 0xfee000 && addr <= 0xfee00a {
-                    let previous = self.read(addr)?;
+                    let previous = self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize];
                     if value != previous {
-                        self.send_addr_value_u8(addr, value)?;
+                        self.on_write_ddr(addr, value)?;
                     }
+                } else {
+                    self.io_registrs1[(addr - IO_REGISTERS1_START_ADDR) as usize] = value;
+                    (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
                 }
-                (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
             }
             AREA2_START_ADDR..=AREA2_END_ADDR => self.dram[(addr - AREA2_START_ADDR) as usize] = value,
             MEMORY_START_ADDR..=MEMORY_END_ADDR => self.memory[(addr - MEMORY_START_ADDR) as usize] = value,
             IO_REGISTERS2_EMC1_START_ADDR..=IO_REGISTERS2_EMC1_END_ADDR => {
-                self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value;
-                // Send I/O Port DR value if changed
+                // Port DR value if changed
                 if addr >= 0xffffd0 && addr <= 0xffffda {
-                    let previous = self.read(addr)?;
+                    let previous = self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize];
                     if value != previous {
-                        self.send_addr_value_u8(addr, value)?;
+                        self.on_write_dr(addr, value)?;
                     }
+                } else {
+                    self.io_registrs2[(addr - IO_REGISTERS2_EMC1_START_ADDR) as usize] = value;
+                    (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
                 }
-                (*self.module_manager.upgrade().unwrap()).borrow_mut().write_registers(addr, value);
             }
             _ => bail!("Invalid address [0x{:x}]", addr),
         }
