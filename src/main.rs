@@ -1,11 +1,11 @@
 mod bus;
 mod cpu;
 mod elf;
+mod ioport;
 mod memory;
 mod modules;
 mod registers;
 mod setting;
-
 mod socket;
 
 use clap::Parser;

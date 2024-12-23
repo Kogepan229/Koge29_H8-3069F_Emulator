@@ -21,6 +21,20 @@ impl Cpu {
         Ok(())
     }
 
+    #[cfg(not(test))]
+    pub fn parse_ioport(&mut self, list: Vec<&str>) {
+        if list.len() != 3 {
+            return;
+        }
+        let port_result = u8::from_str_radix(&list[1], 16);
+        let value_result = u8::from_str_radix(&list[2], 16);
+        if let Ok(port) = port_result {
+            if let Ok(value) = value_result {
+                self.bus.write_port(port, value);
+            }
+        }
+    }
+
     pub fn send_message(&mut self, message: &String) -> Result<()> {
         #[cfg(not(test))]
         if let Some(socket) = &self.socket {
@@ -56,6 +70,12 @@ impl Bus {
         if *setting::ENABLE_PRINT_MESSAGES.read().unwrap() {
             println!("msg: {}", message);
         }
+        Ok(())
+    }
+
+    pub fn send_io_port_value(&mut self, port: u8, value: u8) -> Result<()> {
+        let str = format!("ioport:{:x}:{:x}", port, value);
+        self.send_message(&str)?;
         Ok(())
     }
 
