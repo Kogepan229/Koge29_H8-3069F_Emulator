@@ -3,7 +3,6 @@ use timer8::{Timer8_0, TCR0_8};
 
 use crate::{bus::Bus, cpu::interrupt_controller::InterruptController};
 
-mod ioport;
 mod timer8;
 
 struct Modules {
