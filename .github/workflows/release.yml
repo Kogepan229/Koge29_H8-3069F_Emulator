@@ -27,7 +27,7 @@ jobs:
 
   build-windows:
     needs: check-version
-    if: ${{needs.check-version.outputs.is_new_version}} == true
+    if: ${{needs.check-version.outputs.is_new_version == 'true'}}
     runs-on: windows-latest
     env:
       ARTIFACT_NAME: koge29_h8-3069f_emulator-x86_64-pc-windows-msvc-${{needs.check-version.outputs.current_version}}.zip
@@ -58,7 +58,7 @@ jobs:
 
   build-linux-musl:
     needs: check-version
-    if: ${{needs.check-version.outputs.is_new_version}} == true
+    if: ${{needs.check-version.outputs.is_new_version == 'true'}}
     runs-on: ubuntu-latest
     env:
       ARTIFACT_NAME: koge29_h8-3069f_emulator-x86_64-unknown-linux-musl-${{needs.check-version.outputs.current_version}}.zip
@@ -92,7 +92,7 @@ jobs:
 
   build-linux-gnu:
     needs: check-version
-    if: ${{needs.check-version.outputs.is_new_version}} == true
+    if: ${{needs.check-version.outputs.is_new_version == 'true'}}
     runs-on: ubuntu-latest
     env:
       ARTIFACT_NAME: koge29_h8-3069f_emulator-x86_64-unknown-linux-gnu-${{needs.check-version.outputs.current_version}}.zip
