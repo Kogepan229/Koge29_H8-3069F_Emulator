@@ -1,6 +1,6 @@
 [package]
 name = "koge29_h8-3069f_emulator"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 
 [dependencies]
