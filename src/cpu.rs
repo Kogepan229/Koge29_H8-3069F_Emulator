@@ -165,14 +165,21 @@ impl Cpu {
             }
 
             let opcode = self.fetch();
-            let state = self.exec(opcode).with_context(|| {
-                format!(
-                    "[pc: {:0>8x}({:0>8x})] opcode1 [{:0>4x}]",
-                    self.pc - 2,
-                    self.pc - 2 - PROGRAM_START_ADDR as u32,
-                    opcode
-                )
-            })? * 3; // Temporary speed adjustment
+
+            let state = match self.exec(opcode) {
+                Ok(state) => state * 3, // Temporary speed adjustment
+                Err(e) => {
+                    log::error!(
+                        "An error occurred when executing the opcode. [pc: {:0>8x}({:0>8x})] [opcode1: {:0>4x}]",
+                        self.pc - 2,
+                        self.pc - 2 - PROGRAM_START_ADDR as u32,
+                        opcode
+                    );
+                    self.print_er();
+                    return Err(e);
+                }
+            };
+
             state_sum += state as usize;
             count_1msec += state as usize;
             one_sec_count += state as usize;
