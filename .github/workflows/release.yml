@@ -50,7 +50,7 @@ jobs:
           powershell Compress-Archive -Path target/x86_64-pc-windows-msvc/release/koge29_h8-3069f_emulator.exe -DestinationPath ${{env.ARTIFACT_NAME}}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{env.ARTIFACT_NAME}}
           path: ./${{env.ARTIFACT_NAME}}
@@ -84,7 +84,7 @@ jobs:
           zip --junk-paths ${{env.ARTIFACT_NAME}} target/x86_64-unknown-linux-musl/release/koge29_h8-3069f_emulator
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{env.ARTIFACT_NAME}}
           path: ./${{env.ARTIFACT_NAME}}
@@ -115,7 +115,7 @@ jobs:
           zip --junk-paths ${{env.ARTIFACT_NAME}} target/x86_64-unknown-linux-gnu/release/koge29_h8-3069f_emulator
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{env.ARTIFACT_NAME}}
           path: ./${{env.ARTIFACT_NAME}}
@@ -126,7 +126,7 @@ jobs:
     needs: [check-version, build-windows, build-linux-musl, build-linux-gnu]
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./artifacts
 
