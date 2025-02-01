@@ -25,16 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use nom::{combinator::map, multi::count, number::complete::be_u32, IResult};
+use nom::{combinator::map, multi::count, number::complete::be_u32, IResult, Parser};
 
 use crate::elf::program_header::{ProgramHeader32, SegmentType};
 
 pub fn parse_program_header_table32<'a>(entries: usize) -> impl Fn(&'a [u8]) -> IResult<&'a [u8], Vec<ProgramHeader32>> {
-    move |raw: &'a [u8]| count(parse_program_header32, entries)(raw)
+    move |raw: &'a [u8]| count(parse_program_header32, entries).parse(raw)
 }
 
 fn parse_segment_type(raw: &[u8]) -> IResult<&[u8], SegmentType> {
-    map(be_u32, |v| SegmentType::from(v))(raw)
+    map(be_u32, |v| SegmentType::from(v)).parse(raw)
 }
 
 fn parse_program_header32(raw: &[u8]) -> IResult<&[u8], ProgramHeader32> {

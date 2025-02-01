@@ -27,8 +27,8 @@ SOFTWARE.
 
 use nom::multi::count;
 use nom::number::complete::{be_u16, be_u32};
-use nom::IResult;
 use nom::{bytes::complete::tag, combinator::map, number::complete::u8 as read_u8};
+use nom::{IResult, Parser};
 
 use crate::elf::header::{ElfClass, ElfData, ElfHeader32, ElfIdentification, ElfOsAbi, ElfVersion, ELF_MAGIC_SIGNATURE};
 
@@ -75,19 +75,19 @@ fn parse_elf_magic_number(raw: &[u8]) -> IResult<&[u8], &[u8]> {
 }
 
 fn parse_elf_class(raw: &[u8]) -> IResult<&[u8], ElfClass> {
-    map(read_u8, |byte: u8| ElfClass::from(byte))(raw)
+    map(read_u8, |byte: u8| ElfClass::from(byte)).parse(raw)
 }
 
 fn parse_elf_data(raw: &[u8]) -> IResult<&[u8], ElfData> {
-    map(read_u8, |byte: u8| ElfData::from(byte))(raw)
+    map(read_u8, |byte: u8| ElfData::from(byte)).parse(raw)
 }
 
 fn parse_elf_version(raw: &[u8]) -> IResult<&[u8], ElfVersion> {
-    map(read_u8, |byte: u8| ElfVersion::from(byte))(raw)
+    map(read_u8, |byte: u8| ElfVersion::from(byte)).parse(raw)
 }
 
 fn parse_elf_osabi(raw: &[u8]) -> IResult<&[u8], ElfOsAbi> {
-    map(read_u8, |byte: u8| ElfOsAbi::from(byte))(raw)
+    map(read_u8, |byte: u8| ElfOsAbi::from(byte)).parse(raw)
 }
 
 fn parse_elf_abi_version(raw: &[u8]) -> IResult<&[u8], u8> {
@@ -101,7 +101,7 @@ fn parse_elf_identification(raw: &[u8]) -> IResult<&[u8], ElfIdentification> {
     let (r, version) = parse_elf_version(r)?;
     let (r, osabi) = parse_elf_osabi(r)?;
     let (r, abi_version) = parse_elf_abi_version(r)?;
-    let (r, _padding) = count(read_u8, 7)(r)?;
+    let (r, _padding) = count(read_u8, 7).parse(r)?;
 
     Ok((
         r,

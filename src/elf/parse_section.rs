@@ -25,16 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use nom::{combinator::map, multi::count, number::complete::be_u32, IResult};
+use nom::{combinator::map, multi::count, number::complete::be_u32, IResult, Parser};
 
 use crate::elf::section::{SectionHeader32, SectionType};
 
 pub fn parse_section_header_table32<'a>(entries: usize) -> impl Fn(&'a [u8]) -> IResult<&'a [u8], Vec<SectionHeader32>> {
-    move |raw: &'a [u8]| count(parse_section_header32, entries)(raw)
+    move |raw: &'a [u8]| count(parse_section_header32, entries).parse(raw)
 }
 
 fn parse_section_type(raw: &[u8]) -> IResult<&[u8], SectionType> {
-    map(be_u32, |v| SectionType::from(v))(raw)
+    map(be_u32, |v| SectionType::from(v)).parse(raw)
 }
 
 fn parse_section_header32(raw: &[u8]) -> IResult<&[u8], SectionHeader32> {
