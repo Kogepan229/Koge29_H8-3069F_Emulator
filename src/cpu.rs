@@ -6,7 +6,7 @@ use crate::{
     registers::{ABWCR, ASTCR, DRCRA, WCRH, WCRL},
     setting,
 };
-use anyhow::{bail, Context as _, Result};
+use anyhow::{bail, Result};
 use interrupt_controller::InterruptController;
 use std::{cell::RefCell, ops::Sub, rc::Rc, time::Duration};
 use std::{ops::Add, time};
