@@ -62,6 +62,7 @@ pub const IO_PORT_SIZE: usize = 11;
 pub struct Bus {
     pub message_tx: Option<Sender<String>>,
     pub module_manager: Weak<RefCell<ModuleManager>>,
+    pub cpu_state_sum: usize,
     pub memory: Memory,
     pub exception_handling_vector: Box<[u8]>,
     pub dram: Box<[u8]>,
@@ -75,6 +76,7 @@ impl Bus {
         Bus {
             message_tx: None,
             module_manager,
+            cpu_state_sum: 0,
             memory: create_memory(),
             exception_handling_vector: vec![0; VENCTOR_SIZE].into_boxed_slice(),
             dram: vec![0; AREA2_SIZE].into_boxed_slice(),

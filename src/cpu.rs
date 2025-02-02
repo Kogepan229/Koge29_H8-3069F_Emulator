@@ -37,6 +37,7 @@ pub struct Cpu {
     interrupt_controller: InterruptController,
     pub exit_addr: u32, // address of ___exit
     module_manager: Rc<RefCell<ModuleManager>>,
+    state_sum: usize,
 }
 
 #[allow(dead_code)]
@@ -86,6 +87,7 @@ impl Cpu {
             interrupt_controller: InterruptController::new(),
             exit_addr: 0,
             module_manager: module_manager.clone(),
+            state_sum: 0,
         }
     }
 
@@ -99,7 +101,6 @@ impl Cpu {
     }
 
     pub fn run(&mut self) -> Result<()> {
-        let mut state_sum: usize = 0;
         let exec_time = time::Instant::now();
 
         let sleeper = spin_sleep::SpinSleeper::default();
@@ -180,7 +181,8 @@ impl Cpu {
                 }
             };
 
-            state_sum += state as usize;
+            self.state_sum += state as usize;
+            self.bus.cpu_state_sum = self.state_sum;
             count_1msec += state as usize;
             one_sec_count += state as usize;
 
@@ -195,7 +197,7 @@ impl Cpu {
             if self.pc == self.exit_addr {
                 log::info!("Finished program");
                 log::info!("Exit Code: {}", self.er[0]);
-                log::info!("state: {}, time: {}sec", state_sum, exec_time.elapsed().as_secs_f64());
+                log::info!("state: {}, time: {}sec", self.state_sum, exec_time.elapsed().as_secs_f64());
                 self.print_er();
                 return Ok(());
             }

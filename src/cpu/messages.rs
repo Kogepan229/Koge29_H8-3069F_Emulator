@@ -52,7 +52,7 @@ impl Cpu {
     }
 
     pub fn send_one_sec_message(&mut self) -> Result<()> {
-        self.send_message(&"1sec".to_string())?;
+        self.send_message(&format!("1sec:{}", self.state_sum))?;
         Ok(())
     }
 
@@ -74,7 +74,7 @@ impl Bus {
     }
 
     pub fn send_io_port_value(&mut self, port: u8, value: u8) -> Result<()> {
-        let str = format!("ioport:{:x}:{:x}", port, value);
+        let str = format!("ioport:{:x}:{:x}:{}", port, value, self.cpu_state_sum);
         self.send_message(&str)?;
         Ok(())
     }
