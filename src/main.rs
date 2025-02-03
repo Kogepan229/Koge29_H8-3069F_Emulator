@@ -26,7 +26,7 @@ struct Args {
     args: String,
 
     /// log level (error, warn, info, debug, trace, off)
-    #[arg(short = 'l', long, default_value = "info")]
+    #[arg(long, default_value = "info")]
     log: String,
 
     /// Print executed opcode
@@ -42,6 +42,10 @@ struct Args {
     /// Wait for a start message from the socket
     #[arg(short = 'w', long)]
     wait_start: bool,
+
+    /// The address the socket listens on
+    #[arg(short = 'l', long, default_value = "127.0.0.1")]
+    listen_address: String,
 
     #[arg(short, long, default_value = "12345")]
     port: u16,
@@ -60,7 +64,7 @@ fn main() {
 
     #[cfg(not(test))]
     if args.socket {
-        cpu.connect_socket(&format!("127.0.0.1:{}", args.port)).unwrap();
+        cpu.connect_socket(&format!("{}:{}", args.listen_address, args.port)).unwrap();
     }
 
     elf::load(args.elf, &mut cpu, args.args);
