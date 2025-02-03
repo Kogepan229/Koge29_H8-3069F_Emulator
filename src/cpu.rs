@@ -24,6 +24,7 @@ mod testhelper;
 
 const CPU_CLOCK: usize = 20_000_000;
 pub const ADDRESS_MASK: u32 = 0x00ffffff;
+const SYNC_MESSAGE_INTERVAL: usize = CPU_CLOCK / 10;
 
 #[cfg_attr(test, derive(Clone))]
 pub struct Cpu {
@@ -106,7 +107,7 @@ impl Cpu {
         let sleeper = spin_sleep::SpinSleeper::default();
         let mut loop_time = time::Instant::now();
         let mut count_1msec: usize = 0;
-        let mut one_sec_count: usize = 0;
+        let mut sync_count: usize = 0;
         let mut sleep_time = time::Duration::ZERO;
 
         #[cfg_attr(test, allow(unused_mut))]
@@ -184,7 +185,12 @@ impl Cpu {
             self.state_sum += state as usize;
             self.bus.cpu_state_sum = self.state_sum;
             count_1msec += state as usize;
-            one_sec_count += state as usize;
+            sync_count += state as usize;
+
+            if sync_count >= SYNC_MESSAGE_INTERVAL {
+                self.send_sync_message()?;
+                sync_count -= SYNC_MESSAGE_INTERVAL;
+            }
 
             self.module_manager
                 .borrow_mut()
@@ -214,11 +220,6 @@ impl Cpu {
                     sleeper.sleep(sleep_duration);
                 }
                 loop_time = time::Instant::now();
-            }
-
-            if one_sec_count >= CPU_CLOCK {
-                self.send_one_sec_message()?;
-                one_sec_count -= CPU_CLOCK;
             }
         }
     }

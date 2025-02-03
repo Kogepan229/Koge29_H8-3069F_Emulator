@@ -51,8 +51,8 @@ impl Cpu {
         Ok(())
     }
 
-    pub fn send_one_sec_message(&mut self) -> Result<()> {
-        self.send_message(&format!("1sec:{}", self.state_sum))?;
+    pub fn send_sync_message(&mut self) -> Result<()> {
+        self.send_message(&format!("sync:{}", self.state_sum))?;
         Ok(())
     }
 
