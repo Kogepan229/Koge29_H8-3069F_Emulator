@@ -1,5 +1,5 @@
 use crate::cpu::{Cpu, StateType, ADDRESS_MASK, CCR};
-use anyhow::{bail, Context as _, Result};
+use anyhow::{bail, Result};
 
 impl Cpu {
     pub(in super::super) fn mov_b(&mut self, opcode: u16) -> Result<u8> {
