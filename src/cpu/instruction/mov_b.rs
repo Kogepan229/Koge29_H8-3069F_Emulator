@@ -16,37 +16,21 @@ impl Cpu {
     }
 
     fn mov_b_proc_pcc(&mut self, src: u8) {
-        if (src as i8) < 0 {
-            self.write_ccr(CCR::N, 1);
-        } else {
-            self.write_ccr(CCR::N, 0);
-        }
-        if src == 0 {
-            self.write_ccr(CCR::Z, 1);
-        } else {
-            self.write_ccr(CCR::Z, 0);
-        }
+        self.change_ccr(CCR::N, (src as i8) < 0);
+        self.change_ccr(CCR::Z, src == 0);
         self.write_ccr(CCR::V, 0);
     }
 
     fn mov_b_rn(&mut self, opcode: u16) -> Result<u8> {
-        let mut f = || -> Result<()> {
-            let value = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 3)?)?;
-            self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
-            self.mov_b_proc_pcc(value);
-            return Ok(());
-        };
-        f().with_context(|| format!("opcode [{:x}]", opcode))?;
+        let value = self.read_rn_b(Cpu::get_nibble_opcode(opcode, 3)?)?;
+        self.write_rn_b(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
+        self.mov_b_proc_pcc(value);
         Ok(self.calc_state(StateType::I, 1)?)
     }
 
     fn mov_b_imm(&mut self, opcode: u16) -> Result<u8> {
-        let mut f = || -> Result<()> {
-            self.write_rn_b(Cpu::get_nibble_opcode(opcode, 2)?, opcode as u8)?;
-            self.mov_b_proc_pcc(opcode as u8);
-            return Ok(());
-        };
-        f().with_context(|| format!("opcode [{:x}]", opcode))?;
+        self.write_rn_b(Cpu::get_nibble_opcode(opcode, 2)?, opcode as u8)?;
+        self.mov_b_proc_pcc(opcode as u8);
         Ok(self.calc_state(StateType::I, 1)?)
     }
 

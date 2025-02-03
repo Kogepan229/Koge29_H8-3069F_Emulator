@@ -1,5 +1,5 @@
 use crate::cpu::{Cpu, StateType, ADDRESS_MASK, CCR};
-use anyhow::{bail, Context as _, Result};
+use anyhow::{bail, Result};
 
 impl Cpu {
     pub(in super::super) fn mov_w(&mut self, opcode: u16) -> Result<u8> {
@@ -19,38 +19,22 @@ impl Cpu {
     }
 
     fn mov_w_proc_pcc(&mut self, src: u16) {
-        if (src as i16) < 0 {
-            self.write_ccr(CCR::N, 1);
-        } else {
-            self.write_ccr(CCR::N, 0);
-        }
-        if src == 0 {
-            self.write_ccr(CCR::Z, 1);
-        } else {
-            self.write_ccr(CCR::Z, 0);
-        }
+        self.change_ccr(CCR::N, (src as i16) < 0);
+        self.change_ccr(CCR::Z, src == 0);
         self.write_ccr(CCR::V, 0);
     }
 
     fn mov_w_rn(&mut self, opcode: u16) -> Result<u8> {
-        let mut f = || -> Result<()> {
-            let value = self.read_rn_w(Cpu::get_nibble_opcode(opcode, 3)?)?;
-            self.write_rn_w(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
-            self.mov_w_proc_pcc(value);
-            Ok(())
-        };
-        f().with_context(|| format!("opcode [{:x}]", opcode))?;
+        let value = self.read_rn_w(Cpu::get_nibble_opcode(opcode, 3)?)?;
+        self.write_rn_w(Cpu::get_nibble_opcode(opcode, 4)?, value)?;
+        self.mov_w_proc_pcc(value);
         Ok(self.calc_state(StateType::I, 1)?)
     }
 
     fn mov_w_imm(&mut self, opcode: u16) -> Result<u8> {
         let imm = self.fetch();
-        let mut f = || -> Result<()> {
-            self.write_rn_w(Cpu::get_nibble_opcode(opcode, 4)?, imm)?;
-            self.mov_w_proc_pcc(imm);
-            return Ok(());
-        };
-        f().with_context(|| format!("opcode [{:x}] imm(opcode2) [{:x}]", opcode, imm))?;
+        self.write_rn_w(Cpu::get_nibble_opcode(opcode, 4)?, imm)?;
+        self.mov_w_proc_pcc(imm);
         Ok(self.calc_state(StateType::I, 2)?)
     }
 
